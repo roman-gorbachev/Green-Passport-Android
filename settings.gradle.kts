@@ -24,17 +24,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "GreenPassport"
 include(":app")
-
-include(":core:model")
-include(":core:common")
-include(":core:designsystem")
-include(":core:navigation")
-include(":core:network")
-include(":core:database")
-include(":core:storage")
-include(":core:auth")
-include(":core:messaging")
-include(":core:datastore")
+include(":core")
 
 listOf(
     "auth",
@@ -48,6 +38,5 @@ listOf(
     "feedback",
     "games",
 ).forEach { feature ->
-    include(":feature:$feature:domain")
-    include(":feature:$feature:presentation")
+    include(":feature:$feature")
 }
