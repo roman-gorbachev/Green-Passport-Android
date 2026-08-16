@@ -1,0 +1,13 @@
+<resources>
+    <string name="profile_level_format">Level %1$d</string>
+    <string name="profile_xp_format">%1$d/%2$d XP</string>
+    <string name="profile_anonymous_label">Guest</string>
+    <string name="profile_notifications_label">Notifications</string>
+    <string name="profile_achievements">Achievements</string>
+    <string name="profile_cards">My cards</string>
+    <string name="profile_history">History</string>
+    <string name="profile_favorites">Favorites</string>
+    <string name="profile_bookmarks">Bookmarks</string>
+    <string name="profile_exchange">Exchange</string>
+    <string name="profile_sign_out">Sign out</string>
+</resources>

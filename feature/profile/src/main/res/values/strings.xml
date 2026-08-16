@@ -1,0 +1,13 @@
+<resources>
+    <string name="profile_level_format">Уровень %1$d</string>
+    <string name="profile_xp_format">%1$d/%2$d опыта</string>
+    <string name="profile_anonymous_label">Гость</string>
+    <string name="profile_notifications_label">Уведомления</string>
+    <string name="profile_achievements">Достижения</string>
+    <string name="profile_cards">Мои карты</string>
+    <string name="profile_history">История</string>
+    <string name="profile_favorites">Избранное</string>
+    <string name="profile_bookmarks">Закладки</string>
+    <string name="profile_exchange">Обмен</string>
+    <string name="profile_sign_out">Выход</string>
+</resources>

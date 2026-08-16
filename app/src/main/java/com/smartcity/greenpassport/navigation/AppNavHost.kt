@@ -6,7 +6,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.foundation.layout.padding
 import com.smartcity.greenpassport.core.navigation.Destination
+import com.smartcity.greenpassport.feature.profile.presentation.ProfileScreen
 import com.smartcity.greenpassport.home.HomeScreen
 import com.smartcity.greenpassport.home.homeMenuLabelRes
 
@@ -30,10 +32,12 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             )
         }
         composable<Destination.Profile> {
-            PlaceholderScreen(
+            FeatureScaffold(
                 title = stringResource(homeMenuLabelRes(Destination.Profile)),
                 onNavigateBack = navController::popBackStack,
-            )
+            ) { innerPadding ->
+                ProfileScreen(modifier = Modifier.padding(innerPadding))
+            }
         }
         composable<Destination.Calendar> {
             PlaceholderScreen(
