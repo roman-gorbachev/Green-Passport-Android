@@ -11,47 +11,17 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/core" />
-            <option value="$PROJECT_DIR$/core/auth" />
-            <option value="$PROJECT_DIR$/core/common" />
-            <option value="$PROJECT_DIR$/core/database" />
-            <option value="$PROJECT_DIR$/core/datastore" />
-            <option value="$PROJECT_DIR$/core/designsystem" />
-            <option value="$PROJECT_DIR$/core/messaging" />
-            <option value="$PROJECT_DIR$/core/model" />
-            <option value="$PROJECT_DIR$/core/navigation" />
-            <option value="$PROJECT_DIR$/core/network" />
-            <option value="$PROJECT_DIR$/core/storage" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/auth" />
-            <option value="$PROJECT_DIR$/feature/auth/domain" />
-            <option value="$PROJECT_DIR$/feature/auth/presentation" />
             <option value="$PROJECT_DIR$/feature/calendar" />
-            <option value="$PROJECT_DIR$/feature/calendar/domain" />
-            <option value="$PROJECT_DIR$/feature/calendar/presentation" />
             <option value="$PROJECT_DIR$/feature/community" />
-            <option value="$PROJECT_DIR$/feature/community/domain" />
-            <option value="$PROJECT_DIR$/feature/community/presentation" />
             <option value="$PROJECT_DIR$/feature/ecotips" />
-            <option value="$PROJECT_DIR$/feature/ecotips/domain" />
-            <option value="$PROJECT_DIR$/feature/ecotips/presentation" />
             <option value="$PROJECT_DIR$/feature/feedback" />
-            <option value="$PROJECT_DIR$/feature/feedback/domain" />
-            <option value="$PROJECT_DIR$/feature/feedback/presentation" />
             <option value="$PROJECT_DIR$/feature/games" />
-            <option value="$PROJECT_DIR$/feature/games/domain" />
-            <option value="$PROJECT_DIR$/feature/games/presentation" />
             <option value="$PROJECT_DIR$/feature/map" />
-            <option value="$PROJECT_DIR$/feature/map/domain" />
-            <option value="$PROJECT_DIR$/feature/map/presentation" />
             <option value="$PROJECT_DIR$/feature/profile" />
-            <option value="$PROJECT_DIR$/feature/profile/domain" />
-            <option value="$PROJECT_DIR$/feature/profile/presentation" />
             <option value="$PROJECT_DIR$/feature/shop" />
-            <option value="$PROJECT_DIR$/feature/shop/domain" />
-            <option value="$PROJECT_DIR$/feature/shop/presentation" />
             <option value="$PROJECT_DIR$/feature/tasks" />
-            <option value="$PROJECT_DIR$/feature/tasks/domain" />
-            <option value="$PROJECT_DIR$/feature/tasks/presentation" />
           </set>
         </option>
       </GradleProjectSettings>
