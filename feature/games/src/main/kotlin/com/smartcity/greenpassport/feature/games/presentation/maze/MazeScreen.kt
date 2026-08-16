@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material3.Button
@@ -88,13 +88,13 @@ fun MazeScreen(
             }
             Row {
                 IconButton(onClick = { viewModel.onMove(MazeDirection.LEFT) }) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = null)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                 }
                 IconButton(onClick = { viewModel.onMove(MazeDirection.DOWN) }) {
                     Icon(Icons.Filled.ArrowDownward, contentDescription = null)
                 }
                 IconButton(onClick = { viewModel.onMove(MazeDirection.RIGHT) }) {
-                    Icon(Icons.Filled.ArrowForward, contentDescription = null)
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
                 }
             }
         }

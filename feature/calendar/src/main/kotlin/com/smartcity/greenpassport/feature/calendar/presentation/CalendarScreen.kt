@@ -20,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
@@ -99,7 +98,7 @@ private fun EventCard(
                         color = MaterialTheme.colorScheme.primary,
                     )
 
-                    isRegistering -> CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                    isRegistering -> CircularProgressIndicator(modifier = Modifier.size(Dimens.IconSizeMedium))
 
                     else -> Button(onClick = onRegister) {
                         Text(stringResource(R.string.calendar_register_button))

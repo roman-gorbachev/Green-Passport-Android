@@ -1,10 +1,33 @@
 rules_version = '2';
 service cloud.firestore {
+  function isOwner(userId) {
+    return request.auth != null && request.auth.uid == userId;
+  }
+
+  function maxSingleAward() {
+    return 100000;
+  }
+
   match /databases/{database}/documents {
     match /apps/greenpassport/users/{userId} {
       allow read: if request.auth != null;
-      allow create, update: if request.auth != null && request.auth.uid == userId;
       allow delete: if false;
+
+      allow create: if isOwner(userId) &&
+        request.resource.data.get('availablePoints', 0) is int &&
+        request.resource.data.get('availablePoints', 0) >= 0 &&
+        request.resource.data.get('availablePoints', 0) <= maxSingleAward() &&
+        request.resource.data.get('lifetimeXp', 0) is int &&
+        request.resource.data.get('lifetimeXp', 0) >= 0 &&
+        request.resource.data.get('lifetimeXp', 0) <= maxSingleAward();
+
+      allow update: if isOwner(userId) &&
+        request.resource.data.get('availablePoints', 0) is int &&
+        request.resource.data.get('availablePoints', 0) >= 0 &&
+        request.resource.data.get('availablePoints', 0) <= resource.data.get('availablePoints', 0) + maxSingleAward() &&
+        request.resource.data.get('lifetimeXp', 0) is int &&
+        request.resource.data.get('lifetimeXp', 0) >= resource.data.get('lifetimeXp', 0) &&
+        request.resource.data.get('lifetimeXp', 0) <= resource.data.get('lifetimeXp', 0) + maxSingleAward();
     }
 
     match /apps/greenpassport/taskProgress/{progressId} {

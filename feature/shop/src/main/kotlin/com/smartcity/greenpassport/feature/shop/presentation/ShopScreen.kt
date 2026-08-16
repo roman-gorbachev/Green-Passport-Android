@@ -20,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
@@ -148,7 +147,7 @@ private fun RewardCard(
             }
 
             if (isPurchasing) {
-                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                CircularProgressIndicator(modifier = Modifier.size(Dimens.IconSizeMedium))
             } else {
                 Button(onClick = onPurchase) {
                     Text(stringResource(R.string.shop_purchase_button))
