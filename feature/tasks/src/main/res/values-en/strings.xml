@@ -1,0 +1,12 @@
+<resources>
+    <string name="tasks_filter_all">All</string>
+    <string name="tasks_category_recycling">Recycling</string>
+    <string name="tasks_category_cleanup">Cleanup</string>
+    <string name="tasks_category_transport">Transport</string>
+    <string name="tasks_category_reusable_items">Reusable items</string>
+    <string name="tasks_category_lecture">Lectures</string>
+    <string name="tasks_empty">No tasks in this category yet</string>
+    <string name="task_detail_reward_format">Reward: %1$d points, %2$d XP</string>
+    <string name="task_detail_complete_button">Complete</string>
+    <string name="task_detail_completed_label">Task completed</string>
+</resources>

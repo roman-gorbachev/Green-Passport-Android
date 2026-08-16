@@ -1,0 +1,12 @@
+<resources>
+    <string name="tasks_filter_all">Все</string>
+    <string name="tasks_category_recycling">Переработка</string>
+    <string name="tasks_category_cleanup">Уборка</string>
+    <string name="tasks_category_transport">Транспорт</string>
+    <string name="tasks_category_reusable_items">Многоразовые вещи</string>
+    <string name="tasks_category_lecture">Лекции</string>
+    <string name="tasks_empty">Пока нет заданий в этой категории</string>
+    <string name="task_detail_reward_format">Награда: %1$d баллов, %2$d опыта</string>
+    <string name="task_detail_complete_button">Выполнить</string>
+    <string name="task_detail_completed_label">Задание выполнено</string>
+</resources>

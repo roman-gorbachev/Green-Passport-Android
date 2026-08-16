@@ -1,0 +1,10 @@
+package com.smartcity.greenpassport.feature.tasks.presentation
+
+import com.smartcity.greenpassport.core.model.Task
+
+data class TaskDetailUiState(
+    val task: Task? = null,
+    val isCompleted: Boolean = false,
+    val isLoading: Boolean = true,
+    val isSubmitting: Boolean = false,
+)

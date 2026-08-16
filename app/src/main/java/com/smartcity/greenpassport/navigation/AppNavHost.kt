@@ -7,8 +7,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.layout.padding
+import com.smartcity.greenpassport.R
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.profile.presentation.ProfileScreen
+import com.smartcity.greenpassport.feature.tasks.presentation.TaskDetailScreen
+import com.smartcity.greenpassport.feature.tasks.presentation.TasksListScreen
 import com.smartcity.greenpassport.home.HomeScreen
 import com.smartcity.greenpassport.home.homeMenuLabelRes
 
@@ -26,10 +29,23 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         }
 
         composable<Destination.Tasks> {
-            PlaceholderScreen(
+            FeatureScaffold(
                 title = stringResource(homeMenuLabelRes(Destination.Tasks)),
                 onNavigateBack = navController::popBackStack,
-            )
+            ) { innerPadding ->
+                TasksListScreen(
+                    onTaskSelected = { taskId -> navController.navigate(Destination.TaskDetail(taskId)) },
+                    modifier = Modifier.padding(innerPadding),
+                )
+            }
+        }
+        composable<Destination.TaskDetail> {
+            FeatureScaffold(
+                title = stringResource(R.string.task_detail_title),
+                onNavigateBack = navController::popBackStack,
+            ) { innerPadding ->
+                TaskDetailScreen(modifier = Modifier.padding(innerPadding))
+            }
         }
         composable<Destination.Profile> {
             FeatureScaffold(
