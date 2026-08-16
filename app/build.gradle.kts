@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -40,6 +42,41 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:model"))
+    implementation(project(":core:common"))
+    implementation(project(":core:designsystem"))
+    implementation(project(":core:navigation"))
+    implementation(project(":core:network"))
+    implementation(project(":core:database"))
+    implementation(project(":core:storage"))
+    implementation(project(":core:auth"))
+    implementation(project(":core:messaging"))
+    implementation(project(":core:datastore"))
+
+    implementation(project(":feature:auth:domain"))
+    implementation(project(":feature:auth:presentation"))
+    implementation(project(":feature:profile:domain"))
+    implementation(project(":feature:profile:presentation"))
+    implementation(project(":feature:tasks:domain"))
+    implementation(project(":feature:tasks:presentation"))
+    implementation(project(":feature:shop:domain"))
+    implementation(project(":feature:shop:presentation"))
+    implementation(project(":feature:calendar:domain"))
+    implementation(project(":feature:calendar:presentation"))
+    implementation(project(":feature:map:domain"))
+    implementation(project(":feature:map:presentation"))
+    implementation(project(":feature:community:domain"))
+    implementation(project(":feature:community:presentation"))
+    implementation(project(":feature:ecotips:domain"))
+    implementation(project(":feature:ecotips:presentation"))
+    implementation(project(":feature:feedback:domain"))
+    implementation(project(":feature:feedback:presentation"))
+    implementation(project(":feature:games:domain"))
+    implementation(project(":feature:games:presentation"))
+
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
