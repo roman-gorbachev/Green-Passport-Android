@@ -18,6 +18,8 @@ object Dimens {
 
     val PointsBadgeSize = 88.dp
 
+    val TopBarHeight = 52.dp
+
     val CornerRadiusMedium = 16.dp
     val CornerRadiusPill = 999.dp
 

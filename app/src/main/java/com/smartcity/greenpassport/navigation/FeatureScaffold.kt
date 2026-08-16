@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.smartcity.greenpassport.R
+import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,6 +36,7 @@ fun FeatureScaffold(
                         )
                     }
                 },
+                expandedHeight = Dimens.TopBarHeight,
             )
         },
         content = { innerPadding -> content(innerPadding) },

@@ -19,3 +19,6 @@ claude/
 keystore.properties
 *.jks
 *.keystore
+scripts/service-account.json
+scripts/node_modules/
+scripts/package-lock.json

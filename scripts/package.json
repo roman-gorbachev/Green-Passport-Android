@@ -1,0 +1,16 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "Fills `apps/greenpassport/{tasks,shopItems,mapPoints,events,ecoTips,surveys}` in Firestore with sample content, matching the exact field names the app's repositories expect (see `core.database.Firestore*Repository`). These are the collections that were empty placeholders — Tasks (10), Shop rewards (6), Map points (5), Calendar events (4), Eco tips (7, one marked as tip of the day), one active survey.",
+  "main": "seed-firestore.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "firebase-admin": "^14.2.0"
+  }
+}
