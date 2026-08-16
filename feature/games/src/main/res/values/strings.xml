@@ -26,4 +26,50 @@
     <string name="sorting_item_cardboard_box">Картонная коробка</string>
     <string name="sorting_item_plastic_bag">Пластиковый пакет</string>
     <string name="sorting_item_plastic_bottle">Пластиковая бутылка</string>
+
+    <string name="maze_score_format">Очки: %1$d</string>
+    <string name="maze_finished_format">Вы прошли лабиринт! Очки: %1$d</string>
+
+    <string name="quiz_score_format">Вопрос %1$d из %2$d · Очки: %3$d</string>
+    <string name="quiz_finished_format">Викторина окончена! Правильных ответов: %1$d из %2$d</string>
+
+    <string name="quiz_question_1">Что из перечисленного НЕ перерабатывается повторно?</string>
+    <string-array name="quiz_options_1">
+        <item>Стеклянная бутылка</item>
+        <item>Алюминиевая банка</item>
+        <item>Использованная жвачка</item>
+        <item>Картон</item>
+    </string-array>
+
+    <string name="quiz_question_2">Что помогает сократить количество отходов?</string>
+    <string-array name="quiz_options_2">
+        <item>Одноразовая посуда</item>
+        <item>Многоразовые сумки для покупок</item>
+        <item>Частая замена техники</item>
+        <item>Лишняя упаковка товаров</item>
+    </string-array>
+
+    <string name="quiz_question_3">Какой газ поглощают деревья, помогая бороться с изменением климата?</string>
+    <string-array name="quiz_options_3">
+        <item>Кислород</item>
+        <item>Углекислый газ</item>
+        <item>Азот</item>
+        <item>Водород</item>
+    </string-array>
+
+    <string name="quiz_question_4">Что из этого — пример возобновляемого источника энергии?</string>
+    <string-array name="quiz_options_4">
+        <item>Уголь</item>
+        <item>Нефть</item>
+        <item>Солнечная энергия</item>
+        <item>Природный газ</item>
+    </string-array>
+
+    <string name="quiz_question_5">Зачем нужна сортировка мусора?</string>
+    <string-array name="quiz_options_5">
+        <item>Чтобы мусора было больше</item>
+        <item>Чтобы упростить переработку</item>
+        <item>Чтобы усложнить вывоз</item>
+        <item>Это не имеет значения</item>
+    </string-array>
 </resources>

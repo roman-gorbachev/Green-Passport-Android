@@ -26,4 +26,50 @@
     <string name="sorting_item_cardboard_box">Cardboard box</string>
     <string name="sorting_item_plastic_bag">Plastic bag</string>
     <string name="sorting_item_plastic_bottle">Plastic bottle</string>
+
+    <string name="maze_score_format">Score: %1$d</string>
+    <string name="maze_finished_format">You made it through the maze! Score: %1$d</string>
+
+    <string name="quiz_score_format">Question %1$d of %2$d · Score: %3$d</string>
+    <string name="quiz_finished_format">Quiz complete! Correct answers: %1$d of %2$d</string>
+
+    <string name="quiz_question_1">Which of these is NOT recyclable?</string>
+    <string-array name="quiz_options_1">
+        <item>Glass bottle</item>
+        <item>Aluminum can</item>
+        <item>Used chewing gum</item>
+        <item>Cardboard</item>
+    </string-array>
+
+    <string name="quiz_question_2">What helps reduce the amount of waste?</string>
+    <string-array name="quiz_options_2">
+        <item>Disposable tableware</item>
+        <item>Reusable shopping bags</item>
+        <item>Frequently replacing devices</item>
+        <item>Excess product packaging</item>
+    </string-array>
+
+    <string name="quiz_question_3">Which gas do trees absorb, helping fight climate change?</string>
+    <string-array name="quiz_options_3">
+        <item>Oxygen</item>
+        <item>Carbon dioxide</item>
+        <item>Nitrogen</item>
+        <item>Hydrogen</item>
+    </string-array>
+
+    <string name="quiz_question_4">Which of these is an example of a renewable energy source?</string>
+    <string-array name="quiz_options_4">
+        <item>Coal</item>
+        <item>Oil</item>
+        <item>Solar energy</item>
+        <item>Natural gas</item>
+    </string-array>
+
+    <string name="quiz_question_5">Why does waste sorting matter?</string>
+    <string-array name="quiz_options_5">
+        <item>To create more waste</item>
+        <item>To make recycling easier</item>
+        <item>To make collection harder</item>
+        <item>It doesn\'t matter</item>
+    </string-array>
 </resources>

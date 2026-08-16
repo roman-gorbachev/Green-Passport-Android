@@ -13,7 +13,9 @@ import com.smartcity.greenpassport.feature.calendar.presentation.CalendarScreen
 import com.smartcity.greenpassport.feature.games.domain.GameId
 import com.smartcity.greenpassport.feature.games.presentation.GamesHubScreen
 import com.smartcity.greenpassport.feature.games.presentation.gameTitleRes
+import com.smartcity.greenpassport.feature.games.presentation.maze.MazeScreen
 import com.smartcity.greenpassport.feature.games.presentation.puzzle.PuzzleScreen
+import com.smartcity.greenpassport.feature.games.presentation.quiz.QuizScreen
 import com.smartcity.greenpassport.feature.games.presentation.sorting.WasteSortingScreen
 import com.smartcity.greenpassport.feature.map.presentation.MapScreen
 import com.smartcity.greenpassport.feature.profile.presentation.ProfileScreen
@@ -127,16 +129,20 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             }
         }
         composable<Destination.EcoMazeGame> {
-            PlaceholderScreen(
+            FeatureScaffold(
                 title = stringResource(gameTitleRes(GameId.ECO_MAZE)),
                 onNavigateBack = navController::popBackStack,
-            )
+            ) { innerPadding ->
+                MazeScreen(modifier = Modifier.padding(innerPadding))
+            }
         }
         composable<Destination.EcoQuizGame> {
-            PlaceholderScreen(
+            FeatureScaffold(
                 title = stringResource(gameTitleRes(GameId.ECO_QUIZ)),
                 onNavigateBack = navController::popBackStack,
-            )
+            ) { innerPadding ->
+                QuizScreen(modifier = Modifier.padding(innerPadding))
+            }
         }
         composable<Destination.Shop> {
             FeatureScaffold(
