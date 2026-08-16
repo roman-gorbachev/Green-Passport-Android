@@ -10,4 +10,23 @@
     <string name="profile_bookmarks">Закладки</string>
     <string name="profile_exchange">Обмен</string>
     <string name="profile_sign_out">Выход</string>
+
+    <string name="achievement_first_task_title">Первый шаг</string>
+    <string name="achievement_first_task_description">Выполните первое задание</string>
+    <string name="achievement_task_master_title">Мастер заданий</string>
+    <string name="achievement_task_master_description">Выполните 5 заданий</string>
+    <string name="achievement_event_goer_title">Участник событий</string>
+    <string name="achievement_event_goer_description">Зарегистрируйтесь на мероприятие</string>
+    <string name="achievement_eco_reader_title">Любитель чтения</string>
+    <string name="achievement_eco_reader_description">Изучите 3 эко-совета</string>
+    <string name="achievement_community_member_title">Часть сообщества</string>
+    <string name="achievement_community_member_description">Вступите в группу</string>
+    <string name="achievement_level_five_title">Опытный эко-герой</string>
+    <string name="achievement_level_five_description">Достигните 5 уровня</string>
+
+    <string name="achievements_screen_title">Мои достижения</string>
+    <string name="cards_screen_title">Мои карты</string>
+    <string name="cards_locked_label">Заблокировано</string>
+    <string name="exchange_screen_title">Обмен картами</string>
+    <string name="exchange_unavailable_message">Обмен картами появится, когда в приложении будет возможность найти другого игрока — пока нет списка или поиска пользователей</string>
 </resources>

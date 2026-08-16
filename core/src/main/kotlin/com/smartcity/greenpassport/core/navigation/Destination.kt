@@ -19,6 +19,15 @@ sealed interface Destination {
     data object Profile : Destination
 
     @Serializable
+    data object Achievements : Destination
+
+    @Serializable
+    data object Cards : Destination
+
+    @Serializable
+    data object Exchange : Destination
+
+    @Serializable
     data object Calendar : Destination
 
     @Serializable

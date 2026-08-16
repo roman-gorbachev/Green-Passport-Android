@@ -10,4 +10,23 @@
     <string name="profile_bookmarks">Bookmarks</string>
     <string name="profile_exchange">Exchange</string>
     <string name="profile_sign_out">Sign out</string>
+
+    <string name="achievement_first_task_title">First step</string>
+    <string name="achievement_first_task_description">Complete your first task</string>
+    <string name="achievement_task_master_title">Task master</string>
+    <string name="achievement_task_master_description">Complete 5 tasks</string>
+    <string name="achievement_event_goer_title">Event goer</string>
+    <string name="achievement_event_goer_description">Register for an event</string>
+    <string name="achievement_eco_reader_title">Avid reader</string>
+    <string name="achievement_eco_reader_description">Read 3 eco tips</string>
+    <string name="achievement_community_member_title">Community member</string>
+    <string name="achievement_community_member_description">Join a group</string>
+    <string name="achievement_level_five_title">Seasoned eco-hero</string>
+    <string name="achievement_level_five_description">Reach level 5</string>
+
+    <string name="achievements_screen_title">My achievements</string>
+    <string name="cards_screen_title">My cards</string>
+    <string name="cards_locked_label">Locked</string>
+    <string name="exchange_screen_title">Card exchange</string>
+    <string name="exchange_unavailable_message">Card exchange will become available once the app can find another player — there\'s no user list or search yet</string>
 </resources>

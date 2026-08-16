@@ -38,10 +38,12 @@ import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
 import com.smartcity.greenpassport.core.designsystem.component.PillListItem
 import com.smartcity.greenpassport.core.designsystem.component.PointsBadge
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
+import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.profile.R
 
 @Composable
 fun ProfileScreen(
+    onMenuEntrySelected: (Destination) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
@@ -56,6 +58,7 @@ fun ProfileScreen(
         uiState = uiState,
         onNotificationsToggle = viewModel::onNotificationsToggle,
         onSignOut = viewModel::onSignOut,
+        onMenuEntrySelected = onMenuEntrySelected,
         modifier = modifier,
     )
 }
@@ -63,15 +66,16 @@ fun ProfileScreen(
 private data class ProfileMenuEntry(
     val labelRes: Int,
     val icon: ImageVector,
+    val destination: Destination?,
 )
 
 private val profileMenuEntries = listOf(
-    ProfileMenuEntry(R.string.profile_achievements, Icons.Filled.EmojiEvents),
-    ProfileMenuEntry(R.string.profile_cards, Icons.Filled.Style),
-    ProfileMenuEntry(R.string.profile_history, Icons.Filled.History),
-    ProfileMenuEntry(R.string.profile_favorites, Icons.Filled.Favorite),
-    ProfileMenuEntry(R.string.profile_bookmarks, Icons.Filled.Bookmark),
-    ProfileMenuEntry(R.string.profile_exchange, Icons.Filled.SwapHoriz),
+    ProfileMenuEntry(R.string.profile_achievements, Icons.Filled.EmojiEvents, Destination.Achievements),
+    ProfileMenuEntry(R.string.profile_cards, Icons.Filled.Style, Destination.Cards),
+    ProfileMenuEntry(R.string.profile_history, Icons.Filled.History, null),
+    ProfileMenuEntry(R.string.profile_favorites, Icons.Filled.Favorite, null),
+    ProfileMenuEntry(R.string.profile_bookmarks, Icons.Filled.Bookmark, null),
+    ProfileMenuEntry(R.string.profile_exchange, Icons.Filled.SwapHoriz, Destination.Exchange),
 )
 
 @Composable
@@ -79,6 +83,7 @@ private fun ProfileContent(
     uiState: ProfileUiState,
     onNotificationsToggle: (Boolean) -> Unit,
     onSignOut: () -> Unit,
+    onMenuEntrySelected: (Destination) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -147,7 +152,7 @@ private fun ProfileContent(
             PillListItem(
                 title = stringResource(entry.labelRes),
                 leadingIcon = entry.icon,
-                onClick = {},
+                onClick = { entry.destination?.let(onMenuEntrySelected) },
             )
         }
 

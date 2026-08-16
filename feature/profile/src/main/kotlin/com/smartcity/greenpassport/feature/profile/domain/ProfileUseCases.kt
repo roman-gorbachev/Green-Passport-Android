@@ -3,6 +3,8 @@ package com.smartcity.greenpassport.feature.profile.domain
 import com.smartcity.greenpassport.core.auth.AuthRepository
 import com.smartcity.greenpassport.core.auth.AuthSession
 import com.smartcity.greenpassport.core.datastore.LocalSettingsStore
+import com.smartcity.greenpassport.core.model.Achievement
+import com.smartcity.greenpassport.core.model.AchievementsRepository
 import com.smartcity.greenpassport.core.model.Experience
 import com.smartcity.greenpassport.core.model.PointsBalance
 import com.smartcity.greenpassport.core.model.PointsRepository
@@ -46,4 +48,10 @@ class SetNotificationsEnabledUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(enabled: Boolean) =
         settingsStore.setBoolean(KEY_NOTIFICATIONS_ENABLED, enabled)
+}
+
+class GetAchievementsUseCase @Inject constructor(
+    private val achievementsRepository: AchievementsRepository,
+) {
+    suspend operator fun invoke(userId: String): List<Achievement> = achievementsRepository.getAchievements(userId)
 }

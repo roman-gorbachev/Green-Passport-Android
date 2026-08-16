@@ -25,7 +25,11 @@ import com.smartcity.greenpassport.feature.games.presentation.puzzle.PuzzleScree
 import com.smartcity.greenpassport.feature.games.presentation.quiz.QuizScreen
 import com.smartcity.greenpassport.feature.games.presentation.sorting.WasteSortingScreen
 import com.smartcity.greenpassport.feature.map.presentation.MapScreen
+import com.smartcity.greenpassport.feature.profile.presentation.AchievementsScreen
+import com.smartcity.greenpassport.feature.profile.presentation.CardsScreen
+import com.smartcity.greenpassport.feature.profile.presentation.ExchangeScreen
 import com.smartcity.greenpassport.feature.profile.presentation.ProfileScreen
+import com.smartcity.greenpassport.feature.profile.R as ProfileR
 import com.smartcity.greenpassport.feature.shop.presentation.ShopScreen
 import com.smartcity.greenpassport.feature.tasks.presentation.TaskDetailScreen
 import com.smartcity.greenpassport.feature.tasks.presentation.TasksListScreen
@@ -69,7 +73,34 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                 title = stringResource(homeMenuLabelRes(Destination.Profile)),
                 onNavigateBack = navController::popBackStack,
             ) { innerPadding ->
-                ProfileScreen(modifier = Modifier.padding(innerPadding))
+                ProfileScreen(
+                    onMenuEntrySelected = { destination -> navController.navigate(destination) },
+                    modifier = Modifier.padding(innerPadding),
+                )
+            }
+        }
+        composable<Destination.Achievements> {
+            FeatureScaffold(
+                title = stringResource(ProfileR.string.achievements_screen_title),
+                onNavigateBack = navController::popBackStack,
+            ) { innerPadding ->
+                AchievementsScreen(modifier = Modifier.padding(innerPadding))
+            }
+        }
+        composable<Destination.Cards> {
+            FeatureScaffold(
+                title = stringResource(ProfileR.string.cards_screen_title),
+                onNavigateBack = navController::popBackStack,
+            ) { innerPadding ->
+                CardsScreen(modifier = Modifier.padding(innerPadding))
+            }
+        }
+        composable<Destination.Exchange> {
+            FeatureScaffold(
+                title = stringResource(ProfileR.string.exchange_screen_title),
+                onNavigateBack = navController::popBackStack,
+            ) { innerPadding ->
+                ExchangeScreen(modifier = Modifier.padding(innerPadding))
             }
         }
         composable<Destination.Calendar> {
