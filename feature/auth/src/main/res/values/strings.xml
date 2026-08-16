@@ -1,0 +1,8 @@
+<resources>
+    <string name="auth_email_label">Эл. почта</string>
+    <string name="auth_password_label">Пароль</string>
+    <string name="auth_sign_in">Войти</string>
+    <string name="auth_register">Зарегистрироваться</string>
+    <string name="auth_continue_anonymously">Продолжить без регистрации</string>
+    <string name="auth_error_generic">Не получилось войти. Проверьте данные и попробуйте ещё раз</string>
+</resources>

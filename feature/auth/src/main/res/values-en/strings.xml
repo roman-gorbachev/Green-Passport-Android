@@ -1,0 +1,8 @@
+<resources>
+    <string name="auth_email_label">Email</string>
+    <string name="auth_password_label">Password</string>
+    <string name="auth_sign_in">Sign in</string>
+    <string name="auth_register">Create account</string>
+    <string name="auth_continue_anonymously">Continue without an account</string>
+    <string name="auth_error_generic">Couldn\'t sign you in. Check your details and try again</string>
+</resources>
