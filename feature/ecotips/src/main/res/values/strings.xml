@@ -1,0 +1,11 @@
+<resources>
+    <string name="ecotips_filter_all">Все</string>
+    <string name="ecotips_category_article">Статьи</string>
+    <string name="ecotips_category_video">Видео</string>
+    <string name="ecotips_category_kids">Детям</string>
+    <string name="ecotips_empty">Пока нет советов в этой категории</string>
+    <string name="ecotips_daily_tip_label">Совет дня</string>
+    <string name="ecotip_detail_reward_format">Награда: %1$d баллов, %2$d опыта</string>
+    <string name="ecotip_detail_mark_read_button">Отметить как изучено</string>
+    <string name="ecotip_detail_read_label">Уже изучено</string>
+</resources>

@@ -18,6 +18,8 @@ private const val POSTS_COLLECTION = "posts"
 private const val GROUPS_COLLECTION = "groups"
 private const val CHATS_COLLECTION = "chats"
 private const val MESSAGES_COLLECTION = "messages"
+private const val ECO_TIPS_COLLECTION = "ecoTips"
+private const val ECO_TIP_READS_COLLECTION = "ecoTipReads"
 
 object FirestoreCollections {
     fun appRoot(firestore: FirebaseFirestore): DocumentReference =
@@ -55,4 +57,10 @@ object FirestoreCollections {
 
     fun chatMessages(firestore: FirebaseFirestore, chatId: String): CollectionReference =
         appRoot(firestore).collection(CHATS_COLLECTION).document(chatId).collection(MESSAGES_COLLECTION)
+
+    fun ecoTips(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(ECO_TIPS_COLLECTION)
+
+    fun ecoTipReads(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(ECO_TIP_READS_COLLECTION)
 }

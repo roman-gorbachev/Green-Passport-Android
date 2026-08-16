@@ -14,6 +14,8 @@ import com.smartcity.greenpassport.feature.community.R as CommunityR
 import com.smartcity.greenpassport.feature.community.presentation.CommunityHubScreen
 import com.smartcity.greenpassport.feature.community.presentation.ForumScreen
 import com.smartcity.greenpassport.feature.community.presentation.GroupsScreen
+import com.smartcity.greenpassport.feature.ecotips.presentation.EcoTipDetailScreen
+import com.smartcity.greenpassport.feature.ecotips.presentation.EcoTipsListScreen
 import com.smartcity.greenpassport.feature.games.domain.GameId
 import com.smartcity.greenpassport.feature.games.presentation.GamesHubScreen
 import com.smartcity.greenpassport.feature.games.presentation.gameTitleRes
@@ -114,10 +116,23 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             }
         }
         composable<Destination.EcoTips> {
-            PlaceholderScreen(
+            FeatureScaffold(
                 title = stringResource(homeMenuLabelRes(Destination.EcoTips)),
                 onNavigateBack = navController::popBackStack,
-            )
+            ) { innerPadding ->
+                EcoTipsListScreen(
+                    onTipSelected = { tipId -> navController.navigate(Destination.EcoTipDetail(tipId)) },
+                    modifier = Modifier.padding(innerPadding),
+                )
+            }
+        }
+        composable<Destination.EcoTipDetail> {
+            FeatureScaffold(
+                title = stringResource(R.string.ecotip_detail_title),
+                onNavigateBack = navController::popBackStack,
+            ) { innerPadding ->
+                EcoTipDetailScreen(modifier = Modifier.padding(innerPadding))
+            }
         }
         composable<Destination.Games> {
             FeatureScaffold(

@@ -18,4 +18,5 @@
     <string name="placeholder_coming_soon">This section is still being built</string>
     <string name="navigate_back">Back</string>
     <string name="task_detail_title">Task</string>
+    <string name="ecotip_detail_title">Tip</string>
 </resources>

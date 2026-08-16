@@ -37,6 +37,9 @@ sealed interface Destination {
     data object EcoTips : Destination
 
     @Serializable
+    data class EcoTipDetail(val tipId: String) : Destination
+
+    @Serializable
     data object Games : Destination
 
     @Serializable

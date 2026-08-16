@@ -1,0 +1,11 @@
+<resources>
+    <string name="ecotips_filter_all">All</string>
+    <string name="ecotips_category_article">Articles</string>
+    <string name="ecotips_category_video">Videos</string>
+    <string name="ecotips_category_kids">For Kids</string>
+    <string name="ecotips_empty">No tips in this category yet</string>
+    <string name="ecotips_daily_tip_label">Tip of the day</string>
+    <string name="ecotip_detail_reward_format">Reward: %1$d points, %2$d XP</string>
+    <string name="ecotip_detail_mark_read_button">Mark as read</string>
+    <string name="ecotip_detail_read_label">Already read</string>
+</resources>

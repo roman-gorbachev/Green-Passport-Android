@@ -18,4 +18,5 @@
     <string name="placeholder_coming_soon">Этот раздел ещё в разработке</string>
     <string name="navigate_back">Назад</string>
     <string name="task_detail_title">Задание</string>
+    <string name="ecotip_detail_title">Совет</string>
 </resources>
