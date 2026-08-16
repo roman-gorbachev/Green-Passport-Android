@@ -20,6 +20,9 @@ abstract class MessagingModule {
     @Binds
     abstract fun bindReminderScheduler(impl: WorkManagerReminderScheduler): ReminderScheduler
 
+    @Binds
+    abstract fun bindRewardNotifier(impl: AndroidRewardNotifier): RewardNotifier
+
     companion object {
         @Provides
         @Singleton

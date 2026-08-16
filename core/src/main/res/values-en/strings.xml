@@ -2,4 +2,10 @@
 <resources>
     <string name="notification_channel_rewards_name">Rewards and reminders</string>
     <string name="event_reminder_title">Upcoming event</string>
+    <string name="reward_reason_task_completed">Task completed</string>
+    <string name="reward_reason_game_played">Game played</string>
+    <string name="reward_reason_article_read">Tip read</string>
+    <string name="reward_reason_event_attended">Event registration</string>
+    <string name="reward_reason_feedback_submitted">Thanks for your feedback</string>
+    <string name="reward_notification_body_format">+%1$d points, +%2$d XP</string>
 </resources>

@@ -3,6 +3,7 @@ package com.smartcity.greenpassport.core.database
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.smartcity.greenpassport.core.messaging.RewardNotifier
 import com.smartcity.greenpassport.core.model.Experience
 import com.smartcity.greenpassport.core.model.PointsAward
 import com.smartcity.greenpassport.core.model.PointsBalance
@@ -16,6 +17,7 @@ private const val FIELD_LIFETIME_XP = "lifetimeXp"
 
 class FirestorePointsRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
+    private val rewardNotifier: RewardNotifier,
 ) : PointsRepository {
 
     private val users get() = FirestoreCollections.users(firestore)
@@ -46,6 +48,7 @@ class FirestorePointsRepository @Inject constructor(
             )
             newPoints
         }.await()
+        rewardNotifier.notifyReward(reason = award.reason, points = award.points, xp = award.xp)
         return PointsBalance(userId = userId, availablePoints = updatedPoints)
     }
 

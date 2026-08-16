@@ -2,4 +2,10 @@
 <resources>
     <string name="notification_channel_rewards_name">Награды и напоминания</string>
     <string name="event_reminder_title">Скоро мероприятие</string>
+    <string name="reward_reason_task_completed">Задание выполнено</string>
+    <string name="reward_reason_game_played">Игра сыграна</string>
+    <string name="reward_reason_article_read">Совет изучен</string>
+    <string name="reward_reason_event_attended">Регистрация на событие</string>
+    <string name="reward_reason_feedback_submitted">Спасибо за отзыв</string>
+    <string name="reward_notification_body_format">+%1$d баллов, +%2$d опыта</string>
 </resources>
