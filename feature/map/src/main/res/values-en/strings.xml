@@ -1,0 +1,9 @@
+<resources>
+    <string name="map_filter_all">All</string>
+    <string name="map_type_eco_shop">Eco shops</string>
+    <string name="map_type_recycling_point">Recycling points</string>
+    <string name="map_type_eco_event">Eco events</string>
+    <string name="map_search_placeholder">Search</string>
+    <string name="map_empty">Nothing found</string>
+    <string name="map_route_unavailable">Route directions aren\'t available yet</string>
+</resources>

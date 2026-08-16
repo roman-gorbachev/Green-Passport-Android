@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.layout.padding
 import com.smartcity.greenpassport.R
 import com.smartcity.greenpassport.core.navigation.Destination
+import com.smartcity.greenpassport.feature.map.presentation.MapScreen
 import com.smartcity.greenpassport.feature.profile.presentation.ProfileScreen
 import com.smartcity.greenpassport.feature.shop.presentation.ShopScreen
 import com.smartcity.greenpassport.feature.tasks.presentation.TaskDetailScreen
@@ -63,10 +64,12 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             )
         }
         composable<Destination.Map> {
-            PlaceholderScreen(
+            FeatureScaffold(
                 title = stringResource(homeMenuLabelRes(Destination.Map)),
                 onNavigateBack = navController::popBackStack,
-            )
+            ) { innerPadding ->
+                MapScreen(modifier = Modifier.padding(innerPadding))
+            }
         }
         composable<Destination.Community> {
             PlaceholderScreen(

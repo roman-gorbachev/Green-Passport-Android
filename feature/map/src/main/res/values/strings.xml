@@ -1,0 +1,9 @@
+<resources>
+    <string name="map_filter_all">Все</string>
+    <string name="map_type_eco_shop">Эко-магазины</string>
+    <string name="map_type_recycling_point">Пункты переработки</string>
+    <string name="map_type_eco_event">Эко-события</string>
+    <string name="map_search_placeholder">Поиск</string>
+    <string name="map_empty">Ничего не найдено</string>
+    <string name="map_route_unavailable">Построение маршрута пока недоступно</string>
+</resources>
