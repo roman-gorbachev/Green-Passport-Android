@@ -10,6 +10,11 @@ import androidx.compose.foundation.layout.padding
 import com.smartcity.greenpassport.R
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.calendar.presentation.CalendarScreen
+import com.smartcity.greenpassport.feature.games.domain.GameId
+import com.smartcity.greenpassport.feature.games.presentation.GamesHubScreen
+import com.smartcity.greenpassport.feature.games.presentation.gameTitleRes
+import com.smartcity.greenpassport.feature.games.presentation.puzzle.PuzzleScreen
+import com.smartcity.greenpassport.feature.games.presentation.sorting.WasteSortingScreen
 import com.smartcity.greenpassport.feature.map.presentation.MapScreen
 import com.smartcity.greenpassport.feature.profile.presentation.ProfileScreen
 import com.smartcity.greenpassport.feature.shop.presentation.ShopScreen
@@ -87,8 +92,49 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             )
         }
         composable<Destination.Games> {
-            PlaceholderScreen(
+            FeatureScaffold(
                 title = stringResource(homeMenuLabelRes(Destination.Games)),
+                onNavigateBack = navController::popBackStack,
+            ) { innerPadding ->
+                GamesHubScreen(
+                    onGameSelected = { gameId ->
+                        val destination = when (gameId) {
+                            GameId.ECO_PUZZLE -> Destination.EcoPuzzleGame
+                            GameId.WASTE_SORTING -> Destination.WasteSortingGame
+                            GameId.ECO_MAZE -> Destination.EcoMazeGame
+                            GameId.ECO_QUIZ -> Destination.EcoQuizGame
+                        }
+                        navController.navigate(destination)
+                    },
+                    modifier = Modifier.padding(innerPadding),
+                )
+            }
+        }
+        composable<Destination.EcoPuzzleGame> {
+            FeatureScaffold(
+                title = stringResource(gameTitleRes(GameId.ECO_PUZZLE)),
+                onNavigateBack = navController::popBackStack,
+            ) { innerPadding ->
+                PuzzleScreen(modifier = Modifier.padding(innerPadding))
+            }
+        }
+        composable<Destination.WasteSortingGame> {
+            FeatureScaffold(
+                title = stringResource(gameTitleRes(GameId.WASTE_SORTING)),
+                onNavigateBack = navController::popBackStack,
+            ) { innerPadding ->
+                WasteSortingScreen(modifier = Modifier.padding(innerPadding))
+            }
+        }
+        composable<Destination.EcoMazeGame> {
+            PlaceholderScreen(
+                title = stringResource(gameTitleRes(GameId.ECO_MAZE)),
+                onNavigateBack = navController::popBackStack,
+            )
+        }
+        composable<Destination.EcoQuizGame> {
+            PlaceholderScreen(
+                title = stringResource(gameTitleRes(GameId.ECO_QUIZ)),
                 onNavigateBack = navController::popBackStack,
             )
         }

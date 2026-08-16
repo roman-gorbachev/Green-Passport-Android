@@ -1,0 +1,29 @@
+<resources>
+    <string name="game_eco_puzzle_title">Eco Puzzle</string>
+    <string name="game_waste_sorting_title">Waste Sorting</string>
+    <string name="game_eco_maze_title">Eco Maze</string>
+    <string name="game_eco_quiz_title">Eco Quiz</string>
+    <string name="games_best_score_format">Best: %1$d</string>
+
+    <string name="puzzle_instructions">Find matching pairs of cards</string>
+    <string name="puzzle_finished_format">Done! Moves: %1$d, score: %2$d</string>
+
+    <string name="sorting_instructions">Pick the right bin for the item</string>
+    <string name="sorting_score_format">Score: %1$d</string>
+    <string name="sorting_time_format">Time left: %1$ds</string>
+    <string name="sorting_bin_glass">Glass</string>
+    <string name="sorting_bin_metal">Metal</string>
+    <string name="sorting_bin_paper">Paper</string>
+    <string name="sorting_bin_plastic">Plastic</string>
+    <string name="sorting_finished_format">Game over! Score: %1$d</string>
+    <string name="game_play_again">Play again</string>
+
+    <string name="sorting_item_glass_bottle">Glass bottle</string>
+    <string name="sorting_item_glass_jar">Glass jar</string>
+    <string name="sorting_item_soda_can">Soda can</string>
+    <string name="sorting_item_foil">Aluminum foil</string>
+    <string name="sorting_item_newspaper">Newspaper</string>
+    <string name="sorting_item_cardboard_box">Cardboard box</string>
+    <string name="sorting_item_plastic_bag">Plastic bag</string>
+    <string name="sorting_item_plastic_bottle">Plastic bottle</string>
+</resources>

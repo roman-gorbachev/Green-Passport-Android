@@ -1,0 +1,29 @@
+<resources>
+    <string name="game_eco_puzzle_title">Эко-головоломка</string>
+    <string name="game_waste_sorting_title">Сортировка отходов</string>
+    <string name="game_eco_maze_title">Эко-лабиринт</string>
+    <string name="game_eco_quiz_title">Эко-викторина</string>
+    <string name="games_best_score_format">Рекорд: %1$d</string>
+
+    <string name="puzzle_instructions">Найдите пары одинаковых карточек</string>
+    <string name="puzzle_finished_format">Готово! Ходов: %1$d, очки: %2$d</string>
+
+    <string name="sorting_instructions">Выберите правильный контейнер для отхода</string>
+    <string name="sorting_score_format">Очки: %1$d</string>
+    <string name="sorting_time_format">Осталось: %1$d с</string>
+    <string name="sorting_bin_glass">Стекло</string>
+    <string name="sorting_bin_metal">Металл</string>
+    <string name="sorting_bin_paper">Бумага</string>
+    <string name="sorting_bin_plastic">Пластик</string>
+    <string name="sorting_finished_format">Игра окончена! Очки: %1$d</string>
+    <string name="game_play_again">Играть снова</string>
+
+    <string name="sorting_item_glass_bottle">Стеклянная бутылка</string>
+    <string name="sorting_item_glass_jar">Стеклянная банка</string>
+    <string name="sorting_item_soda_can">Банка из-под газировки</string>
+    <string name="sorting_item_foil">Алюминиевая фольга</string>
+    <string name="sorting_item_newspaper">Газета</string>
+    <string name="sorting_item_cardboard_box">Картонная коробка</string>
+    <string name="sorting_item_plastic_bag">Пластиковый пакет</string>
+    <string name="sorting_item_plastic_bottle">Пластиковая бутылка</string>
+</resources>
