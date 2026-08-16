@@ -13,6 +13,12 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    match /apps/greenpassport/purchases/{purchaseId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if false;
+    }
+
     match /apps/greenpassport/{collection}/{document=**} {
       allow read: if request.auth != null;
       allow write: if false;

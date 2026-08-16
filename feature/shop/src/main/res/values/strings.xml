@@ -1,0 +1,9 @@
+<resources>
+    <string name="shop_catalog_title">Купоны партнёров</string>
+    <string name="shop_history_title">Мои покупки</string>
+    <string name="shop_purchase_button">Обменять</string>
+    <string name="shop_cost_format">%1$d баллов</string>
+    <string name="shop_insufficient_points">Недостаточно баллов для обмена</string>
+    <string name="shop_empty_rewards">Пока нет доступных купонов</string>
+    <string name="shop_empty_purchases">Вы ещё не обменивали баллы на купоны</string>
+</resources>

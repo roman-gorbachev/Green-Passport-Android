@@ -9,6 +9,8 @@ private const val APP_DOCUMENT = "greenpassport"
 private const val USERS_COLLECTION = "users"
 private const val TASKS_COLLECTION = "tasks"
 private const val TASK_PROGRESS_COLLECTION = "taskProgress"
+private const val SHOP_ITEMS_COLLECTION = "shopItems"
+private const val PURCHASES_COLLECTION = "purchases"
 
 object FirestoreCollections {
     fun appRoot(firestore: FirebaseFirestore): DocumentReference =
@@ -22,4 +24,10 @@ object FirestoreCollections {
 
     fun taskProgress(firestore: FirebaseFirestore): CollectionReference =
         appRoot(firestore).collection(TASK_PROGRESS_COLLECTION)
+
+    fun shopItems(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(SHOP_ITEMS_COLLECTION)
+
+    fun purchases(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(PURCHASES_COLLECTION)
 }

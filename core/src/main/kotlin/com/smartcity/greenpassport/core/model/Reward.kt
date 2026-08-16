@@ -13,3 +13,9 @@ data class Coupon(
     val redeemedAtEpochMillis: Long,
     val expiresAtEpochMillis: Long?,
 )
+
+interface ShopRepository {
+    suspend fun getRewards(): List<Reward>
+    suspend fun getPurchases(userId: String): List<Coupon>
+    suspend fun recordPurchase(userId: String, reward: Reward): Coupon
+}

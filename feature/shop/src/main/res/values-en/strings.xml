@@ -1,0 +1,9 @@
+<resources>
+    <string name="shop_catalog_title">Partner coupons</string>
+    <string name="shop_history_title">My purchases</string>
+    <string name="shop_purchase_button">Redeem</string>
+    <string name="shop_cost_format">%1$d points</string>
+    <string name="shop_insufficient_points">Not enough points to redeem this</string>
+    <string name="shop_empty_rewards">No coupons available yet</string>
+    <string name="shop_empty_purchases">You haven\'t redeemed any points yet</string>
+</resources>
