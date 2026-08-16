@@ -1,0 +1,13 @@
+<resources>
+    <string name="community_forum_title">Форум</string>
+    <string name="community_groups_title">Группы</string>
+    <string name="forum_empty">Пока нет сообщений — станьте первым</string>
+    <string name="forum_draft_label">Ваше сообщение</string>
+    <string name="forum_post_button">Отправить</string>
+    <string name="groups_empty">Пока нет групп — создайте первую</string>
+    <string name="groups_draft_label">Название группы</string>
+    <string name="groups_create_button">Создать</string>
+    <string name="groups_join_button">Вступить</string>
+    <string name="groups_joined_label">Вы участник</string>
+    <string name="groups_member_count_format">Участников: %1$d</string>
+</resources>

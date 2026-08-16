@@ -28,6 +28,12 @@ sealed interface Destination {
     data object Community : Destination
 
     @Serializable
+    data object Forum : Destination
+
+    @Serializable
+    data object CommunityGroups : Destination
+
+    @Serializable
     data object EcoTips : Destination
 
     @Serializable

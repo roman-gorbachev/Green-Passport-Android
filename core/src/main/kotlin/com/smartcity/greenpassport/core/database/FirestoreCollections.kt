@@ -14,6 +14,10 @@ private const val PURCHASES_COLLECTION = "purchases"
 private const val MAP_POINTS_COLLECTION = "mapPoints"
 private const val EVENTS_COLLECTION = "events"
 private const val EVENT_REGISTRATIONS_COLLECTION = "eventRegistrations"
+private const val POSTS_COLLECTION = "posts"
+private const val GROUPS_COLLECTION = "groups"
+private const val CHATS_COLLECTION = "chats"
+private const val MESSAGES_COLLECTION = "messages"
 
 object FirestoreCollections {
     fun appRoot(firestore: FirebaseFirestore): DocumentReference =
@@ -42,4 +46,13 @@ object FirestoreCollections {
 
     fun eventRegistrations(firestore: FirebaseFirestore): CollectionReference =
         appRoot(firestore).collection(EVENT_REGISTRATIONS_COLLECTION)
+
+    fun posts(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(POSTS_COLLECTION)
+
+    fun groups(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(GROUPS_COLLECTION)
+
+    fun chatMessages(firestore: FirebaseFirestore, chatId: String): CollectionReference =
+        appRoot(firestore).collection(CHATS_COLLECTION).document(chatId).collection(MESSAGES_COLLECTION)
 }

@@ -1,0 +1,13 @@
+<resources>
+    <string name="community_forum_title">Forum</string>
+    <string name="community_groups_title">Groups</string>
+    <string name="forum_empty">No posts yet — be the first</string>
+    <string name="forum_draft_label">Your message</string>
+    <string name="forum_post_button">Post</string>
+    <string name="groups_empty">No groups yet — create the first one</string>
+    <string name="groups_draft_label">Group name</string>
+    <string name="groups_create_button">Create</string>
+    <string name="groups_join_button">Join</string>
+    <string name="groups_joined_label">You\'re a member</string>
+    <string name="groups_member_count_format">Members: %1$d</string>
+</resources>

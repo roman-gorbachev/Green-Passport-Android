@@ -25,6 +25,25 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    match /apps/greenpassport/posts/{postId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.authorId == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    match /apps/greenpassport/groups/{groupId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if false;
+    }
+
+    match /apps/greenpassport/chats/{chatId}/messages/{messageId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.senderId == request.auth.uid;
+      allow update, delete: if false;
+    }
+
     match /apps/greenpassport/{collection}/{document=**} {
       allow read: if request.auth != null;
       allow write: if false;

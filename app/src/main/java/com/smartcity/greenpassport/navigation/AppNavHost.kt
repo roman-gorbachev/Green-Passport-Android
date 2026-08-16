@@ -10,6 +10,10 @@ import androidx.compose.foundation.layout.padding
 import com.smartcity.greenpassport.R
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.calendar.presentation.CalendarScreen
+import com.smartcity.greenpassport.feature.community.R as CommunityR
+import com.smartcity.greenpassport.feature.community.presentation.CommunityHubScreen
+import com.smartcity.greenpassport.feature.community.presentation.ForumScreen
+import com.smartcity.greenpassport.feature.community.presentation.GroupsScreen
 import com.smartcity.greenpassport.feature.games.domain.GameId
 import com.smartcity.greenpassport.feature.games.presentation.GamesHubScreen
 import com.smartcity.greenpassport.feature.games.presentation.gameTitleRes
@@ -82,10 +86,32 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             }
         }
         composable<Destination.Community> {
-            PlaceholderScreen(
+            FeatureScaffold(
                 title = stringResource(homeMenuLabelRes(Destination.Community)),
                 onNavigateBack = navController::popBackStack,
-            )
+            ) { innerPadding ->
+                CommunityHubScreen(
+                    onForumSelected = { navController.navigate(Destination.Forum) },
+                    onGroupsSelected = { navController.navigate(Destination.CommunityGroups) },
+                    modifier = Modifier.padding(innerPadding),
+                )
+            }
+        }
+        composable<Destination.Forum> {
+            FeatureScaffold(
+                title = stringResource(CommunityR.string.community_forum_title),
+                onNavigateBack = navController::popBackStack,
+            ) { innerPadding ->
+                ForumScreen(modifier = Modifier.padding(innerPadding))
+            }
+        }
+        composable<Destination.CommunityGroups> {
+            FeatureScaffold(
+                title = stringResource(CommunityR.string.community_groups_title),
+                onNavigateBack = navController::popBackStack,
+            ) { innerPadding ->
+                GroupsScreen(modifier = Modifier.padding(innerPadding))
+            }
         }
         composable<Destination.EcoTips> {
             PlaceholderScreen(
