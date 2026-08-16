@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -19,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,7 +61,7 @@ private fun HomeMenuTile(
             .fillMaxWidth()
             .aspectRatio(1f),
         shape = RoundedCornerShape(Dimens.CornerRadiusMedium),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
     ) {
         Column(
             modifier = Modifier
@@ -67,16 +70,28 @@ private fun HomeMenuTile(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Icon(
-                imageVector = item.icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.padding(bottom = Dimens.SpacingSmall),
-            )
+            when (val icon = item.icon) {
+                is HomeMenuIcon.Artwork -> Image(
+                    painter = painterResource(icon.drawableRes),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(Dimens.IconSizeLarge)
+                        .padding(bottom = Dimens.SpacingSmall),
+                )
+
+                is HomeMenuIcon.Symbol -> Icon(
+                    imageVector = icon.imageVector,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .size(Dimens.IconSizeLarge)
+                        .padding(bottom = Dimens.SpacingSmall),
+                )
+            }
             Text(
                 text = stringResource(item.labelRes),
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center,
             )
         }

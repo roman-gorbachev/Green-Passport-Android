@@ -1,25 +1,23 @@
 package com.smartcity.greenpassport.home
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material.icons.filled.Eco
-import androidx.compose.material.icons.filled.Feedback
-import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.SportsEsports
-import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.smartcity.greenpassport.R
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.core.navigation.homeMenuDestinations
 
+sealed interface HomeMenuIcon {
+    data class Artwork(@DrawableRes val drawableRes: Int) : HomeMenuIcon
+    data class Symbol(val imageVector: ImageVector) : HomeMenuIcon
+}
+
 data class HomeMenuItem(
     val destination: Destination,
     @StringRes val labelRes: Int,
-    val icon: ImageVector,
+    val icon: HomeMenuIcon,
 )
 
 fun homeMenuLabelRes(destination: Destination): Int = when (destination) {
@@ -35,16 +33,16 @@ fun homeMenuLabelRes(destination: Destination): Int = when (destination) {
     else -> error("Unexpected home menu destination: $destination")
 }
 
-private fun homeMenuIcon(destination: Destination): ImageVector = when (destination) {
-    Destination.Tasks -> Icons.Filled.Checklist
-    Destination.Profile -> Icons.Filled.Person
-    Destination.Calendar -> Icons.Filled.CalendarMonth
-    Destination.Map -> Icons.Filled.Map
-    Destination.Community -> Icons.Filled.Groups
-    Destination.EcoTips -> Icons.Filled.Eco
-    Destination.Games -> Icons.Filled.SportsEsports
-    Destination.Shop -> Icons.Filled.Storefront
-    Destination.Feedback -> Icons.Filled.Feedback
+private fun homeMenuIcon(destination: Destination): HomeMenuIcon = when (destination) {
+    Destination.Tasks -> HomeMenuIcon.Artwork(R.drawable.ic_home_tasks)
+    Destination.Calendar -> HomeMenuIcon.Artwork(R.drawable.ic_home_calendar)
+    Destination.Map -> HomeMenuIcon.Artwork(R.drawable.ic_home_map)
+    Destination.Community -> HomeMenuIcon.Artwork(R.drawable.ic_home_community)
+    Destination.EcoTips -> HomeMenuIcon.Artwork(R.drawable.ic_home_ecotips)
+    Destination.Games -> HomeMenuIcon.Artwork(R.drawable.ic_home_games)
+    Destination.Shop -> HomeMenuIcon.Artwork(R.drawable.ic_home_shop)
+    Destination.Feedback -> HomeMenuIcon.Artwork(R.drawable.ic_home_feedback)
+    Destination.Profile -> HomeMenuIcon.Symbol(Icons.Filled.Person)
     else -> error("Unexpected home menu destination: $destination")
 }
 
