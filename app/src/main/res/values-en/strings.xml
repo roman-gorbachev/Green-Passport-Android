@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Green Passport</string>
+
+    <string name="onboarding_title">Green Passport</string>
+    <string name="onboarding_subtitle">Complete eco-friendly tasks, earn points, and exchange them for discounts from partners</string>
+    <string name="onboarding_get_started">Get started</string>
+
+    <string name="home_tile_tasks">Tasks</string>
+    <string name="home_tile_profile">My profile</string>
+    <string name="home_tile_calendar">Event calendar</string>
+    <string name="home_tile_map">Map</string>
+    <string name="home_tile_community">Community</string>
+    <string name="home_tile_ecotips">Eco-tips</string>
+    <string name="home_tile_games">Mini-games</string>
+    <string name="home_tile_shop">Shop</string>
+    <string name="home_tile_feedback">Feedback</string>
+
+    <string name="placeholder_coming_soon">This section is still being built</string>
+    <string name="navigate_back">Back</string>
+</resources>

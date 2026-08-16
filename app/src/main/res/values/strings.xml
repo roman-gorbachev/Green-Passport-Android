@@ -1,3 +1,20 @@
 <resources>
-    <string name="app_name">GreenPassport</string>
+    <string name="app_name">Зелёный Паспорт</string>
+
+    <string name="onboarding_title">Зелёный Паспорт</string>
+    <string name="onboarding_subtitle">Выполняйте экологические задания, зарабатывайте баллы и обменивайте их на скидки у партнёров</string>
+    <string name="onboarding_get_started">Начать</string>
+
+    <string name="home_tile_tasks">Задания</string>
+    <string name="home_tile_profile">Мой профиль</string>
+    <string name="home_tile_calendar">Календарь событий</string>
+    <string name="home_tile_map">Карта</string>
+    <string name="home_tile_community">Сообщество</string>
+    <string name="home_tile_ecotips">Эко-советы</string>
+    <string name="home_tile_games">Мини-игры</string>
+    <string name="home_tile_shop">Магазин</string>
+    <string name="home_tile_feedback">Обратная связь</string>
+
+    <string name="placeholder_coming_soon">Этот раздел ещё в разработке</string>
+    <string name="navigate_back">Назад</string>
 </resources>
