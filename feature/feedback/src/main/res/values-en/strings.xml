@@ -1,0 +1,15 @@
+<resources>
+    <string name="feedback_review_title">Rate the app</string>
+    <string name="feedback_review_message_label">Comment (optional)</string>
+    <string name="feedback_review_submit_button">Send rating</string>
+    <string name="feedback_review_submitted_label">Thanks for rating us!</string>
+    <string name="feedback_suggestion_title">Feedback or suggestion</string>
+    <string name="feedback_suggestion_message_label">Describe an issue or idea</string>
+    <string name="feedback_suggestion_submit_button">Send</string>
+    <string name="feedback_suggestion_submitted_label">Thanks, we\'ve received your message</string>
+    <string name="feedback_survey_title">Survey</string>
+    <string name="feedback_survey_answered_label">Thanks for answering!</string>
+    <string name="feedback_support_title">Support</string>
+    <string name="feedback_support_email_format">Email: %1$s</string>
+    <string name="feedback_support_phone_format">Phone: %1$s</string>
+</resources>

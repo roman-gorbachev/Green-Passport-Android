@@ -16,6 +16,7 @@ import com.smartcity.greenpassport.feature.community.presentation.ForumScreen
 import com.smartcity.greenpassport.feature.community.presentation.GroupsScreen
 import com.smartcity.greenpassport.feature.ecotips.presentation.EcoTipDetailScreen
 import com.smartcity.greenpassport.feature.ecotips.presentation.EcoTipsListScreen
+import com.smartcity.greenpassport.feature.feedback.presentation.FeedbackScreen
 import com.smartcity.greenpassport.feature.games.domain.GameId
 import com.smartcity.greenpassport.feature.games.presentation.GamesHubScreen
 import com.smartcity.greenpassport.feature.games.presentation.gameTitleRes
@@ -194,10 +195,12 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             }
         }
         composable<Destination.Feedback> {
-            PlaceholderScreen(
+            FeatureScaffold(
                 title = stringResource(homeMenuLabelRes(Destination.Feedback)),
                 onNavigateBack = navController::popBackStack,
-            )
+            ) { innerPadding ->
+                FeedbackScreen(modifier = Modifier.padding(innerPadding))
+            }
         }
     }
 }

@@ -1,0 +1,15 @@
+<resources>
+    <string name="feedback_review_title">Оценить приложение</string>
+    <string name="feedback_review_message_label">Комментарий (необязательно)</string>
+    <string name="feedback_review_submit_button">Отправить оценку</string>
+    <string name="feedback_review_submitted_label">Спасибо за оценку!</string>
+    <string name="feedback_suggestion_title">Отзыв или предложение</string>
+    <string name="feedback_suggestion_message_label">Опишите проблему или идею</string>
+    <string name="feedback_suggestion_submit_button">Отправить</string>
+    <string name="feedback_suggestion_submitted_label">Спасибо, мы получили ваше сообщение</string>
+    <string name="feedback_survey_title">Опрос</string>
+    <string name="feedback_survey_answered_label">Спасибо за ответ!</string>
+    <string name="feedback_support_title">Поддержка</string>
+    <string name="feedback_support_email_format">Почта: %1$s</string>
+    <string name="feedback_support_phone_format">Телефон: %1$s</string>
+</resources>
