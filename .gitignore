@@ -14,5 +14,8 @@
 .externalNativeBuild
 .cxx
 local.properties
-CLAUDE.md 
+CLAUDE.md
 claude/
+keystore.properties
+*.jks
+*.keystore
