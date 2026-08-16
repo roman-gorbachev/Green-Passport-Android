@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.smartcity.greenpassport.core.R
+import dagger.hilt.android.EntryPointAccessors
 
 class EventReminderWorker(
     context: Context,
@@ -18,6 +19,13 @@ class EventReminderWorker(
     override suspend fun doWork(): Result {
         val eventTitle = inputData.getString(KEY_EVENT_TITLE) ?: return Result.failure()
         val eventId = inputData.getString(KEY_EVENT_ID) ?: return Result.failure()
+        val reminderBody = applicationContext.getString(R.string.event_reminder_title)
+
+        val entryPoint = EntryPointAccessors.fromApplication(
+            applicationContext,
+            NotificationLogEntryPoint::class.java,
+        )
+        entryPoint.notificationLogRepository().log(title = eventTitle, body = reminderBody)
 
         if (ContextCompat.checkSelfPermission(
                 applicationContext,

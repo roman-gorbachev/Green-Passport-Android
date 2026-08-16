@@ -6,6 +6,7 @@ import com.smartcity.greenpassport.core.model.EcoTipCategory
 data class EcoTipsListUiState(
     val tips: List<EcoTip> = emptyList(),
     val readTipIds: Set<String> = emptySet(),
+    val bookmarkedTipIds: Set<String> = emptySet(),
     val selectedCategory: EcoTipCategory? = null,
     val isLoading: Boolean = true,
 ) {

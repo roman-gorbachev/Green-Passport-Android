@@ -23,6 +23,8 @@ private const val ECO_TIP_READS_COLLECTION = "ecoTipReads"
 private const val FEEDBACK_COLLECTION = "feedback"
 private const val SURVEYS_COLLECTION = "surveys"
 private const val SURVEY_ANSWERS_COLLECTION = "surveyAnswers"
+private const val FAVORITE_TASKS_COLLECTION = "favoriteTasks"
+private const val BOOKMARKED_TIPS_COLLECTION = "bookmarkedTips"
 
 object FirestoreCollections {
     fun appRoot(firestore: FirebaseFirestore): DocumentReference =
@@ -75,4 +77,10 @@ object FirestoreCollections {
 
     fun surveyAnswers(firestore: FirebaseFirestore): CollectionReference =
         appRoot(firestore).collection(SURVEY_ANSWERS_COLLECTION)
+
+    fun favoriteTasks(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(FAVORITE_TASKS_COLLECTION)
+
+    fun bookmarkedTips(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(BOOKMARKED_TIPS_COLLECTION)
 }

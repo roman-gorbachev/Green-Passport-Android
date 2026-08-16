@@ -28,6 +28,18 @@ sealed interface Destination {
     data object Exchange : Destination
 
     @Serializable
+    data object History : Destination
+
+    @Serializable
+    data object Notifications : Destination
+
+    @Serializable
+    data object Favorites : Destination
+
+    @Serializable
+    data object Bookmarks : Destination
+
+    @Serializable
     data object Calendar : Destination
 
     @Serializable

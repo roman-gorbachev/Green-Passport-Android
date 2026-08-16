@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.HorizontalDivider
@@ -72,9 +73,10 @@ private data class ProfileMenuEntry(
 private val profileMenuEntries = listOf(
     ProfileMenuEntry(R.string.profile_achievements, Icons.Filled.EmojiEvents, Destination.Achievements),
     ProfileMenuEntry(R.string.profile_cards, Icons.Filled.Style, Destination.Cards),
-    ProfileMenuEntry(R.string.profile_history, Icons.Filled.History, null),
-    ProfileMenuEntry(R.string.profile_favorites, Icons.Filled.Favorite, null),
-    ProfileMenuEntry(R.string.profile_bookmarks, Icons.Filled.Bookmark, null),
+    ProfileMenuEntry(R.string.profile_history, Icons.Filled.History, Destination.History),
+    ProfileMenuEntry(R.string.profile_notifications_label, Icons.Filled.Notifications, Destination.Notifications),
+    ProfileMenuEntry(R.string.profile_favorites, Icons.Filled.Favorite, Destination.Favorites),
+    ProfileMenuEntry(R.string.profile_bookmarks, Icons.Filled.Bookmark, Destination.Bookmarks),
     ProfileMenuEntry(R.string.profile_exchange, Icons.Filled.SwapHoriz, Destination.Exchange),
 )
 

@@ -4,6 +4,7 @@ import com.smartcity.greenpassport.core.auth.AuthRepository
 import com.smartcity.greenpassport.core.auth.AuthSession
 import com.smartcity.greenpassport.core.model.EcoTip
 import com.smartcity.greenpassport.core.model.EcoTipsRepository
+import com.smartcity.greenpassport.core.model.FavoritesRepository
 import com.smartcity.greenpassport.core.model.PointsAward
 import com.smartcity.greenpassport.core.model.PointsEarnReason
 import com.smartcity.greenpassport.core.model.PointsRepository
@@ -43,4 +44,17 @@ class MarkTipReadUseCase @Inject constructor(
             ),
         )
     }
+}
+
+class ObserveBookmarkedTipIdsUseCase @Inject constructor(
+    private val favoritesRepository: FavoritesRepository,
+) {
+    operator fun invoke(userId: String): Flow<Set<String>> = favoritesRepository.observeBookmarkedTipIds(userId)
+}
+
+class ToggleTipBookmarkUseCase @Inject constructor(
+    private val favoritesRepository: FavoritesRepository,
+) {
+    suspend operator fun invoke(userId: String, tipId: String, isBookmarked: Boolean) =
+        favoritesRepository.setTipBookmarked(userId, tipId, isBookmarked)
 }

@@ -15,6 +15,7 @@ private const val FIELD_START_AT = "startAtEpochMillis"
 
 private const val FIELD_USER_ID = "userId"
 private const val FIELD_EVENT_ID = "eventId"
+private const val FIELD_REGISTERED_AT = "registeredAtEpochMillis"
 
 class FirestoreEventsRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
@@ -36,7 +37,13 @@ class FirestoreEventsRepository @Inject constructor(
     override suspend fun registerForEvent(userId: String, eventId: String) {
         val registrationId = "${userId}_$eventId"
         FirestoreCollections.eventRegistrations(firestore).document(registrationId)
-            .set(mapOf(FIELD_USER_ID to userId, FIELD_EVENT_ID to eventId))
+            .set(
+                mapOf(
+                    FIELD_USER_ID to userId,
+                    FIELD_EVENT_ID to eventId,
+                    FIELD_REGISTERED_AT to System.currentTimeMillis(),
+                ),
+            )
             .await()
     }
 }

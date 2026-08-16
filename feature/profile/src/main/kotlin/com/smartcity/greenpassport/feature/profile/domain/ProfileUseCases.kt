@@ -3,13 +3,23 @@ package com.smartcity.greenpassport.feature.profile.domain
 import com.smartcity.greenpassport.core.auth.AuthRepository
 import com.smartcity.greenpassport.core.auth.AuthSession
 import com.smartcity.greenpassport.core.datastore.LocalSettingsStore
+import com.smartcity.greenpassport.core.local.NotificationLogEntry
+import com.smartcity.greenpassport.core.local.NotificationLogRepository
 import com.smartcity.greenpassport.core.model.Achievement
 import com.smartcity.greenpassport.core.model.AchievementsRepository
+import com.smartcity.greenpassport.core.model.EcoTip
+import com.smartcity.greenpassport.core.model.EcoTipsRepository
 import com.smartcity.greenpassport.core.model.Experience
+import com.smartcity.greenpassport.core.model.FavoritesRepository
+import com.smartcity.greenpassport.core.model.HistoryEntry
+import com.smartcity.greenpassport.core.model.HistoryRepository
 import com.smartcity.greenpassport.core.model.PointsBalance
 import com.smartcity.greenpassport.core.model.PointsRepository
+import com.smartcity.greenpassport.core.model.Task
+import com.smartcity.greenpassport.core.model.TasksRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 private const val KEY_NOTIFICATIONS_ENABLED = "notifications_enabled"
 
@@ -54,4 +64,36 @@ class GetAchievementsUseCase @Inject constructor(
     private val achievementsRepository: AchievementsRepository,
 ) {
     suspend operator fun invoke(userId: String): List<Achievement> = achievementsRepository.getAchievements(userId)
+}
+
+class GetHistoryUseCase @Inject constructor(
+    private val historyRepository: HistoryRepository,
+) {
+    suspend operator fun invoke(userId: String): List<HistoryEntry> = historyRepository.getHistory(userId)
+}
+
+class ObserveNotificationLogUseCase @Inject constructor(
+    private val notificationLogRepository: NotificationLogRepository,
+) {
+    operator fun invoke(): Flow<List<NotificationLogEntry>> = notificationLogRepository.observeAll()
+}
+
+class GetFavoriteTasksUseCase @Inject constructor(
+    private val favoritesRepository: FavoritesRepository,
+    private val tasksRepository: TasksRepository,
+) {
+    suspend operator fun invoke(userId: String): List<Task> {
+        val favoriteIds = favoritesRepository.observeFavoriteTaskIds(userId).first()
+        return tasksRepository.getTasks().filter { favoriteIds.contains(it.id) }
+    }
+}
+
+class GetBookmarkedTipsUseCase @Inject constructor(
+    private val favoritesRepository: FavoritesRepository,
+    private val ecoTipsRepository: EcoTipsRepository,
+) {
+    suspend operator fun invoke(userId: String): List<EcoTip> {
+        val bookmarkedIds = favoritesRepository.observeBookmarkedTipIds(userId).first()
+        return ecoTipsRepository.getTips().filter { bookmarkedIds.contains(it.id) }
+    }
 }

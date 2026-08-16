@@ -6,6 +6,7 @@ import com.smartcity.greenpassport.core.model.TaskCategory
 data class TasksListUiState(
     val tasks: List<Task> = emptyList(),
     val completedTaskIds: Set<String> = emptySet(),
+    val favoriteTaskIds: Set<String> = emptySet(),
     val selectedCategory: TaskCategory? = null,
     val isLoading: Boolean = true,
 ) {

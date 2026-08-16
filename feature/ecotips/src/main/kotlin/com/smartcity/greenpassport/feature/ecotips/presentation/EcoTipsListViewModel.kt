@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.model.EcoTipCategory
 import com.smartcity.greenpassport.feature.ecotips.domain.GetEcoTipsUseCase
 import com.smartcity.greenpassport.feature.ecotips.domain.GetReadTipIdsUseCase
+import com.smartcity.greenpassport.feature.ecotips.domain.ObserveBookmarkedTipIdsUseCase
 import com.smartcity.greenpassport.feature.ecotips.domain.ObserveEcoTipsSessionUseCase
+import com.smartcity.greenpassport.feature.ecotips.domain.ToggleTipBookmarkUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +21,8 @@ import kotlinx.coroutines.launch
 class EcoTipsListViewModel @Inject constructor(
     private val getEcoTips: GetEcoTipsUseCase,
     private val getReadTipIds: GetReadTipIdsUseCase,
+    private val observeBookmarkedTipIds: ObserveBookmarkedTipIdsUseCase,
+    private val toggleTipBookmark: ToggleTipBookmarkUseCase,
     observeSession: ObserveEcoTipsSessionUseCase,
 ) : ViewModel() {
 
@@ -32,6 +36,11 @@ class EcoTipsListViewModel @Inject constructor(
             observeSession().collectLatest { session ->
                 currentUserId = session?.userId
                 refresh()
+                if (session != null) {
+                    observeBookmarkedTipIds(session.userId).collectLatest { bookmarkedIds ->
+                        _uiState.update { it.copy(bookmarkedTipIds = bookmarkedIds) }
+                    }
+                }
             }
         }
     }
@@ -48,5 +57,11 @@ class EcoTipsListViewModel @Inject constructor(
 
     fun onCategorySelected(category: EcoTipCategory?) {
         _uiState.update { it.copy(selectedCategory = category) }
+    }
+
+    fun onToggleBookmark(tipId: String) {
+        val userId = currentUserId ?: return
+        val isBookmarked = _uiState.value.bookmarkedTipIds.contains(tipId)
+        viewModelScope.launch { toggleTipBookmark(userId, tipId, !isBookmarked) }
     }
 }

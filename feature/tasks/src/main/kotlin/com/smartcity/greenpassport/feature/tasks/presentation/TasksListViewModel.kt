@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.model.TaskCategory
 import com.smartcity.greenpassport.feature.tasks.domain.GetCompletedTaskIdsUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.GetTasksUseCase
+import com.smartcity.greenpassport.feature.tasks.domain.ObserveFavoriteTaskIdsUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.ObserveTasksSessionUseCase
+import com.smartcity.greenpassport.feature.tasks.domain.ToggleTaskFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +21,8 @@ import kotlinx.coroutines.launch
 class TasksListViewModel @Inject constructor(
     private val getTasks: GetTasksUseCase,
     private val getCompletedTaskIds: GetCompletedTaskIdsUseCase,
+    private val observeFavoriteTaskIds: ObserveFavoriteTaskIdsUseCase,
+    private val toggleTaskFavorite: ToggleTaskFavoriteUseCase,
     observeSession: ObserveTasksSessionUseCase,
 ) : ViewModel() {
 
@@ -32,12 +36,23 @@ class TasksListViewModel @Inject constructor(
             observeSession().collectLatest { session ->
                 currentUserId = session?.userId
                 refresh()
+                if (session != null) {
+                    observeFavoriteTaskIds(session.userId).collectLatest { favoriteIds ->
+                        _uiState.update { it.copy(favoriteTaskIds = favoriteIds) }
+                    }
+                }
             }
         }
     }
 
     fun onCategorySelected(category: TaskCategory?) {
         _uiState.update { it.copy(selectedCategory = category) }
+    }
+
+    fun onToggleFavorite(taskId: String) {
+        val userId = currentUserId ?: return
+        val isFavorite = _uiState.value.favoriteTaskIds.contains(taskId)
+        viewModelScope.launch { toggleTaskFavorite(userId, taskId, !isFavorite) }
     }
 
     fun refresh() {

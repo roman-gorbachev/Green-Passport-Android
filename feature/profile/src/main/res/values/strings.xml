@@ -28,5 +28,20 @@
     <string name="cards_screen_title">Мои карты</string>
     <string name="cards_locked_label">Заблокировано</string>
     <string name="exchange_screen_title">Обмен картами</string>
+    <string name="history_screen_title">История</string>
+    <string name="notifications_screen_title">Уведомления</string>
+    <string name="favorites_screen_title">Избранное</string>
+    <string name="bookmarks_screen_title">Закладки</string>
     <string name="exchange_unavailable_message">Обмен картами появится, когда в приложении будет возможность найти другого игрока — пока нет списка или поиска пользователей</string>
+
+    <string name="history_type_task_completed">Задание выполнено</string>
+    <string name="history_type_event_attended">Регистрация на событие</string>
+    <string name="history_type_reward_redeemed">Награда получена</string>
+    <string name="history_row_subtitle_format">%1$s · %2$s</string>
+    <string name="history_empty">История пока пуста</string>
+
+    <string name="notifications_empty">Уведомлений пока не было</string>
+
+    <string name="favorites_empty">Пока нет избранных заданий — отметьте звёздочкой на экране заданий</string>
+    <string name="bookmarks_empty">Пока нет закладок — отметьте совет закладкой на экране эко-советов</string>
 </resources>

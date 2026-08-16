@@ -8,16 +8,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,6 +50,7 @@ fun TasksListScreen(
         uiState = uiState,
         onCategorySelected = viewModel::onCategorySelected,
         onTaskSelected = onTaskSelected,
+        onToggleFavorite = viewModel::onToggleFavorite,
         modifier = modifier,
     )
 }
@@ -54,6 +61,7 @@ private fun TasksListContent(
     uiState: TasksListUiState,
     onCategorySelected: (TaskCategory?) -> Unit,
     onTaskSelected: (String) -> Unit,
+    onToggleFavorite: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -92,7 +100,9 @@ private fun TasksListContent(
                     TaskRow(
                         task = task,
                         isCompleted = uiState.completedTaskIds.contains(task.id),
+                        isFavorite = uiState.favoriteTaskIds.contains(task.id),
                         onClick = { onTaskSelected(task.id) },
+                        onToggleFavorite = { onToggleFavorite(task.id) },
                     )
                 }
             }
@@ -104,11 +114,23 @@ private fun TasksListContent(
 private fun TaskRow(
     task: Task,
     isCompleted: Boolean,
+    isFavorite: Boolean,
     onClick: () -> Unit,
+    onToggleFavorite: () -> Unit,
 ) {
-    PillListItem(
-        title = task.title,
-        leadingIcon = if (isCompleted) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked,
-        onClick = onClick,
-    )
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        PillListItem(
+            title = task.title,
+            leadingIcon = if (isCompleted) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked,
+            onClick = onClick,
+            modifier = Modifier.weight(1f),
+        )
+        IconButton(onClick = onToggleFavorite) {
+            Icon(
+                imageVector = if (isFavorite) Icons.Filled.Star else Icons.Filled.StarBorder,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+            )
+        }
+    }
 }

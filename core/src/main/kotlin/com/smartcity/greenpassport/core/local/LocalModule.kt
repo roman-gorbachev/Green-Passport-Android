@@ -19,14 +19,23 @@ abstract class LocalModule {
     @Binds
     abstract fun bindGameProgressRepository(impl: RoomGameProgressRepository): GameProgressRepository
 
+    @Binds
+    abstract fun bindNotificationLogRepository(impl: RoomNotificationLogRepository): NotificationLogRepository
+
     companion object {
         @Provides
         @Singleton
         fun provideDatabase(@ApplicationContext context: Context): GreenPassportDatabase =
-            Room.databaseBuilder(context, GreenPassportDatabase::class.java, DATABASE_NAME).build()
+            Room.databaseBuilder(context, GreenPassportDatabase::class.java, DATABASE_NAME)
+                .fallbackToDestructiveMigration(dropAllTables = true)
+                .build()
 
         @Provides
         fun provideGameProgressDao(database: GreenPassportDatabase): GameProgressDao =
             database.gameProgressDao()
+
+        @Provides
+        fun provideNotificationLogDao(database: GreenPassportDatabase): NotificationLogDao =
+            database.notificationLogDao()
     }
 }

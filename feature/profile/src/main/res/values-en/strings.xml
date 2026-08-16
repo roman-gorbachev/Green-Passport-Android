@@ -28,5 +28,20 @@
     <string name="cards_screen_title">My cards</string>
     <string name="cards_locked_label">Locked</string>
     <string name="exchange_screen_title">Card exchange</string>
+    <string name="history_screen_title">History</string>
+    <string name="notifications_screen_title">Notifications</string>
+    <string name="favorites_screen_title">Favorites</string>
+    <string name="bookmarks_screen_title">Bookmarks</string>
     <string name="exchange_unavailable_message">Card exchange will become available once the app can find another player — there\'s no user list or search yet</string>
+
+    <string name="history_type_task_completed">Task completed</string>
+    <string name="history_type_event_attended">Event registration</string>
+    <string name="history_type_reward_redeemed">Reward redeemed</string>
+    <string name="history_row_subtitle_format">%1$s · %2$s</string>
+    <string name="history_empty">Your history is empty so far</string>
+
+    <string name="notifications_empty">No notifications yet</string>
+
+    <string name="favorites_empty">No favorite tasks yet — star one on the tasks screen</string>
+    <string name="bookmarks_empty">No bookmarks yet — bookmark a tip on the eco tips screen</string>
 </resources>

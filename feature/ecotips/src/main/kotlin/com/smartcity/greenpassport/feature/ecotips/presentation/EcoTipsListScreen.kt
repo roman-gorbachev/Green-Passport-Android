@@ -3,6 +3,7 @@ package com.smartcity.greenpassport.feature.ecotips.presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,17 +11,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,6 +53,7 @@ fun EcoTipsListScreen(
         uiState = uiState,
         onCategorySelected = viewModel::onCategorySelected,
         onTipSelected = onTipSelected,
+        onToggleBookmark = viewModel::onToggleBookmark,
         modifier = modifier,
     )
 }
@@ -57,6 +64,7 @@ private fun EcoTipsListContent(
     uiState: EcoTipsListUiState,
     onCategorySelected: (EcoTipCategory?) -> Unit,
     onTipSelected: (String) -> Unit,
+    onToggleBookmark: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -97,15 +105,29 @@ private fun EcoTipsListContent(
                 verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
             ) {
                 items(uiState.visibleTips) { tip ->
-                    PillListItem(
-                        title = tip.title,
-                        leadingIcon = if (uiState.readTipIds.contains(tip.id)) {
-                            Icons.Filled.CheckCircle
-                        } else {
-                            Icons.Filled.RadioButtonUnchecked
-                        },
-                        onClick = { onTipSelected(tip.id) },
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        PillListItem(
+                            title = tip.title,
+                            leadingIcon = if (uiState.readTipIds.contains(tip.id)) {
+                                Icons.Filled.CheckCircle
+                            } else {
+                                Icons.Filled.RadioButtonUnchecked
+                            },
+                            onClick = { onTipSelected(tip.id) },
+                            modifier = Modifier.weight(1f),
+                        )
+                        IconButton(onClick = { onToggleBookmark(tip.id) }) {
+                            Icon(
+                                imageVector = if (uiState.bookmarkedTipIds.contains(tip.id)) {
+                                    Icons.Filled.Bookmark
+                                } else {
+                                    Icons.Filled.BookmarkBorder
+                                },
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
                 }
             }
         }
