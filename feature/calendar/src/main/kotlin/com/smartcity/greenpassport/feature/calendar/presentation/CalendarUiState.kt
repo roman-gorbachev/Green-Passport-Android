@@ -7,4 +7,5 @@ data class CalendarUiState(
     val registeredEventIds: Set<String> = emptySet(),
     val registeringEventId: String? = null,
     val isLoading: Boolean = true,
+    val hasError: Boolean = false,
 )

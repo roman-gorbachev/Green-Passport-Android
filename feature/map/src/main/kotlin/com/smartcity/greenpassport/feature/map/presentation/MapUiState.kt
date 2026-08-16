@@ -9,6 +9,7 @@ data class MapUiState(
     val selectedType: MapPointType? = null,
     val searchQuery: String = "",
     val isLoading: Boolean = true,
+    val hasError: Boolean = false,
 ) {
     val visiblePoints: List<MapPoint>
         get() = points

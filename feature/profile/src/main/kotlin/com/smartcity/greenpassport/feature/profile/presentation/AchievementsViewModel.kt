@@ -6,6 +6,7 @@ import com.smartcity.greenpassport.feature.profile.domain.GetAchievementsUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveProfileSessionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,17 +23,35 @@ class AchievementsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AchievementsUiState())
     val uiState: StateFlow<AchievementsUiState> = _uiState.asStateFlow()
 
+    private var currentUserId: String? = null
+
     init {
         viewModelScope.launch {
             observeSession().collectLatest { session ->
+                currentUserId = session?.userId
                 if (session == null) {
                     _uiState.update { it.copy(achievements = emptyList(), isLoading = false) }
                     return@collectLatest
                 }
-                _uiState.update { it.copy(isLoading = true) }
-                val achievements = getAchievements(session.userId)
-                _uiState.update { it.copy(achievements = achievements, isLoading = false) }
+                loadAchievements(session.userId)
             }
+        }
+    }
+
+    fun retry() {
+        val userId = currentUserId ?: return
+        viewModelScope.launch { loadAchievements(userId) }
+    }
+
+    private suspend fun loadAchievements(userId: String) {
+        _uiState.update { it.copy(isLoading = true, hasError = false) }
+        try {
+            val achievements = getAchievements(userId)
+            _uiState.update { it.copy(achievements = achievements, isLoading = false) }
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            _uiState.update { it.copy(isLoading = false, hasError = true) }
         }
     }
 }

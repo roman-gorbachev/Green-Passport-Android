@@ -29,12 +29,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
+import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.PillListItem
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.core.model.TaskCategory
 import com.smartcity.greenpassport.feature.tasks.R
+import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun TasksListScreen(
@@ -51,6 +53,7 @@ fun TasksListScreen(
         onCategorySelected = viewModel::onCategorySelected,
         onTaskSelected = onTaskSelected,
         onToggleFavorite = viewModel::onToggleFavorite,
+        onRetry = viewModel::refresh,
         modifier = modifier,
     )
 }
@@ -62,6 +65,7 @@ private fun TasksListContent(
     onCategorySelected: (TaskCategory?) -> Unit,
     onTaskSelected: (String) -> Unit,
     onToggleFavorite: (String) -> Unit,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -87,6 +91,12 @@ private fun TasksListContent(
 
         when {
             uiState.isLoading -> LoadingContent(modifier = Modifier.fillMaxSize())
+            uiState.hasError -> ErrorContent(
+                message = stringResource(CoreR.string.error_generic_message),
+                retryLabel = stringResource(CoreR.string.retry_button),
+                onRetry = onRetry,
+                modifier = Modifier.fillMaxSize(),
+            )
             uiState.visibleTasks.isEmpty() -> EmptyContent(
                 message = stringResource(R.string.tasks_empty),
                 modifier = Modifier.fillMaxSize(),

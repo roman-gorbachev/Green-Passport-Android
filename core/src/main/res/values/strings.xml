@@ -8,4 +8,6 @@
     <string name="reward_reason_event_attended">Регистрация на событие</string>
     <string name="reward_reason_feedback_submitted">Спасибо за отзыв</string>
     <string name="reward_notification_body_format">+%1$d баллов, +%2$d опыта</string>
+    <string name="error_generic_message">Не удалось загрузить данные. Проверьте соединение и попробуйте снова</string>
+    <string name="retry_button">Повторить</string>
 </resources>

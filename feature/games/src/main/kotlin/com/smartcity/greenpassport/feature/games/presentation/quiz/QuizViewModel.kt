@@ -7,6 +7,7 @@ import com.smartcity.greenpassport.feature.games.domain.ObserveGamesSessionUseCa
 import com.smartcity.greenpassport.feature.games.domain.SubmitGameResultUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -56,7 +57,13 @@ class QuizViewModel @Inject constructor(
         if (nextIndex >= quizQuestions.size) {
             _uiState.update { it.copy(isFinished = true, selectedOptionIndex = null) }
             val userId = observeSession().first()?.userId ?: return
-            submitGameResult(userId, GameId.ECO_QUIZ, _uiState.value.score)
+            try {
+                submitGameResult(userId, GameId.ECO_QUIZ, _uiState.value.score)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Unit
+            }
         } else {
             _uiState.update { it.copy(currentQuestionIndex = nextIndex, selectedOptionIndex = null) }
         }

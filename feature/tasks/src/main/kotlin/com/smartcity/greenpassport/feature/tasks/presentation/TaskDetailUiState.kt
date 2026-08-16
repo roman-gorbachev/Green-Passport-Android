@@ -7,4 +7,5 @@ data class TaskDetailUiState(
     val isCompleted: Boolean = false,
     val isLoading: Boolean = true,
     val isSubmitting: Boolean = false,
+    val hasError: Boolean = false,
 )

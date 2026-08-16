@@ -8,6 +8,7 @@ import com.smartcity.greenpassport.feature.map.domain.ObserveSavedMapPointIdsUse
 import com.smartcity.greenpassport.feature.map.domain.ToggleSavedMapPointUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,15 +27,25 @@ class MapViewModel @Inject constructor(
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            val points = getMapPoints()
-            _uiState.update { it.copy(points = points, isLoading = false) }
-        }
+        refresh()
 
         viewModelScope.launch {
             observeSavedMapPointIds().collectLatest { savedIds ->
                 _uiState.update { it.copy(savedPointIds = savedIds) }
+            }
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, hasError = false) }
+            try {
+                val points = getMapPoints()
+                _uiState.update { it.copy(points = points, isLoading = false) }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                _uiState.update { it.copy(isLoading = false, hasError = true) }
             }
         }
     }
@@ -49,7 +60,13 @@ class MapViewModel @Inject constructor(
 
     fun onToggleSaved(pointId: String) {
         viewModelScope.launch {
-            toggleSavedMapPoint(pointId, _uiState.value.savedPointIds)
+            try {
+                toggleSavedMapPoint(pointId, _uiState.value.savedPointIds)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Unit
+            }
         }
     }
 }

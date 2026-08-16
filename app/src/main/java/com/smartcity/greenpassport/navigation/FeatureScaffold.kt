@@ -1,6 +1,7 @@
 package com.smartcity.greenpassport.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,6 +16,8 @@ import androidx.compose.ui.res.stringResource
 import com.smartcity.greenpassport.R
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 
+private val NoWindowInsets = WindowInsets(0, 0, 0, 0)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeatureScaffold(
@@ -25,6 +28,7 @@ fun FeatureScaffold(
 ) {
     Scaffold(
         modifier = modifier,
+        contentWindowInsets = NoWindowInsets,
         topBar = {
             TopAppBar(
                 title = { Text(title) },
@@ -37,6 +41,7 @@ fun FeatureScaffold(
                     }
                 },
                 expandedHeight = Dimens.TopBarHeight,
+                windowInsets = NoWindowInsets,
             )
         },
         content = { innerPadding -> content(innerPadding) },

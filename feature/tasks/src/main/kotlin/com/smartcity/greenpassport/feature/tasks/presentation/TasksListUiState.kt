@@ -9,6 +9,7 @@ data class TasksListUiState(
     val favoriteTaskIds: Set<String> = emptySet(),
     val selectedCategory: TaskCategory? = null,
     val isLoading: Boolean = true,
+    val hasError: Boolean = false,
 ) {
     val visibleTasks: List<Task>
         get() = selectedCategory?.let { category -> tasks.filter { it.category == category } } ?: tasks

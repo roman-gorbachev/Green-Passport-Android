@@ -10,6 +10,7 @@ import com.smartcity.greenpassport.feature.ecotips.domain.ObserveEcoTipsSessionU
 import com.smartcity.greenpassport.feature.ecotips.domain.ToggleTipBookmarkUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,11 +48,17 @@ class EcoTipsListViewModel @Inject constructor(
 
     fun refresh() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            val userId = currentUserId
-            val tips = getEcoTips()
-            val readIds = userId?.let { getReadTipIds(it) } ?: emptySet()
-            _uiState.update { it.copy(tips = tips, readTipIds = readIds, isLoading = false) }
+            _uiState.update { it.copy(isLoading = true, hasError = false) }
+            try {
+                val userId = currentUserId
+                val tips = getEcoTips()
+                val readIds = userId?.let { getReadTipIds(it) } ?: emptySet()
+                _uiState.update { it.copy(tips = tips, readTipIds = readIds, isLoading = false) }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                _uiState.update { it.copy(isLoading = false, hasError = true) }
+            }
         }
     }
 
@@ -62,6 +69,14 @@ class EcoTipsListViewModel @Inject constructor(
     fun onToggleBookmark(tipId: String) {
         val userId = currentUserId ?: return
         val isBookmarked = _uiState.value.bookmarkedTipIds.contains(tipId)
-        viewModelScope.launch { toggleTipBookmark(userId, tipId, !isBookmarked) }
+        viewModelScope.launch {
+            try {
+                toggleTipBookmark(userId, tipId, !isBookmarked)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Unit
+            }
+        }
     }
 }

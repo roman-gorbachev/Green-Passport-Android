@@ -23,12 +23,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
+import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.EcoEvent
 import com.smartcity.greenpassport.feature.calendar.R
 import java.text.DateFormat
 import java.util.Date
+import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun CalendarScreen(
@@ -39,6 +41,12 @@ fun CalendarScreen(
 
     when {
         uiState.isLoading -> LoadingContent(modifier = modifier)
+        uiState.hasError -> ErrorContent(
+            message = stringResource(CoreR.string.error_generic_message),
+            retryLabel = stringResource(CoreR.string.retry_button),
+            onRetry = viewModel::refresh,
+            modifier = modifier,
+        )
         uiState.events.isEmpty() -> EmptyContent(
             message = stringResource(R.string.calendar_empty),
             modifier = modifier,

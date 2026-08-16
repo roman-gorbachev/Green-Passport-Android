@@ -14,4 +14,5 @@ data class FeedbackUiState(
     val hasAnsweredSurvey: Boolean = false,
     val isSubmittingSurveyAnswer: Boolean = false,
     val isLoading: Boolean = true,
+    val hasError: Boolean = false,
 )

@@ -29,11 +29,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
+import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.MapPoint
 import com.smartcity.greenpassport.core.model.MapPointType
 import com.smartcity.greenpassport.feature.map.R
+import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun MapScreen(
@@ -47,6 +49,7 @@ fun MapScreen(
         onTypeSelected = viewModel::onTypeSelected,
         onSearchQueryChange = viewModel::onSearchQueryChange,
         onToggleSaved = viewModel::onToggleSaved,
+        onRetry = viewModel::refresh,
         modifier = modifier,
     )
 }
@@ -58,6 +61,7 @@ private fun MapContent(
     onTypeSelected: (MapPointType?) -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onToggleSaved: (String) -> Unit,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -93,6 +97,12 @@ private fun MapContent(
 
         when {
             uiState.isLoading -> LoadingContent(modifier = Modifier.fillMaxSize())
+            uiState.hasError -> ErrorContent(
+                message = stringResource(CoreR.string.error_generic_message),
+                retryLabel = stringResource(CoreR.string.retry_button),
+                onRetry = onRetry,
+                modifier = Modifier.fillMaxSize(),
+            )
             uiState.visiblePoints.isEmpty() -> EmptyContent(
                 message = stringResource(R.string.map_empty),
                 modifier = Modifier.fillMaxSize(),

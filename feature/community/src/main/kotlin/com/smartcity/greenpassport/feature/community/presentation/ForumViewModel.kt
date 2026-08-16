@@ -7,6 +7,7 @@ import com.smartcity.greenpassport.feature.community.domain.ObserveForumPostsUse
 import com.smartcity.greenpassport.feature.community.domain.PostToForumUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,8 +49,14 @@ class ForumViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isPosting = true) }
-            postToForum(authorId, text)
-            _uiState.update { it.copy(isPosting = false, draft = "") }
+            try {
+                postToForum(authorId, text)
+                _uiState.update { it.copy(isPosting = false, draft = "") }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                _uiState.update { it.copy(isPosting = false) }
+            }
         }
     }
 }

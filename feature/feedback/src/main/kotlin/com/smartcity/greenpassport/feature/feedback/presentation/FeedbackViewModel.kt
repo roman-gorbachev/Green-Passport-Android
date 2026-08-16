@@ -10,6 +10,7 @@ import com.smartcity.greenpassport.feature.feedback.domain.SubmitFeedbackUseCase
 import com.smartcity.greenpassport.feature.feedback.domain.SubmitSurveyAnswerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,13 +41,23 @@ class FeedbackViewModel @Inject constructor(
         }
     }
 
+    fun retry() {
+        refresh()
+    }
+
     private fun refresh() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            val survey = getActiveSurvey()
-            val userId = currentUserId
-            val answered = if (survey != null && userId != null) hasAnsweredSurvey(userId, survey.id) else false
-            _uiState.update { it.copy(survey = survey, hasAnsweredSurvey = answered, isLoading = false) }
+            _uiState.update { it.copy(isLoading = true, hasError = false) }
+            try {
+                val survey = getActiveSurvey()
+                val userId = currentUserId
+                val answered = if (survey != null && userId != null) hasAnsweredSurvey(userId, survey.id) else false
+                _uiState.update { it.copy(survey = survey, hasAnsweredSurvey = answered, isLoading = false) }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                _uiState.update { it.copy(isLoading = false, hasError = true) }
+            }
         }
     }
 
@@ -65,8 +76,14 @@ class FeedbackViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmittingReview = true) }
-            submitFeedback(userId, FeedbackType.REVIEW, state.reviewMessage.trim(), state.rating)
-            _uiState.update { it.copy(isSubmittingReview = false, reviewSubmitted = true) }
+            try {
+                submitFeedback(userId, FeedbackType.REVIEW, state.reviewMessage.trim(), state.rating)
+                _uiState.update { it.copy(isSubmittingReview = false, reviewSubmitted = true) }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                _uiState.update { it.copy(isSubmittingReview = false) }
+            }
         }
     }
 
@@ -82,9 +99,15 @@ class FeedbackViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmittingSuggestion = true) }
-            submitFeedback(userId, FeedbackType.SUGGESTION, text, null)
-            _uiState.update {
-                it.copy(isSubmittingSuggestion = false, suggestionSubmitted = true, suggestionMessage = "")
+            try {
+                submitFeedback(userId, FeedbackType.SUGGESTION, text, null)
+                _uiState.update {
+                    it.copy(isSubmittingSuggestion = false, suggestionSubmitted = true, suggestionMessage = "")
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                _uiState.update { it.copy(isSubmittingSuggestion = false) }
             }
         }
     }
@@ -96,8 +119,14 @@ class FeedbackViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmittingSurveyAnswer = true) }
-            submitSurveyAnswer(userId, survey.id, optionIndex)
-            _uiState.update { it.copy(isSubmittingSurveyAnswer = false, hasAnsweredSurvey = true) }
+            try {
+                submitSurveyAnswer(userId, survey.id, optionIndex)
+                _uiState.update { it.copy(isSubmittingSurveyAnswer = false, hasAnsweredSurvey = true) }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                _uiState.update { it.copy(isSubmittingSurveyAnswer = false) }
+            }
         }
     }
 }

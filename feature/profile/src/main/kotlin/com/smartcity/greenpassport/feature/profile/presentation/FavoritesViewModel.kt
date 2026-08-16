@@ -6,6 +6,7 @@ import com.smartcity.greenpassport.feature.profile.domain.GetFavoriteTasksUseCas
 import com.smartcity.greenpassport.feature.profile.domain.ObserveProfileSessionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,17 +23,35 @@ class FavoritesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(FavoritesUiState())
     val uiState: StateFlow<FavoritesUiState> = _uiState.asStateFlow()
 
+    private var currentUserId: String? = null
+
     init {
         viewModelScope.launch {
             observeSession().collectLatest { session ->
+                currentUserId = session?.userId
                 if (session == null) {
                     _uiState.update { it.copy(tasks = emptyList(), isLoading = false) }
                     return@collectLatest
                 }
-                _uiState.update { it.copy(isLoading = true) }
-                val tasks = getFavoriteTasks(session.userId)
-                _uiState.update { it.copy(tasks = tasks, isLoading = false) }
+                loadFavorites(session.userId)
             }
+        }
+    }
+
+    fun retry() {
+        val userId = currentUserId ?: return
+        viewModelScope.launch { loadFavorites(userId) }
+    }
+
+    private suspend fun loadFavorites(userId: String) {
+        _uiState.update { it.copy(isLoading = true, hasError = false) }
+        try {
+            val tasks = getFavoriteTasks(userId)
+            _uiState.update { it.copy(tasks = tasks, isLoading = false) }
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            _uiState.update { it.copy(isLoading = false, hasError = true) }
         }
     }
 }

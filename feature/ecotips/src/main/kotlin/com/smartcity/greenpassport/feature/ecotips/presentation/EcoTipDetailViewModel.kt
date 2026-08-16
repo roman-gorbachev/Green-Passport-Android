@@ -9,6 +9,7 @@ import com.smartcity.greenpassport.feature.ecotips.domain.MarkTipReadUseCase
 import com.smartcity.greenpassport.feature.ecotips.domain.ObserveEcoTipsSessionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,11 +41,21 @@ class EcoTipDetailViewModel @Inject constructor(
         }
     }
 
+    fun retry() {
+        viewModelScope.launch { loadTip() }
+    }
+
     private suspend fun loadTip() {
-        _uiState.update { it.copy(isLoading = true) }
-        val tip = getEcoTips().firstOrNull { it.id == tipId }
-        val isRead = currentUserId?.let { getReadTipIds(it) }?.contains(tipId) ?: false
-        _uiState.update { it.copy(tip = tip, isRead = isRead, isLoading = false) }
+        _uiState.update { it.copy(isLoading = true, hasError = false) }
+        try {
+            val tip = getEcoTips().firstOrNull { it.id == tipId }
+            val isRead = currentUserId?.let { getReadTipIds(it) }?.contains(tipId) ?: false
+            _uiState.update { it.copy(tip = tip, isRead = isRead, isLoading = false) }
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            _uiState.update { it.copy(isLoading = false, hasError = true) }
+        }
     }
 
     fun onMarkAsRead() {
@@ -55,8 +66,14 @@ class EcoTipDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true) }
-            markTipRead(userId, tip)
-            _uiState.update { it.copy(isSubmitting = false, isRead = true) }
+            try {
+                markTipRead(userId, tip)
+                _uiState.update { it.copy(isSubmitting = false, isRead = true) }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                _uiState.update { it.copy(isSubmitting = false) }
+            }
         }
     }
 }

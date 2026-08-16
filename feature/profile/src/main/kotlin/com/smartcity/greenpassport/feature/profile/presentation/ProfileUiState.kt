@@ -9,4 +9,5 @@ data class ProfileUiState(
     val points: Int = 0,
     val notificationsEnabled: Boolean = false,
     val isLoading: Boolean = true,
+    val hasError: Boolean = false,
 )

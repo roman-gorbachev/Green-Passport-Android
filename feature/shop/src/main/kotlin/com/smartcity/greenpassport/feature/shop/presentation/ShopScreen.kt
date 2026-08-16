@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.PointsBadge
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
@@ -30,6 +31,7 @@ import com.smartcity.greenpassport.core.model.Reward
 import com.smartcity.greenpassport.feature.shop.R
 import java.text.DateFormat
 import java.util.Date
+import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun ShopScreen(
@@ -37,6 +39,16 @@ fun ShopScreen(
     viewModel: ShopViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    if (uiState.hasError) {
+        ErrorContent(
+            message = stringResource(CoreR.string.error_generic_message),
+            retryLabel = stringResource(CoreR.string.retry_button),
+            onRetry = viewModel::refresh,
+            modifier = modifier,
+        )
+        return
+    }
 
     if (uiState.isLoading) {
         LoadingContent(modifier = modifier)

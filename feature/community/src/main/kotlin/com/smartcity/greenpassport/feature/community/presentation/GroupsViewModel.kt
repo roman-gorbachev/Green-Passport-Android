@@ -9,6 +9,7 @@ import com.smartcity.greenpassport.feature.community.domain.ObserveCommunitySess
 import com.smartcity.greenpassport.feature.community.domain.ObserveGroupsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -51,8 +52,14 @@ class GroupsViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isCreating = true) }
-            createGroup(name, creatorId)
-            _uiState.update { it.copy(isCreating = false, draftName = "") }
+            try {
+                createGroup(name, creatorId)
+                _uiState.update { it.copy(isCreating = false, draftName = "") }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                _uiState.update { it.copy(isCreating = false) }
+            }
         }
     }
 
@@ -63,8 +70,15 @@ class GroupsViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(joiningGroupId = group.id) }
-            joinGroup(group.id, userId)
-            _uiState.update { it.copy(joiningGroupId = null) }
+            try {
+                joinGroup(group.id, userId)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Unit
+            } finally {
+                _uiState.update { it.copy(joiningGroupId = null) }
+            }
         }
     }
 }

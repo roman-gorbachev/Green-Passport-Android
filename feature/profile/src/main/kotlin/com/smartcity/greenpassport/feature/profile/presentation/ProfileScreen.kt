@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
 import com.smartcity.greenpassport.core.designsystem.component.PillListItem
@@ -41,6 +42,7 @@ import com.smartcity.greenpassport.core.designsystem.component.PointsBadge
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.profile.R
+import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun ProfileScreen(
@@ -49,6 +51,16 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    if (uiState.hasError) {
+        ErrorContent(
+            message = stringResource(CoreR.string.error_generic_message),
+            retryLabel = stringResource(CoreR.string.retry_button),
+            onRetry = viewModel::refresh,
+            modifier = modifier,
+        )
+        return
+    }
 
     if (uiState.isLoading) {
         LoadingContent(modifier = modifier)

@@ -16,10 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.EcoTip
 import com.smartcity.greenpassport.feature.ecotips.R
+import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun EcoTipDetailScreen(
@@ -27,6 +29,16 @@ fun EcoTipDetailScreen(
     viewModel: EcoTipDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    if (uiState.hasError) {
+        ErrorContent(
+            message = stringResource(CoreR.string.error_generic_message),
+            retryLabel = stringResource(CoreR.string.retry_button),
+            onRetry = viewModel::retry,
+            modifier = modifier,
+        )
+        return
+    }
 
     if (uiState.isLoading || uiState.tip == null) {
         LoadingContent(modifier = modifier)

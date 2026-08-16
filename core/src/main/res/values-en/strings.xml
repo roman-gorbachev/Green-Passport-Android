@@ -8,4 +8,6 @@
     <string name="reward_reason_event_attended">Event registration</string>
     <string name="reward_reason_feedback_submitted">Thanks for your feedback</string>
     <string name="reward_notification_body_format">+%1$d points, +%2$d XP</string>
+    <string name="error_generic_message">Couldn\'t load data. Check your connection and try again</string>
+    <string name="retry_button">Retry</string>
 </resources>

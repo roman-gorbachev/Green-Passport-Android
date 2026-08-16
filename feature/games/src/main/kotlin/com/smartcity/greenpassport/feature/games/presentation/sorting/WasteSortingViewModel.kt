@@ -7,6 +7,7 @@ import com.smartcity.greenpassport.feature.games.domain.ObserveGamesSessionUseCa
 import com.smartcity.greenpassport.feature.games.domain.SubmitGameResultUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,7 +67,13 @@ class WasteSortingViewModel @Inject constructor(
         _uiState.update { it.copy(isFinished = true, currentItem = null) }
         viewModelScope.launch {
             val userId = observeSession().first()?.userId ?: return@launch
-            submitGameResult(userId, GameId.WASTE_SORTING, _uiState.value.score)
+            try {
+                submitGameResult(userId, GameId.WASTE_SORTING, _uiState.value.score)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Unit
+            }
         }
     }
 

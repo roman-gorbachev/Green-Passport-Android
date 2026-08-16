@@ -32,12 +32,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
+import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.PillListItem
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.EcoTip
 import com.smartcity.greenpassport.core.model.EcoTipCategory
 import com.smartcity.greenpassport.feature.ecotips.R
+import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun EcoTipsListScreen(
@@ -54,6 +56,7 @@ fun EcoTipsListScreen(
         onCategorySelected = viewModel::onCategorySelected,
         onTipSelected = onTipSelected,
         onToggleBookmark = viewModel::onToggleBookmark,
+        onRetry = viewModel::refresh,
         modifier = modifier,
     )
 }
@@ -65,6 +68,7 @@ private fun EcoTipsListContent(
     onCategorySelected: (EcoTipCategory?) -> Unit,
     onTipSelected: (String) -> Unit,
     onToggleBookmark: (String) -> Unit,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -95,6 +99,12 @@ private fun EcoTipsListContent(
 
         when {
             uiState.isLoading -> LoadingContent(modifier = Modifier.fillMaxSize())
+            uiState.hasError -> ErrorContent(
+                message = stringResource(CoreR.string.error_generic_message),
+                retryLabel = stringResource(CoreR.string.retry_button),
+                onRetry = onRetry,
+                modifier = Modifier.fillMaxSize(),
+            )
             uiState.visibleTips.isEmpty() -> EmptyContent(
                 message = stringResource(R.string.ecotips_empty),
                 modifier = Modifier.fillMaxSize(),

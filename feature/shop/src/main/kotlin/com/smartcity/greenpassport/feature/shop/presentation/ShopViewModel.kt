@@ -43,13 +43,19 @@ class ShopViewModel @Inject constructor(
 
     fun refresh() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            val userId = currentUserId
-            val rewards = getRewards()
-            val points = userId?.let { getPointsBalance(it) } ?: 0
-            val purchases = userId?.let { getPurchases(it) } ?: emptyList()
-            _uiState.update {
-                it.copy(rewards = rewards, points = points, purchases = purchases, isLoading = false)
+            _uiState.update { it.copy(isLoading = true, hasError = false) }
+            try {
+                val userId = currentUserId
+                val rewards = getRewards()
+                val points = userId?.let { getPointsBalance(it) } ?: 0
+                val purchases = userId?.let { getPurchases(it) } ?: emptyList()
+                _uiState.update {
+                    it.copy(rewards = rewards, points = points, purchases = purchases, isLoading = false)
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                _uiState.update { it.copy(isLoading = false, hasError = true) }
             }
         }
     }

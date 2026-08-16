@@ -9,6 +9,7 @@ data class EcoTipsListUiState(
     val bookmarkedTipIds: Set<String> = emptySet(),
     val selectedCategory: EcoTipCategory? = null,
     val isLoading: Boolean = true,
+    val hasError: Boolean = false,
 ) {
     val dailyTip: EcoTip?
         get() = tips.firstOrNull { it.isDailyTip }

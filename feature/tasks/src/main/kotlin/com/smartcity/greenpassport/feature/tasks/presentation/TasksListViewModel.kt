@@ -10,6 +10,7 @@ import com.smartcity.greenpassport.feature.tasks.domain.ObserveTasksSessionUseCa
 import com.smartcity.greenpassport.feature.tasks.domain.ToggleTaskFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,16 +53,30 @@ class TasksListViewModel @Inject constructor(
     fun onToggleFavorite(taskId: String) {
         val userId = currentUserId ?: return
         val isFavorite = _uiState.value.favoriteTaskIds.contains(taskId)
-        viewModelScope.launch { toggleTaskFavorite(userId, taskId, !isFavorite) }
+        viewModelScope.launch {
+            try {
+                toggleTaskFavorite(userId, taskId, !isFavorite)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Unit
+            }
+        }
     }
 
     fun refresh() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            val tasks = getTasks()
-            val completedIds = currentUserId?.let { getCompletedTaskIds(it) } ?: emptySet()
-            _uiState.update {
-                it.copy(tasks = tasks, completedTaskIds = completedIds, isLoading = false)
+            _uiState.update { it.copy(isLoading = true, hasError = false) }
+            try {
+                val tasks = getTasks()
+                val completedIds = currentUserId?.let { getCompletedTaskIds(it) } ?: emptySet()
+                _uiState.update {
+                    it.copy(tasks = tasks, completedTaskIds = completedIds, isLoading = false)
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                _uiState.update { it.copy(isLoading = false, hasError = true) }
             }
         }
     }

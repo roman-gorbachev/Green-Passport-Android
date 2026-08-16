@@ -10,4 +10,5 @@ data class ShopUiState(
     val purchasingRewardId: String? = null,
     val hasInsufficientPoints: Boolean = false,
     val isLoading: Boolean = true,
+    val hasError: Boolean = false,
 )

@@ -7,6 +7,7 @@ import com.smartcity.greenpassport.feature.games.domain.ObserveGamesSessionUseCa
 import com.smartcity.greenpassport.feature.games.domain.SubmitGameResultUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -54,7 +55,13 @@ class MazeViewModel @Inject constructor(
         if (isFinished) {
             viewModelScope.launch {
                 val userId = observeSession().first()?.userId ?: return@launch
-                submitGameResult(userId, GameId.ECO_MAZE, score)
+                try {
+                    submitGameResult(userId, GameId.ECO_MAZE, score)
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (error: Exception) {
+                    Unit
+                }
             }
         }
     }

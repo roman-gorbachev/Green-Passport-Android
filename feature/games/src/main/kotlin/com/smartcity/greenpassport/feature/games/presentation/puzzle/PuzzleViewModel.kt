@@ -7,6 +7,7 @@ import com.smartcity.greenpassport.feature.games.domain.ObserveGamesSessionUseCa
 import com.smartcity.greenpassport.feature.games.domain.SubmitGameResultUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -77,7 +78,13 @@ class PuzzleViewModel @Inject constructor(
         _uiState.update { it.copy(isFinished = true, score = score) }
 
         val userId = observeSession().first()?.userId ?: return
-        submitGameResult(userId, GameId.ECO_PUZZLE, score)
+        try {
+            submitGameResult(userId, GameId.ECO_PUZZLE, score)
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            Unit
+        }
     }
 
     fun onRestart() {

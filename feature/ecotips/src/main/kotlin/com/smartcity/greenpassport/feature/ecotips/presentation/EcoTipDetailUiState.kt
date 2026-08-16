@@ -7,4 +7,5 @@ data class EcoTipDetailUiState(
     val isRead: Boolean = false,
     val isLoading: Boolean = true,
     val isSubmitting: Boolean = false,
+    val hasError: Boolean = false,
 )
