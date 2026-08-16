@@ -1,0 +1,5 @@
+<resources>
+    <string name="calendar_empty">No upcoming events yet</string>
+    <string name="calendar_register_button">Register</string>
+    <string name="calendar_registered_label">You\'re registered</string>
+</resources>

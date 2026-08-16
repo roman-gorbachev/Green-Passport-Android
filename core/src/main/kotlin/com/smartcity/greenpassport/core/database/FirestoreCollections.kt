@@ -12,6 +12,8 @@ private const val TASK_PROGRESS_COLLECTION = "taskProgress"
 private const val SHOP_ITEMS_COLLECTION = "shopItems"
 private const val PURCHASES_COLLECTION = "purchases"
 private const val MAP_POINTS_COLLECTION = "mapPoints"
+private const val EVENTS_COLLECTION = "events"
+private const val EVENT_REGISTRATIONS_COLLECTION = "eventRegistrations"
 
 object FirestoreCollections {
     fun appRoot(firestore: FirebaseFirestore): DocumentReference =
@@ -34,4 +36,10 @@ object FirestoreCollections {
 
     fun mapPoints(firestore: FirebaseFirestore): CollectionReference =
         appRoot(firestore).collection(MAP_POINTS_COLLECTION)
+
+    fun events(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(EVENTS_COLLECTION)
+
+    fun eventRegistrations(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(EVENT_REGISTRATIONS_COLLECTION)
 }

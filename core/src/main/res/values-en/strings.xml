@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="notification_channel_rewards_name">Rewards and reminders</string>
+    <string name="event_reminder_title">Upcoming event</string>
 </resources>

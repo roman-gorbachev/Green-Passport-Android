@@ -1,0 +1,5 @@
+<resources>
+    <string name="calendar_empty">Пока нет запланированных мероприятий</string>
+    <string name="calendar_register_button">Зарегистрироваться</string>
+    <string name="calendar_registered_label">Вы зарегистрированы</string>
+</resources>

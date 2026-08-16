@@ -17,6 +17,9 @@ abstract class MessagingModule {
     @Binds
     abstract fun bindNotificationsRepository(impl: FirebaseNotificationsRepository): NotificationsRepository
 
+    @Binds
+    abstract fun bindReminderScheduler(impl: WorkManagerReminderScheduler): ReminderScheduler
+
     companion object {
         @Provides
         @Singleton

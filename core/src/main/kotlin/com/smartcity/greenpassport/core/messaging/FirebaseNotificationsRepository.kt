@@ -16,7 +16,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.tasks.await
 
-private const val REWARDS_CHANNEL_ID = "greenpassport_rewards"
 private const val FIELD_FCM_TOKEN = "fcmToken"
 
 class FirebaseNotificationsRepository @Inject constructor(
@@ -36,7 +35,7 @@ class FirebaseNotificationsRepository @Inject constructor(
     override fun ensureNotificationChannel() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val channel = NotificationChannel(
-            REWARDS_CHANNEL_ID,
+            NotificationChannels.REWARDS_CHANNEL_ID,
             context.getString(R.string.notification_channel_rewards_name),
             NotificationManager.IMPORTANCE_DEFAULT,
         )
