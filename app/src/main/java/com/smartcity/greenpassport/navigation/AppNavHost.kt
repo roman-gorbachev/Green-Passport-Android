@@ -1,21 +1,20 @@
 package com.smartcity.greenpassport.navigation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.foundation.layout.padding
 import com.smartcity.greenpassport.R
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.calendar.presentation.CalendarScreen
-import com.smartcity.greenpassport.feature.community.R as CommunityR
-import com.smartcity.greenpassport.feature.community.presentation.CommunityHubScreen
-import com.smartcity.greenpassport.feature.community.presentation.ForumScreen
-import com.smartcity.greenpassport.feature.community.presentation.GroupsScreen
-import com.smartcity.greenpassport.feature.ecotips.presentation.EcoTipDetailScreen
-import com.smartcity.greenpassport.feature.ecotips.presentation.EcoTipsListScreen
+import com.smartcity.greenpassport.feature.community.presentation.ui.CommunityHubScreen
+import com.smartcity.greenpassport.feature.community.presentation.ui.ForumScreen
+import com.smartcity.greenpassport.feature.community.presentation.ui.GroupsScreen
+import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipDetailScreen
+import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipsListScreen
 import com.smartcity.greenpassport.feature.feedback.presentation.FeedbackScreen
 import com.smartcity.greenpassport.feature.games.domain.GameId
 import com.smartcity.greenpassport.feature.games.presentation.GamesHubScreen
@@ -25,20 +24,21 @@ import com.smartcity.greenpassport.feature.games.presentation.puzzle.PuzzleScree
 import com.smartcity.greenpassport.feature.games.presentation.quiz.QuizScreen
 import com.smartcity.greenpassport.feature.games.presentation.sorting.WasteSortingScreen
 import com.smartcity.greenpassport.feature.map.presentation.MapScreen
-import com.smartcity.greenpassport.feature.profile.presentation.AchievementsScreen
-import com.smartcity.greenpassport.feature.profile.presentation.BookmarksScreen
 import com.smartcity.greenpassport.feature.profile.presentation.CardsScreen
 import com.smartcity.greenpassport.feature.profile.presentation.ExchangeScreen
-import com.smartcity.greenpassport.feature.profile.presentation.FavoritesScreen
-import com.smartcity.greenpassport.feature.profile.presentation.HistoryScreen
-import com.smartcity.greenpassport.feature.profile.presentation.NotificationsScreen
-import com.smartcity.greenpassport.feature.profile.presentation.ProfileScreen
-import com.smartcity.greenpassport.feature.profile.R as ProfileR
+import com.smartcity.greenpassport.feature.profile.presentation.achievements.AchievementsScreen
+import com.smartcity.greenpassport.feature.profile.presentation.bookmarks.BookmarksScreen
+import com.smartcity.greenpassport.feature.profile.presentation.favorites.FavoritesScreen
+import com.smartcity.greenpassport.feature.profile.presentation.history.HistoryScreen
+import com.smartcity.greenpassport.feature.profile.presentation.notifications.NotificationsScreen
+import com.smartcity.greenpassport.feature.profile.presentation.profile.ProfileScreen
 import com.smartcity.greenpassport.feature.shop.presentation.ShopScreen
-import com.smartcity.greenpassport.feature.tasks.presentation.TaskDetailScreen
-import com.smartcity.greenpassport.feature.tasks.presentation.TasksListScreen
+import com.smartcity.greenpassport.feature.tasks.presentation.ui.TaskDetailScreen
+import com.smartcity.greenpassport.feature.tasks.presentation.ui.TasksListScreen
 import com.smartcity.greenpassport.home.HomeScreen
 import com.smartcity.greenpassport.home.homeMenuLabelRes
+import com.smartcity.greenpassport.feature.community.R as CommunityR
+import com.smartcity.greenpassport.feature.profile.R as ProfileR
 
 @Composable
 fun AppNavHost(modifier: Modifier = Modifier) {

@@ -1,17 +1,18 @@
 package com.smartcity.greenpassport.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -21,10 +22,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.smartcity.greenpassport.R
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.navigation.Destination
@@ -36,15 +41,39 @@ fun HomeScreen(
     onDestinationSelected: (Destination) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(HOME_GRID_COLUMNS),
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(Dimens.SpacingMedium),
-        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
-        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+    Box(
+        modifier = modifier.fillMaxSize()
     ) {
-        items(homeMenuItems) { item ->
-            HomeMenuTile(item = item, onClick = { onDestinationSelected(item.destination) })
+        Image(
+            painter = painterResource(id = R.drawable.background),
+            contentDescription = null,
+            modifier = Modifier.matchParentSize(),
+            contentScale = ContentScale.Crop
+        )
+        Text(
+            text = stringResource(R.string.onboarding_title),
+            style = MaterialTheme.typography.headlineLarge,
+            textAlign = TextAlign.Center,
+            fontSize = 36.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 64.dp),
+        )
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(HOME_GRID_COLUMNS),
+            modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter),
+            contentPadding = PaddingValues(
+                top = Dimens.SpacingMedium,
+                start = Dimens.SpacingMedium,
+                end = Dimens.SpacingMedium,
+                bottom = 64.dp
+            ),
+            horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+            verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+        ) {
+            items(homeMenuItems) { item ->
+                HomeMenuTile(item = item, onClick = { onDestinationSelected(item.destination) })
+            }
         }
     }
 }
@@ -75,7 +104,7 @@ private fun HomeMenuTile(
                     painter = painterResource(icon.drawableRes),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(Dimens.IconSizeLarge)
+                        .size(Dimens.IconSizeExtraLarge)
                         .padding(bottom = Dimens.SpacingSmall),
                 )
 
@@ -84,7 +113,7 @@ private fun HomeMenuTile(
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier
-                        .size(Dimens.IconSizeLarge)
+                        .size(Dimens.IconSizeExtraLarge)
                         .padding(bottom = Dimens.SpacingSmall),
                 )
             }

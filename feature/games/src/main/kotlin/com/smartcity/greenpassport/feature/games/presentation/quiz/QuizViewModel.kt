@@ -1,13 +1,12 @@
 package com.smartcity.greenpassport.feature.games.presentation.quiz
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.feature.games.domain.GameId
 import com.smartcity.greenpassport.feature.games.domain.ObserveGamesSessionUseCase
 import com.smartcity.greenpassport.feature.games.domain.SubmitGameResultUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val POINTS_PER_CORRECT_ANSWER = 20
 private const val ANSWER_FEEDBACK_DELAY_MILLIS = 600L
@@ -45,7 +46,7 @@ class QuizViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            delay(ANSWER_FEEDBACK_DELAY_MILLIS)
+            delay(ANSWER_FEEDBACK_DELAY_MILLIS.milliseconds)
             advance()
         }
     }
@@ -57,12 +58,10 @@ class QuizViewModel @Inject constructor(
         if (nextIndex >= quizQuestions.size) {
             _uiState.update { it.copy(isFinished = true, selectedOptionIndex = null) }
             val userId = observeSession().first()?.userId ?: return
-            try {
+            runCatching {
                 submitGameResult(userId, GameId.ECO_QUIZ, _uiState.value.score)
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
-                Unit
+            }.onFailure { error ->
+                Log.e("QuizViewModel::advance()", error.message.orEmpty())
             }
         } else {
             _uiState.update { it.copy(currentQuestionIndex = nextIndex, selectedOptionIndex = null) }

@@ -12,6 +12,7 @@ object Dimens {
     val IconSizeSmall = 20.dp
     val IconSizeMedium = 24.dp
     val IconSizeLarge = 40.dp
+    val IconSizeExtraLarge = 48.dp
 
     val MascotSizeMedium = 64.dp
     val MascotSizeLarge = 96.dp

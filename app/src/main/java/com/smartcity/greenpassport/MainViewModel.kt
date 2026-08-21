@@ -5,12 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.datastore.LocalSettingsStore
 import com.smartcity.greenpassport.feature.auth.domain.ObserveAuthSessionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 private const val KEY_ONBOARDING_SEEN = "onboarding_seen"
 private const val SUBSCRIPTION_TIMEOUT_MILLIS = 5_000L

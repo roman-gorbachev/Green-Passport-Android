@@ -8,13 +8,12 @@ import com.smartcity.greenpassport.feature.auth.domain.RegisterWithEmailUseCase
 import com.smartcity.greenpassport.feature.auth.domain.SignInAnonymouslyUseCase
 import com.smartcity.greenpassport.feature.auth.domain.SignInWithEmailUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 private const val TAG = "AuthViewModel"
 
@@ -53,12 +52,10 @@ class AuthViewModel @Inject constructor(
     private fun launchAuthAction(action: suspend () -> AuthSession) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, hasError = false) }
-            try {
+            runCatching {
                 action()
                 _uiState.update { it.copy(isLoading = false, isSignedIn = true) }
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
+            }.onFailure { error ->
                 Log.e(TAG, "Auth action failed", error)
                 _uiState.update { it.copy(isLoading = false, hasError = true) }
             }

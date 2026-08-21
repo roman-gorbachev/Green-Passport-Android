@@ -1,13 +1,12 @@
 package com.smartcity.greenpassport.feature.games.presentation.sorting
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.feature.games.domain.GameId
 import com.smartcity.greenpassport.feature.games.domain.ObserveGamesSessionUseCase
 import com.smartcity.greenpassport.feature.games.domain.SubmitGameResultUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val GAME_DURATION_SECONDS = 30
 private const val POINTS_PER_CORRECT_ANSWER = 10
@@ -42,7 +43,7 @@ class WasteSortingViewModel @Inject constructor(
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (_uiState.value.secondsRemaining > 0) {
-                delay(TICK_INTERVAL_MILLIS)
+                delay(TICK_INTERVAL_MILLIS.milliseconds)
                 _uiState.update { it.copy(secondsRemaining = it.secondsRemaining - 1) }
             }
             finishGame()
@@ -67,12 +68,10 @@ class WasteSortingViewModel @Inject constructor(
         _uiState.update { it.copy(isFinished = true, currentItem = null) }
         viewModelScope.launch {
             val userId = observeSession().first()?.userId ?: return@launch
-            try {
+            runCatching {
                 submitGameResult(userId, GameId.WASTE_SORTING, _uiState.value.score)
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
-                Unit
+            }.onFailure { error ->
+                Log.e("WasteSortingViewModel::finishGame()", error.message.orEmpty())
             }
         }
     }

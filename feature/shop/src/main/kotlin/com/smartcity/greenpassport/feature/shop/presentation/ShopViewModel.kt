@@ -9,14 +9,13 @@ import com.smartcity.greenpassport.feature.shop.domain.GetShopPointsBalanceUseCa
 import com.smartcity.greenpassport.feature.shop.domain.ObserveShopSessionUseCase
 import com.smartcity.greenpassport.feature.shop.domain.PurchaseRewardUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class ShopViewModel @Inject constructor(
@@ -44,7 +43,7 @@ class ShopViewModel @Inject constructor(
     fun refresh() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, hasError = false) }
-            try {
+            runCatching {
                 val userId = currentUserId
                 val rewards = getRewards()
                 val points = userId?.let { getPointsBalance(it) } ?: 0
@@ -52,9 +51,7 @@ class ShopViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(rewards = rewards, points = points, purchases = purchases, isLoading = false)
                 }
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
+            }.onFailure {
                 _uiState.update { it.copy(isLoading = false, hasError = true) }
             }
         }
@@ -74,9 +71,7 @@ class ShopViewModel @Inject constructor(
             try {
                 purchaseReward(userId, reward)
                 refresh()
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
+            } catch (_: Exception) {
                 _uiState.update { it.copy(hasInsufficientPoints = true) }
             } finally {
                 _uiState.update { it.copy(purchasingRewardId = null) }

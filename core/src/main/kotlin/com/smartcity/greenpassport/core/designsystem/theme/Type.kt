@@ -2,11 +2,15 @@ package com.smartcity.greenpassport.core.designsystem.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.smartcity.greenpassport.core.R
 
-private val ScreenTitleFontFamily = FontFamily.Cursive
+private val ScreenTitleFontFamily = FontFamily(
+    Font(R.font.greatvibes_regular)
+)
 private val BodyFontFamily = FontFamily.Default
 
 val GreenPassportTypography = Typography(
@@ -19,7 +23,7 @@ val GreenPassportTypography = Typography(
     headlineLarge = TextStyle(
         fontFamily = ScreenTitleFontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
+        fontSize = 36.sp,
         lineHeight = 34.sp,
     ),
     headlineMedium = TextStyle(

@@ -8,14 +8,13 @@ import com.smartcity.greenpassport.feature.calendar.domain.GetRegisteredEventIds
 import com.smartcity.greenpassport.feature.calendar.domain.ObserveCalendarSessionUseCase
 import com.smartcity.greenpassport.feature.calendar.domain.RegisterForEventUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
@@ -42,16 +41,14 @@ class CalendarViewModel @Inject constructor(
     fun refresh() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, hasError = false) }
-            try {
+            runCatching {
                 val userId = currentUserId
                 val events = getEvents()
                 val registeredIds = userId?.let { getRegisteredEventIds(it) } ?: emptySet()
                 _uiState.update {
                     it.copy(events = events, registeredEventIds = registeredIds, isLoading = false)
                 }
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
+            }.onFailure {
                 _uiState.update { it.copy(isLoading = false, hasError = true) }
             }
         }
@@ -64,7 +61,7 @@ class CalendarViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(registeringEventId = event.id) }
-            try {
+            runCatching {
                 registerForEvent(userId, event)
                 _uiState.update {
                     it.copy(
@@ -72,9 +69,7 @@ class CalendarViewModel @Inject constructor(
                         registeredEventIds = it.registeredEventIds + event.id,
                     )
                 }
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
+            }.onFailure {
                 _uiState.update { it.copy(registeringEventId = null) }
             }
         }

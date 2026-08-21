@@ -1,19 +1,19 @@
 package com.smartcity.greenpassport.feature.games.presentation.maze
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.feature.games.domain.GameId
 import com.smartcity.greenpassport.feature.games.domain.ObserveGamesSessionUseCase
 import com.smartcity.greenpassport.feature.games.domain.SubmitGameResultUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 private const val POINTS_PER_ITEM = 20
 
@@ -55,12 +55,10 @@ class MazeViewModel @Inject constructor(
         if (isFinished) {
             viewModelScope.launch {
                 val userId = observeSession().first()?.userId ?: return@launch
-                try {
+                runCatching {
                     submitGameResult(userId, GameId.ECO_MAZE, score)
-                } catch (error: CancellationException) {
-                    throw error
-                } catch (error: Exception) {
-                    Unit
+                }.onFailure { error ->
+                    Log.e("MazeViewModel::onMove()", error.message.orEmpty())
                 }
             }
         }

@@ -24,7 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
@@ -35,7 +35,7 @@ import com.smartcity.greenpassport.core.R as CoreR
 
 private const val MAX_RATING = 5
 private const val SUPPORT_EMAIL = "support@greenpassport.app"
-private const val SUPPORT_PHONE = "+7 (800) 555-01-01"
+private const val SUPPORT_PHONE = "+375 (33) 555-01-01"
 
 @Composable
 fun FeedbackScreen(

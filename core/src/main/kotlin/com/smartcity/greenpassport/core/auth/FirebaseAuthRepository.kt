@@ -3,11 +3,11 @@ package com.smartcity.greenpassport.core.auth
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import javax.inject.Inject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
 class FirebaseAuthRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
@@ -44,4 +44,8 @@ class FirebaseAuthRepository @Inject constructor(
 private fun AuthResult.requireUser(): FirebaseUser =
     user ?: error("Firebase returned a successful auth result without a user")
 
-private fun FirebaseUser.toAuthSession() = AuthSession(userId = uid, isAnonymous = isAnonymous)
+private fun FirebaseUser.toAuthSession() = AuthSession(
+    userId = uid,
+    email = email,
+    isAnonymous = isAnonymous
+)

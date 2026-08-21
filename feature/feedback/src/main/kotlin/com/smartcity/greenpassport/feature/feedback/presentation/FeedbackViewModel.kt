@@ -9,14 +9,13 @@ import com.smartcity.greenpassport.feature.feedback.domain.ObserveFeedbackSessio
 import com.smartcity.greenpassport.feature.feedback.domain.SubmitFeedbackUseCase
 import com.smartcity.greenpassport.feature.feedback.domain.SubmitSurveyAnswerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class FeedbackViewModel @Inject constructor(
@@ -48,14 +47,12 @@ class FeedbackViewModel @Inject constructor(
     private fun refresh() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, hasError = false) }
-            try {
+            runCatching {
                 val survey = getActiveSurvey()
                 val userId = currentUserId
                 val answered = if (survey != null && userId != null) hasAnsweredSurvey(userId, survey.id) else false
                 _uiState.update { it.copy(survey = survey, hasAnsweredSurvey = answered, isLoading = false) }
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
+            }.onFailure {
                 _uiState.update { it.copy(isLoading = false, hasError = true) }
             }
         }
@@ -76,12 +73,10 @@ class FeedbackViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmittingReview = true) }
-            try {
+            runCatching {
                 submitFeedback(userId, FeedbackType.REVIEW, state.reviewMessage.trim(), state.rating)
                 _uiState.update { it.copy(isSubmittingReview = false, reviewSubmitted = true) }
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
+            }.onFailure {
                 _uiState.update { it.copy(isSubmittingReview = false) }
             }
         }
@@ -99,14 +94,12 @@ class FeedbackViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmittingSuggestion = true) }
-            try {
+            runCatching {
                 submitFeedback(userId, FeedbackType.SUGGESTION, text, null)
                 _uiState.update {
                     it.copy(isSubmittingSuggestion = false, suggestionSubmitted = true, suggestionMessage = "")
                 }
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
+            }.onFailure {
                 _uiState.update { it.copy(isSubmittingSuggestion = false) }
             }
         }
@@ -119,12 +112,10 @@ class FeedbackViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmittingSurveyAnswer = true) }
-            try {
+            runCatching {
                 submitSurveyAnswer(userId, survey.id, optionIndex)
                 _uiState.update { it.copy(isSubmittingSurveyAnswer = false, hasAnsweredSurvey = true) }
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
+            }.onFailure {
                 _uiState.update { it.copy(isSubmittingSurveyAnswer = false) }
             }
         }

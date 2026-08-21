@@ -1,8 +1,8 @@
 package com.smartcity.greenpassport.core.storage
 
 import com.google.firebase.storage.FirebaseStorage
-import javax.inject.Inject
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
 private const val STORAGE_ROOT = "greenpassport"
 

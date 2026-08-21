@@ -1,13 +1,12 @@
 package com.smartcity.greenpassport.feature.games.presentation.puzzle
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.feature.games.domain.GameId
 import com.smartcity.greenpassport.feature.games.domain.ObserveGamesSessionUseCase
 import com.smartcity.greenpassport.feature.games.domain.SubmitGameResultUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val PAIR_COUNT = 6
 private const val OPTIMAL_MOVES = PAIR_COUNT
@@ -54,7 +55,7 @@ class PuzzleViewModel @Inject constructor(
         val isMatch = firstCard.iconIndex == card.iconIndex
 
         viewModelScope.launch {
-            if (!isMatch) delay(MISMATCH_DELAY_MILLIS)
+            if (!isMatch) delay(MISMATCH_DELAY_MILLIS.milliseconds)
             _uiState.update { current ->
                 val updatedCards = current.cards.map { existing ->
                     when {
@@ -78,12 +79,10 @@ class PuzzleViewModel @Inject constructor(
         _uiState.update { it.copy(isFinished = true, score = score) }
 
         val userId = observeSession().first()?.userId ?: return
-        try {
+        runCatching {
             submitGameResult(userId, GameId.ECO_PUZZLE, score)
-        } catch (error: CancellationException) {
-            throw error
-        } catch (error: Exception) {
-            Unit
+        }.onFailure { error ->
+            Log.e("PuzzleViewModel::maybeFinish()", error.message.orEmpty())
         }
     }
 
