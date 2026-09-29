@@ -17,8 +17,8 @@ enum class HomeQuickAction(
     @StringRes val labelRes: Int,
 ) {
     COMMUNITY(Destination.Community, Icons.Filled.Groups, R.string.community),
-    GAMES(Destination.Games, Icons.Filled.SportsEsports, R.string.mini_games),
-    ECO_TIPS(Destination.EcoTips, Icons.Filled.Eco, R.string.eco_tips),
+    GAMES(Destination.Games, Icons.Filled.SportsEsports, R.string.games),
+    ECO_TIPS(Destination.EcoTips, Icons.Filled.Eco, R.string.tips),
     CALENDAR(Destination.Calendar, Icons.Filled.CalendarMonth, R.string.calendar),
     FEEDBACK(Destination.Feedback, Icons.Filled.RateReview, R.string.feedback),
 }

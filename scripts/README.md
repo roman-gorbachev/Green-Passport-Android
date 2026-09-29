@@ -38,3 +38,17 @@ node seed-firestore.js /path/to/service-account.json
 Each run **adds** new documents (auto-generated IDs) — running it twice duplicates
 the data. Delete the collections in the Firebase Console first if you want to reset,
 or edit the script to use fixed doc IDs instead of `collectionRef.doc()`.
+
+### Refreshing demo events
+
+The home screen only shows an upcoming event (`startAtEpochMillis` in the future). The seeded
+events are dated October–November 2026. Once they are in the past, or if you seeded an older
+version of the script, delete the `apps/greenpassport/events` collection in the Firebase Console,
+move the dates in `seed-firestore.js` forward and re-seed only that collection:
+
+```
+node seed-firestore.js --only=events
+```
+
+`--only` takes a comma-separated list of collection names and skips the rest, so the other
+collections are not duplicated.

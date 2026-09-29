@@ -36,8 +36,9 @@ import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSearchField
 import com.smartcity.greenpassport.core.designsystem.component.GpSheetScaffold
-import com.smartcity.greenpassport.core.designsystem.component.GpTopBar
+import com.smartcity.greenpassport.core.designsystem.component.IconCircle
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
+import com.smartcity.greenpassport.core.designsystem.component.ScreenHeader
 import com.smartcity.greenpassport.core.designsystem.component.SheetDialogProperties
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.MapPoint
@@ -47,7 +48,6 @@ import com.smartcity.greenpassport.feature.map.R
 import com.smartcity.greenpassport.feature.map.presentation.state.MapUiState
 import com.smartcity.greenpassport.feature.map.presentation.viewmodels.MapViewModel
 import com.smartcity.greenpassport.core.R as CoreR
-
 
 @Composable
 fun MapScreen(
@@ -143,7 +143,7 @@ private fun MapPointsListContent(
     val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
     Column(modifier = modifier.fillMaxSize()) {
-        GpTopBar(title = stringResource(CoreR.string.map))
+        ScreenHeader(title = stringResource(CoreR.string.map))
         MapFiltersOverlay(
             uiState = uiState,
             onTypeSelected = onTypeSelected,
@@ -170,6 +170,13 @@ private fun MapPointsListContent(
                     GpListRow(
                         title = point.name,
                         subtitle = point.address,
+                        leading = {
+                            IconCircle(
+                                icon = mapPointTypeIcon(point.type),
+                                color = mapPointTypeColor(point.type),
+                                size = Dimens.IconCircleSmallSize,
+                            )
+                        },
                         onClick = { onPointSelected(point.id) },
                     )
                 }

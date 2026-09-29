@@ -45,9 +45,9 @@ Module graph: `:app` → `:core` + every `:feature:<name>`; each `:feature:<name
 
 **`:app`** owns wiring:
 - `GreenPassportApp` switches on `AppStartupState` (onboarding → auth → main). The main state renders `navigation/GreenPassportAppShell`: `AppNavHost` plus a floating `GpBottomBar`, shown only on the four `TopLevelDestination` tabs (Home, Shop, Map, Favorites). The app is edge-to-edge, so screens handle insets themselves.
-- `navigation/AppNavHost.kt` registers every `Destination`. Nested screens are wrapped in `FeatureScaffold` (`GpTopBar` + back; pass `onNavigateBack = null` for a tab, which also reserves space for the bottom bar). Details that open from several features (`TaskDetail`, `EventDetail`) are `dialog<>` destinations rendered with `GpSheetScaffold`, a bottom sheet with a blurred background on API 31+. Features can't depend on each other, so a sheet can't be embedded in the caller's screen.
+- `navigation/AppNavHost.kt` registers every `Destination`. Nested screens are wrapped in `FeatureScaffold`: no top app bar, a `ScreenHeader` (round back button + title as part of the page) that scrolls away with the content; pass `onNavigateBack = null` for a tab, which also reserves space for the bottom bar. Details that open from several features (`TaskDetail`, `EventDetail`) are `dialog<>` destinations rendered with `GpSheetScaffold`, a full-width bottom sheet with a rounded top over a dimmed scrim (no blur). Features can't depend on each other, so a sheet can't be embedded in the caller's screen.
 - Adding a screen means: add a `Destination` in `:core`, then an entry in `AppNavHost`. A home shortcut is a `HomeQuickAction` in `:feature:home`.
-- UI is built from `core/designsystem/component` (`Gp*` components, `LevelProgressCard`, `HeroImageCard`, `QuickActionTile`, …) and theme tokens. Don't use raw Material `Card`/`Button`/`TopAppBar` in feature screens.
+- UI is built from `core/designsystem/component` (`Gp*` components, `ProgressHeroCard`, `QuickActionButton`, `IconCircle`, `PointsChip`, `HeroImageCard`, …) and theme tokens. Section accents (community, games, tips, calendar, feedback) come from `GreenPassportTheme.sectionColors`. Don't use raw Material `Card`/`Button`/`TopAppBar` in feature screens.
 
 ## Conventions
 

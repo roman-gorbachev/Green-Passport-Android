@@ -2,7 +2,10 @@ const { initializeApp, cert } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 const path = require('path');
 
-const serviceAccountPath = process.argv[2] || path.join(__dirname, 'service-account.json');
+const args = process.argv.slice(2);
+const serviceAccountPath = args.find((arg) => !arg.startsWith('--')) || path.join(__dirname, 'service-account.json');
+const onlyArg = args.find((arg) => arg.startsWith('--only='));
+const onlyCollections = onlyArg ? onlyArg.slice('--only='.length).split(',') : null;
 
 initializeApp({
   credential: cert(require(serviceAccountPath)),
@@ -42,10 +45,10 @@ const mapPoints = [
 ];
 
 const events = [
-  { title: 'Эко-субботник в парке Горького', description: 'Совместная уборка территории парка, инвентарь предоставляется.', location: 'Парк Горького, главный вход', city: 'Москва', startAtEpochMillis: 1787472000000, imageUrl: null, rewardPoints: 50 },
-  { title: 'Лекция «Осознанное потребление»', description: 'Открытая лекция о том, как сократить количество отходов в быту.', location: 'Библиотека им. Некрасова', city: 'Москва', startAtEpochMillis: 1787931000000, imageUrl: null, rewardPoints: 20 },
-  { title: 'День вторсырья', description: 'Приём макулатуры, пластика и стекла на переработку.', location: 'Сокольники, площадь у ДК', city: 'Москва', startAtEpochMillis: 1788591600000, imageUrl: null, rewardPoints: 30 },
-  { title: 'Велопробег за чистый воздух', description: 'Массовый велопробег по центру города в поддержку чистого воздуха.', location: 'Старт у ВДНХ', city: 'Москва', startAtEpochMillis: 1789192800000, imageUrl: null, rewardPoints: 40 },
+  { title: 'Эко-субботник в парке Горького', description: 'Совместная уборка территории парка, инвентарь предоставляется.', location: 'Парк Горького, главный вход', city: 'Москва', startAtEpochMillis: 1792224000000, imageUrl: null, rewardPoints: 50 },
+  { title: 'Лекция «Осознанное потребление»', description: 'Открытая лекция о том, как сократить количество отходов в быту.', location: 'Библиотека им. Некрасова', city: 'Москва', startAtEpochMillis: 1792857600000, imageUrl: null, rewardPoints: 20 },
+  { title: 'День вторсырья', description: 'Приём макулатуры, пластика и стекла на переработку.', location: 'Сокольники, площадь у ДК', city: 'Москва', startAtEpochMillis: 1794042000000, imageUrl: null, rewardPoints: 30 },
+  { title: 'Велопробег за чистый воздух', description: 'Массовый велопробег по центру города в поддержку чистого воздуха.', location: 'Старт у ВДНХ', city: 'Москва', startAtEpochMillis: 1795244400000, imageUrl: null, rewardPoints: 40 },
 ];
 
 const ecoTips = [
@@ -63,6 +66,9 @@ const surveys = [
 ];
 
 async function seedCollection(collectionName, documents) {
+  if (onlyCollections && !onlyCollections.includes(collectionName)) {
+    return;
+  }
   const collectionRef = root.collection(collectionName);
   const batch = db.batch();
   documents.forEach((doc) => {

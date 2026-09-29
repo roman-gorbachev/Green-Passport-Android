@@ -3,6 +3,7 @@ package com.smartcity.greenpassport.feature.tasks.presentation.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -15,6 +16,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -26,7 +28,9 @@ import com.smartcity.greenpassport.core.designsystem.component.GpFilterChip
 import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
+import com.smartcity.greenpassport.core.designsystem.component.PointsChip
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
+import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.core.model.TaskCategory
 import com.smartcity.greenpassport.feature.tasks.R
@@ -117,6 +121,7 @@ private fun TasksListContent(
                         isFavorite = uiState.favoriteTaskIds.contains(task.id),
                         onClick = { onTaskSelected(task.id) },
                         onToggleFavorite = { onToggleFavorite(task.id) },
+                        modifier = Modifier.animateItem(),
                     )
                 }
             }
@@ -131,28 +136,31 @@ private fun TaskRow(
     isFavorite: Boolean,
     onClick: () -> Unit,
     onToggleFavorite: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     GpListRow(
         title = task.title,
-        subtitle = if (isCompleted) {
-            stringResource(R.string.task_detail_completed_label)
-        } else {
-            stringResource(CoreR.string.points_reward, task.rewardPoints)
-        },
+        subtitle = if (isCompleted) stringResource(R.string.task_detail_completed_label) else null,
         leading = { MascotWidget(size = Dimens.ListRowMascotSize) },
         trailing = {
-            IconButton(onClick = onToggleFavorite) {
-                Icon(
-                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                    contentDescription = stringResource(CoreR.string.favorites),
-                    tint = if (isFavorite) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (!isCompleted) {
+                    PointsChip(points = task.rewardPoints)
+                }
+                IconButton(onClick = onToggleFavorite) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                        contentDescription = stringResource(CoreR.string.favorites),
+                        tint = if (isFavorite) {
+                            GreenPassportTheme.sectionColors.feedback
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                    )
+                }
             }
         },
         onClick = onClick,
+        modifier = modifier,
     )
 }

@@ -31,7 +31,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.common.formatEventDate
 import com.smartcity.greenpassport.core.common.formatEventTime
-import com.smartcity.greenpassport.core.designsystem.component.ConfirmHapticOnSuccess
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSheetScaffold
@@ -55,8 +54,6 @@ fun EventDetailSheet(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = uiState.event
-
-    ConfirmHapticOnSuccess(inProgress = uiState.isRegistering, succeeded = uiState.isRegistered)
 
     GpSheetScaffold(onDismiss = onDismiss, modifier = modifier) {
         when {

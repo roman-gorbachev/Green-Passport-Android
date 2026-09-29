@@ -6,5 +6,4 @@
     <string name="shop_insufficient_points">Недостаточно баллов для обмена</string>
     <string name="shop_empty_rewards">Пока нет доступных купонов</string>
     <string name="shop_empty_purchases">Вы ещё не обменивали баллы на купоны</string>
-    <string name="balance">На счету</string>
 </resources>

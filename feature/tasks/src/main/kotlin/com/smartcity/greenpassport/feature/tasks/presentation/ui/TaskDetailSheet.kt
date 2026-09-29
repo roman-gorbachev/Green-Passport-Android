@@ -20,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.designsystem.component.ConfirmHapticOnSuccess
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSheetScaffold
@@ -41,8 +40,6 @@ fun TaskDetailSheet(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val task = uiState.task
-
-    ConfirmHapticOnSuccess(inProgress = uiState.isSubmitting, succeeded = uiState.isCompleted)
 
     GpSheetScaffold(onDismiss = onDismiss, modifier = modifier) {
         when {

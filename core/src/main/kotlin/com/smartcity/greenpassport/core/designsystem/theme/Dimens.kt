@@ -14,21 +14,25 @@ object Dimens {
     val CardPadding = 16.dp
     val ItemSpacing = 14.dp
 
+    val IconSizeExtraSmall = 16.dp
     val IconSizeSmall = 20.dp
     val IconSizeMedium = 24.dp
     val IconSizeLarge = 40.dp
     val IconSizeExtraLarge = 48.dp
 
     val BottomBarHeight = 60.dp
-    val BottomBarTabWidth = 92.dp
-    val BottomBarElevation = 6.dp
-    val GlassBlurRadius = 24.dp
+    val BottomBarElevation = 8.dp
+    val BottomBarSelectedSize = 44.dp
     val BottomBarReservedHeight = 76.dp
-    val QuickActionHeight = 75.dp
-    val LevelCardHeight = 47.dp
+    val QuickActionWidth = 76.dp
+    val IconCircleSize = 52.dp
+    val IconCircleSmallSize = 36.dp
+    val ProgressHeroHeight = 140.dp
+    val ProgressHeroMascotSize = 96.dp
+    val SpeechBubbleMaxWidth = 132.dp
     val HeroCardHeight = 200.dp
     val EventCardHeight = 160.dp
-    val ProgressBarHeight = 4.dp
+    val ProgressBarHeight = 8.dp
     val AvatarSize = 44.dp
     val BackButtonSize = 44.dp
     val BackIconOpticalOffset = 2.dp
@@ -40,7 +44,6 @@ object Dimens {
     val EmptyStateMascotSize = 120.dp
     val HeroMascotSize = 200.dp
     val PrimaryButtonHeight = 52.dp
-    val SheetInset = 8.dp
     val SheetContentPadding = 20.dp
     val SheetHandleWidth = 36.dp
     val SheetHandleHeight = 4.dp

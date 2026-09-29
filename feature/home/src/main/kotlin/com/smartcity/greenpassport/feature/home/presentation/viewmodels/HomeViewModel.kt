@@ -6,12 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.auth.AuthSession
 import com.smartcity.greenpassport.feature.home.domain.GetLevelUseCase
 import com.smartcity.greenpassport.feature.home.domain.GetPendingTasksUseCase
+import com.smartcity.greenpassport.feature.home.domain.GetPointsBalanceUseCase
 import com.smartcity.greenpassport.feature.home.domain.GetUpcomingEventUseCase
 import com.smartcity.greenpassport.feature.home.domain.ObserveHomeSessionUseCase
 import com.smartcity.greenpassport.feature.home.presentation.state.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,6 +31,7 @@ class HomeViewModel @Inject constructor(
     private val getLevel: GetLevelUseCase,
     private val getUpcomingEvent: GetUpcomingEventUseCase,
     private val getPendingTasks: GetPendingTasksUseCase,
+    private val getPointsBalance: GetPointsBalanceUseCase,
 ) : ViewModel() {
 
     private val refreshRequests = MutableSharedFlow<Unit>(
@@ -50,16 +54,23 @@ class HomeViewModel @Inject constructor(
             .mapLatest { session -> loadHomeUiState(session) }
     }
 
-    private suspend fun loadHomeUiState(session: AuthSession): HomeUiState {
-        val tasks = runCatching { getPendingTasks(session.userId) }
-            .onFailure { error -> Log.w(TAG, "Failed to load tasks", error) }
-        return HomeUiState(
+    private suspend fun loadHomeUiState(session: AuthSession): HomeUiState = coroutineScope {
+        val tasks = async {
+            runCatching { getPendingTasks(session.userId) }
+                .onFailure { error -> Log.w(TAG, "Failed to load tasks", error) }
+        }
+        val balance = async { runCatching { getPointsBalance(session.userId) }.getOrNull() }
+        val level = async { runCatching { getLevel(session.userId) }.getOrNull() }
+        val upcomingEvent = async { runCatching { getUpcomingEvent() }.getOrNull() }
+        val loadedTasks = tasks.await()
+        HomeUiState(
             isLoading = false,
-            hasTasksError = tasks.isFailure,
+            hasTasksError = loadedTasks.isFailure,
             displayName = session.displayName,
-            level = runCatching { getLevel(session.userId) }.getOrNull(),
-            upcomingEvent = runCatching { getUpcomingEvent() }.getOrNull(),
-            tasks = tasks.getOrDefault(emptyList()),
+            points = balance.await()?.availablePoints ?: 0,
+            level = level.await(),
+            upcomingEvent = upcomingEvent.await(),
+            tasks = loadedTasks.getOrDefault(emptyList()),
         )
     }
 

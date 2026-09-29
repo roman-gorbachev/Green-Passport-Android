@@ -1,32 +1,28 @@
 package com.smartcity.greenpassport.feature.games.presentation
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
+import com.smartcity.greenpassport.core.designsystem.component.GpListRow
+import com.smartcity.greenpassport.core.designsystem.component.IconCircle
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
+import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.feature.games.R
 import com.smartcity.greenpassport.feature.games.domain.GameId
-
-private const val GAMES_GRID_COLUMNS = 2
 
 @Composable
 fun GamesHubScreen(
@@ -36,18 +32,16 @@ fun GamesHubScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(GAMES_GRID_COLUMNS),
+    LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(
             horizontal = Dimens.ScreenHorizontalPadding,
             vertical = Dimens.SpacingSmall,
         ),
-        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
         verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
     ) {
         items(GameId.entries) { gameId ->
-            GameTile(
+            GameRow(
                 gameId = gameId,
                 bestScore = uiState.bestScores[gameId.storageId],
                 onClick = { onGameSelected(gameId) },
@@ -57,41 +51,42 @@ fun GamesHubScreen(
 }
 
 @Composable
-private fun GameTile(
+private fun GameRow(
     gameId: GameId,
     bestScore: Int?,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    GpSurfaceCard(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(Dimens.SpacingMedium),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Icon(
-                imageVector = gameIcon(gameId),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-            )
-            Text(
-                text = stringResource(gameTitleRes(gameId)),
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = Dimens.SpacingSmall),
-            )
+    GpListRow(
+        title = stringResource(gameTitleRes(gameId)),
+        leading = { IconCircle(icon = gameIcon(gameId), color = gameColor(gameId)) },
+        trailing = {
             if (bestScore != null) {
                 Text(
                     text = stringResource(R.string.games_best_score_format, bestScore),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.outline,
                 )
             }
-        }
+        },
+        onClick = onClick,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun gameColor(gameId: GameId): Color {
+    val sectionColors = GreenPassportTheme.sectionColors
+    return when (gameId) {
+        GameId.ECO_PUZZLE -> sectionColors.games
+        GameId.WASTE_SORTING -> sectionColors.community
+        GameId.ECO_MAZE -> sectionColors.calendar
+        GameId.ECO_QUIZ -> sectionColors.tips
     }
 }

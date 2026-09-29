@@ -21,14 +21,12 @@ fun GpBackButton(
     GpSurfaceCard(
         onClick = onClick,
         shape = CircleShape,
-        modifier = modifier
-            .padding(start = Dimens.SpacingSmall)
-            .size(Dimens.BackButtonSize),
+        modifier = modifier.size(Dimens.BackButtonSize),
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
             contentDescription = stringResource(R.string.back),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
                 .padding(start = Dimens.BackIconOpticalOffset)
                 .padding(Dimens.SpacingSmall + Dimens.SpacingExtraSmall)

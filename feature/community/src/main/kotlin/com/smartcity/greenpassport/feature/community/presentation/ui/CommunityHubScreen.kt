@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.smartcity.greenpassport.core.designsystem.component.GpListRow
+import com.smartcity.greenpassport.core.designsystem.component.IconCircle
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
+import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.feature.community.R
 
 @Composable
@@ -22,6 +22,8 @@ fun CommunityHubScreen(
     onGroupsSelected: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val sectionColors = GreenPassportTheme.sectionColors
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -30,24 +32,12 @@ fun CommunityHubScreen(
     ) {
         GpListRow(
             title = stringResource(R.string.community_forum_title),
-            leading = {
-                Icon(
-                    imageVector = Icons.Filled.Forum,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            },
+            leading = { IconCircle(icon = Icons.Filled.Forum, color = sectionColors.community) },
             onClick = onForumSelected,
         )
         GpListRow(
             title = stringResource(R.string.community_groups_title),
-            leading = {
-                Icon(
-                    imageVector = Icons.Filled.Groups,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            },
+            leading = { IconCircle(icon = Icons.Filled.Groups, color = sectionColors.calendar) },
             onClick = onGroupsSelected,
         )
     }

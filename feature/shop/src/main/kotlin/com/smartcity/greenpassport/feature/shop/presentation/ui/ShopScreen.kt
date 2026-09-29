@@ -26,6 +26,7 @@ import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
+import com.smartcity.greenpassport.core.designsystem.component.ProgressHeroCard
 import com.smartcity.greenpassport.core.designsystem.component.SectionHeader
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.Reward
@@ -135,26 +136,15 @@ private fun BalanceCard(
     hasInsufficientPoints: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    GpSurfaceCard(modifier = modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(Dimens.CardPadding)) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        ProgressHeroCard(points = points)
+        if (hasInsufficientPoints) {
             Text(
-                text = stringResource(R.string.balance),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = stringResource(R.string.shop_insufficient_points),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = Dimens.SpacingSmall),
             )
-            Text(
-                text = stringResource(R.string.shop_cost_format, points),
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            if (hasInsufficientPoints) {
-                Text(
-                    text = stringResource(R.string.shop_insufficient_points),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = Dimens.SpacingSmall),
-                )
-            }
         }
     }
 }

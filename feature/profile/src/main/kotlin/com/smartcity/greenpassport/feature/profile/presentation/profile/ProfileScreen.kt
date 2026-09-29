@@ -30,16 +30,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpListRow
-import com.smartcity.greenpassport.core.designsystem.component.LevelProgressCard
+import com.smartcity.greenpassport.core.designsystem.component.IconCircle
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
+import com.smartcity.greenpassport.core.designsystem.component.ProgressHeroCard
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
+import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
+import com.smartcity.greenpassport.core.designsystem.theme.SectionColors
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.profile.R
 import com.smartcity.greenpassport.core.R as CoreR
@@ -80,16 +84,21 @@ private data class ProfileMenuEntry(
     val labelRes: Int,
     val icon: ImageVector,
     val destination: Destination?,
+    val color: (SectionColors) -> Color,
 )
 
 private val profileMenuEntries = listOf(
-    ProfileMenuEntry(R.string.profile_achievements, Icons.Filled.EmojiEvents, Destination.Achievements),
-    ProfileMenuEntry(R.string.profile_cards, Icons.Filled.Style, Destination.Cards),
-    ProfileMenuEntry(R.string.profile_history, Icons.Filled.History, Destination.History),
-    ProfileMenuEntry(R.string.profile_notifications_label, Icons.Filled.Notifications, Destination.Notifications),
-    ProfileMenuEntry(R.string.profile_favorites, Icons.Filled.Favorite, Destination.Favorites),
-    ProfileMenuEntry(R.string.profile_bookmarks, Icons.Filled.Bookmark, Destination.Bookmarks),
-    ProfileMenuEntry(R.string.profile_exchange, Icons.Filled.SwapHoriz, Destination.Exchange),
+    ProfileMenuEntry(R.string.profile_achievements, Icons.Filled.EmojiEvents, Destination.Achievements) { it.tips },
+    ProfileMenuEntry(R.string.profile_cards, Icons.Filled.Style, Destination.Cards) { it.games },
+    ProfileMenuEntry(R.string.profile_history, Icons.Filled.History, Destination.History) { it.calendar },
+    ProfileMenuEntry(
+        R.string.profile_notifications_label,
+        Icons.Filled.Notifications,
+        Destination.Notifications,
+    ) { it.feedback },
+    ProfileMenuEntry(R.string.profile_favorites, Icons.Filled.Favorite, Destination.Favorites) { it.feedback },
+    ProfileMenuEntry(R.string.profile_bookmarks, Icons.Filled.Bookmark, Destination.Bookmarks) { it.community },
+    ProfileMenuEntry(R.string.profile_exchange, Icons.Filled.SwapHoriz, Destination.Exchange) { it.games },
 )
 
 @Composable
@@ -112,20 +121,16 @@ private fun ProfileContent(
             ProfileHeader(uiState = uiState)
         }
 
-        uiState.level?.let { level ->
-            item {
-                LevelProgressCard(
-                    level = level.number,
-                    currentXp = level.currentXp,
-                    xpForNextLevel = level.xpForNextLevel,
-                )
-            }
+        item {
+            ProgressHeroCard(points = uiState.points, level = uiState.level)
         }
 
         item {
             GpListRow(
                 title = stringResource(R.string.profile_notifications_label),
-                leading = { ProfileMenuIcon(icon = Icons.Filled.Notifications) },
+                leading = {
+                    ProfileMenuIcon(icon = Icons.Filled.Notifications, color = MaterialTheme.colorScheme.primary)
+                },
                 trailing = {
                     Switch(
                         checked = uiState.notificationsEnabled,
@@ -139,7 +144,7 @@ private fun ProfileContent(
         items(profileMenuEntries) { entry ->
             GpListRow(
                 title = stringResource(entry.labelRes),
-                leading = { ProfileMenuIcon(icon = entry.icon) },
+                leading = { ProfileMenuIcon(icon = entry.icon, color = entry.color(GreenPassportTheme.sectionColors)) },
                 onClick = { entry.destination?.let(onMenuEntrySelected) },
             )
         }
@@ -174,10 +179,10 @@ private fun ProfileHeader(
     ) {
         Surface(
             shape = CircleShape,
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.size(Dimens.AvatarSize),
         ) {
-            MascotWidget(size = Dimens.AvatarSize)
+            MascotWidget(size = Dimens.AvatarSize, modifier = Modifier.padding(Dimens.SpacingExtraSmall))
         }
         Column(modifier = Modifier.padding(start = Dimens.SpacingMedium)) {
             Text(
@@ -189,7 +194,7 @@ private fun ProfileHeader(
             Text(
                 text = stringResource(R.string.points_balance, uiState.points),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.outline,
             )
         }
     }
@@ -198,12 +203,13 @@ private fun ProfileHeader(
 @Composable
 private fun ProfileMenuIcon(
     icon: ImageVector,
+    color: Color,
     modifier: Modifier = Modifier,
 ) {
-    Icon(
-        imageVector = icon,
-        contentDescription = null,
-        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = modifier.size(Dimens.ListRowIconSize),
+    IconCircle(
+        icon = icon,
+        color = color,
+        size = Dimens.IconCircleSmallSize,
+        modifier = modifier,
     )
 }
