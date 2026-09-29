@@ -4,15 +4,16 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-private val MintBackgroundLight = Color(0xFFEAF6EC)
-private val LeafSurfaceLight = Color(0xFFD5EDDA)
-private val LeafSurfaceVariantLight = Color(0xFFC6E3CD)
-private val InkLight = Color(0xFF1B1F1C)
-private val MossLight = Color(0xFF4E6A61)
-private val BarkLight = Color(0xFF93674A)
+private val MintBackgroundLight = Color(0xFFF1FEF5)
+private val LeafSurfaceLight = Color(0xFFD6F1E0)
+private val LeafSurfaceVariantLight = Color(0xFFC9E6D3)
+private val InkLight = Color(0xFF0B0F10)
+private val MossLight = Color(0xFF385247)
+private val BarkLight = Color(0xFF947259)
 private val OnBarkLight = Color(0xFFFFFFFF)
-private val TrackLight = Color(0xFFDCE3DE)
-private val OutlineLight = Color(0xFF9DB3A8)
+private val TrackLight = Color(0xFFC5DCD2)
+private val MossSecondaryLight = Color(0xFF526959)
+private val PebbleLight = Color(0xFFD1DCD6)
 private val ErrorLight = Color(0xFFB3261E)
 private val OnErrorLight = Color(0xFFFFFFFF)
 
@@ -24,7 +25,8 @@ private val MossDark = Color(0xFFA9C2B7)
 private val BarkDark = Color(0xFFC39A7C)
 private val OnBarkDark = Color(0xFF2E1A0D)
 private val TrackDark = Color(0xFF34443B)
-private val OutlineDark = Color(0xFF5E7268)
+private val MossSecondaryDark = Color(0xFF8AA398)
+private val PebbleDark = Color(0xFF3A4540)
 private val ErrorDark = Color(0xFFF2B8B5)
 private val OnErrorDark = Color(0xFF601410)
 
@@ -50,7 +52,8 @@ val GreenPassportLightColorScheme = lightColorScheme(
     surfaceContainer = LeafSurfaceLight,
     surfaceContainerHigh = LeafSurfaceVariantLight,
     surfaceContainerHighest = LeafSurfaceVariantLight,
-    outline = OutlineLight,
+    outline = MossSecondaryLight,
+    surfaceDim = PebbleLight,
     outlineVariant = TrackLight,
     error = ErrorLight,
     onError = OnErrorLight,
@@ -78,7 +81,8 @@ val GreenPassportDarkColorScheme = darkColorScheme(
     surfaceContainer = LeafSurfaceDark,
     surfaceContainerHigh = LeafSurfaceVariantDark,
     surfaceContainerHighest = LeafSurfaceVariantDark,
-    outline = OutlineDark,
+    outline = MossSecondaryDark,
+    surfaceDim = PebbleDark,
     outlineVariant = TrackDark,
     error = ErrorDark,
     onError = OnErrorDark,

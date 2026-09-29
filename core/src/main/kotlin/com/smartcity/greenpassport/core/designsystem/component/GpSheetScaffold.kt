@@ -1,43 +1,49 @@
 package com.smartcity.greenpassport.core.designsystem.component
 
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.Window
 import android.view.WindowManager
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-private const val SHEET_SURFACE_ALPHA = 0.94f
-private const val SCRIM_ALPHA = 0.35f
-private const val SHEET_BLUR_RADIUS = 48
+private const val SHEET_ALPHA_WITH_BLUR = 0.72f
+private const val SHEET_ALPHA_WITHOUT_BLUR = 0.97f
+private const val SHEET_DIM_AMOUNT = 0.18f
+private const val SHEET_BLUR_RADIUS = 60
 private const val DISMISS_VELOCITY = 1200f
 private const val DISMISS_OFFSET_PX = 240f
 
@@ -52,78 +58,134 @@ fun GpSheetScaffold(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    ConfigureSheetWindow()
+    val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+    val density = LocalDensity.current
+    val insetPx = with(density) { Dimens.SheetInset.roundToPx() }
+    val cornerRadiusPx = with(density) { Dimens.CornerRadiusSheet.toPx() }
+    val sheetColor = MaterialTheme.colorScheme.surfaceContainer
     val scope = rememberCoroutineScope()
     val dragOffset = remember { Animatable(0f) }
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background.copy(alpha = SCRIM_ALPHA))
-            .clickable(interactionSource = null, indication = null, onClick = onDismiss),
-        contentAlignment = Alignment.BottomCenter,
-    ) {
-        Column(
-            modifier = Modifier
-                .statusBarsPadding()
-                .offset { IntOffset(0, dragOffset.value.roundToInt()) }
-                .fillMaxWidth()
-                .clip(
-                    RoundedCornerShape(
-                        topStart = Dimens.CornerRadiusExtraLarge,
-                        topEnd = Dimens.CornerRadiusExtraLarge,
-                    ),
-                )
-                .background(MaterialTheme.colorScheme.surfaceContainer.copy(alpha = SHEET_SURFACE_ALPHA))
-                .clickable(interactionSource = null, indication = null, onClick = {})
-                .draggable(
-                    orientation = Orientation.Vertical,
-                    state = rememberDraggableState { delta ->
-                        scope.launch { dragOffset.snapTo((dragOffset.value + delta).coerceAtLeast(0f)) }
-                    },
-                    onDragStopped = { velocity ->
-                        if (velocity > DISMISS_VELOCITY || dragOffset.value > DISMISS_OFFSET_PX) {
-                            onDismiss()
-                        } else {
-                            dragOffset.animateTo(0f)
-                        }
-                    },
-                )
-                .navigationBarsPadding()
-                .padding(
-                    start = Dimens.CardPadding,
-                    end = Dimens.CardPadding,
-                    bottom = Dimens.CardPadding,
-                ),
-        ) {
-            SheetHandle(modifier = Modifier.align(Alignment.CenterHorizontally))
-            content()
+    if (window != null) {
+        DisposableEffect(window) {
+            window.configureAsFloatingSheet(insetPx, cornerRadiusPx, sheetColor)
+            onDispose {}
         }
+        LaunchedEffect(window) {
+            snapshotFlow { dragOffset.value }.collect { offset ->
+                window.attributes = window.attributes.also { it.y = insetPx - offset.roundToInt() }
+            }
+        }
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                color = if (window == null) sheetColor else Color.Transparent,
+                shape = RoundedCornerShape(Dimens.CornerRadiusSheet),
+            )
+            .navigationBarsPadding()
+            .padding(
+                start = Dimens.SheetContentPadding,
+                end = Dimens.SheetContentPadding,
+                bottom = Dimens.CardPadding,
+            ),
+    ) {
+        SheetDragHandle(
+            onDrag = { offset -> scope.launch { dragOffset.snapTo(offset) } },
+            onDragEnd = { velocity ->
+                if (velocity > DISMISS_VELOCITY || dragOffset.value > DISMISS_OFFSET_PX) {
+                    onDismiss()
+                } else {
+                    scope.launch { dragOffset.animateTo(0f, spring(dampingRatio = Spring.DampingRatioLowBouncy)) }
+                }
+            },
+        )
+        content()
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun SheetHandle(modifier: Modifier = Modifier) {
+private fun SheetDragHandle(
+    onDrag: (Float) -> Unit,
+    onDragEnd: (velocity: Float) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val tracker = remember { DragTracker() }
+
     Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier
-            .padding(vertical = Dimens.SpacingSmall + Dimens.SpacingExtraSmall)
-            .size(width = Dimens.SheetHandleWidth, height = Dimens.SheetHandleHeight)
-            .background(
-                MaterialTheme.colorScheme.outline,
-                RoundedCornerShape(Dimens.CornerRadiusPill),
-            ),
-    )
+            .fillMaxWidth()
+            .height(Dimens.SheetDragZoneHeight)
+            .pointerInteropFilter { event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> tracker.start(event.rawY, event.eventTime)
+                    MotionEvent.ACTION_MOVE -> onDrag(tracker.move(event.rawY, event.eventTime))
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> onDragEnd(tracker.velocity)
+                }
+                true
+            },
+    ) {
+        Box(
+            modifier = Modifier
+                .size(width = Dimens.SheetHandleWidth, height = Dimens.SheetHandleHeight)
+                .background(
+                    MaterialTheme.colorScheme.outlineVariant,
+                    RoundedCornerShape(Dimens.CornerRadiusPill),
+                ),
+        )
+    }
 }
 
-@Composable
-private fun ConfigureSheetWindow() {
-    val window = (LocalView.current.parent as? DialogWindowProvider)?.window ?: return
-    DisposableEffect(window) {
-        window.setDimAmount(0f)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-            window.attributes = window.attributes.also { it.blurBehindRadius = SHEET_BLUR_RADIUS }
-        }
-        onDispose {}
+private class DragTracker {
+    private var startY = 0f
+    private var lastY = 0f
+    private var lastTime = 0L
+
+    var velocity = 0f
+        private set
+
+    fun start(rawY: Float, time: Long) {
+        startY = rawY
+        lastY = rawY
+        lastTime = time
+        velocity = 0f
+    }
+
+    fun move(rawY: Float, time: Long): Float {
+        val elapsed = (time - lastTime).coerceAtLeast(1L)
+        velocity = (rawY - lastY) / elapsed * MILLIS_PER_SECOND
+        lastY = rawY
+        lastTime = time
+        return (rawY - startY).coerceAtLeast(0f)
+    }
+
+    companion object {
+        private const val MILLIS_PER_SECOND = 1000f
+    }
+}
+
+private fun Window.configureAsFloatingSheet(insetPx: Int, cornerRadiusPx: Float, color: Color) {
+    val isBlurAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && windowManager.isCrossWindowBlurEnabled
+    val alpha = if (isBlurAvailable) SHEET_ALPHA_WITH_BLUR else SHEET_ALPHA_WITHOUT_BLUR
+    val screenWidth = context.resources.displayMetrics.widthPixels
+
+    setGravity(Gravity.BOTTOM)
+    setLayout(screenWidth - insetPx * 2, WindowManager.LayoutParams.WRAP_CONTENT)
+    addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+    setDimAmount(SHEET_DIM_AMOUNT)
+    setWindowAnimations(android.R.style.Animation_InputMethod)
+    setBackgroundDrawable(
+        GradientDrawable().apply {
+            cornerRadius = cornerRadiusPx
+            setColor(color.copy(alpha = alpha).toArgb())
+        },
+    )
+    attributes = attributes.also { it.y = insetPx }
+    if (isBlurAvailable) {
+        setBackgroundBlurRadius(SHEET_BLUR_RADIUS)
     }
 }

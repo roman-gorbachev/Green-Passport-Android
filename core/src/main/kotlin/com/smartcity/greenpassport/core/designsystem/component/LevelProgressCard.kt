@@ -3,6 +3,7 @@ package com.smartcity.greenpassport.core.designsystem.component
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -28,12 +29,17 @@ fun LevelProgressCard(
     xpForNextLevel: Int,
     modifier: Modifier = Modifier,
 ) {
-    GpSurfaceCard(modifier = modifier.fillMaxWidth()) {
+    GpSurfaceCard(
+        shape = MaterialTheme.shapes.small,
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = Dimens.LevelCardHeight),
+    ) {
         Row(
             modifier = Modifier.padding(
                 start = Dimens.CardPadding,
                 end = Dimens.CardPadding,
-                top = Dimens.SpacingMedium,
+                top = Dimens.SpacingSmall,
             ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -69,8 +75,8 @@ fun LevelProgressCard(
                 .padding(
                     start = Dimens.CardPadding,
                     end = Dimens.CardPadding,
-                    top = Dimens.SpacingSmall,
-                    bottom = Dimens.SpacingMedium,
+                    top = Dimens.SpacingExtraSmall,
+                    bottom = Dimens.SpacingSmall + Dimens.SpacingExtraSmall,
                 )
                 .height(Dimens.ProgressBarHeight),
         )

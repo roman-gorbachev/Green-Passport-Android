@@ -106,7 +106,7 @@ private fun ProfileContent(
             horizontal = Dimens.ScreenHorizontalPadding,
             vertical = Dimens.SpacingMedium,
         ),
-        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+        verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
     ) {
         item {
             ProfileHeader(uiState = uiState)
@@ -204,6 +204,6 @@ private fun ProfileMenuIcon(
         imageVector = icon,
         contentDescription = null,
         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = modifier.size(Dimens.IconSizeMedium),
+        modifier = modifier.size(Dimens.ListRowIconSize),
     )
 }

@@ -31,7 +31,7 @@ fun OnboardingScreen(
     ) {
         Spacer(modifier = Modifier.weight(1f))
 
-        MascotWidget(size = Dimens.MascotSizeLarge)
+        MascotWidget(size = Dimens.HeroMascotSize)
 
         Text(
             text = stringResource(R.string.onboarding_title),

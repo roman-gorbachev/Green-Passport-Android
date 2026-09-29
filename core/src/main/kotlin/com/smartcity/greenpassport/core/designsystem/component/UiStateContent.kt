@@ -38,7 +38,7 @@ fun EmptyContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        MascotWidget(size = Dimens.MascotSizeLarge)
+        MascotWidget(size = Dimens.EmptyStateMascotSize)
         Text(
             text = message,
             style = MaterialTheme.typography.bodyLarge,
@@ -63,7 +63,7 @@ fun ErrorContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        MascotWidget(size = Dimens.MascotSizeLarge)
+        MascotWidget(size = Dimens.EmptyStateMascotSize)
         Text(
             text = message,
             style = MaterialTheme.typography.bodyLarge,

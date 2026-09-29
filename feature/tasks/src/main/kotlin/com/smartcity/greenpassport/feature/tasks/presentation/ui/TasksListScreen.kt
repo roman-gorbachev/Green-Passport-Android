@@ -108,7 +108,7 @@ private fun TasksListContent(
                     horizontal = Dimens.ScreenHorizontalPadding,
                     vertical = Dimens.SpacingSmall,
                 ),
-                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+                verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
             ) {
                 items(uiState.visibleTasks, key = { it.id }) { task ->
                     TaskRow(
@@ -139,13 +139,17 @@ private fun TaskRow(
         } else {
             stringResource(CoreR.string.points_reward, task.rewardPoints)
         },
-        leading = { MascotWidget(size = Dimens.IconSizeExtraLarge) },
+        leading = { MascotWidget(size = Dimens.ListRowMascotSize) },
         trailing = {
             IconButton(onClick = onToggleFavorite) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                     contentDescription = stringResource(CoreR.string.favorites),
-                    tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = if (isFavorite) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
                 )
             }
         },

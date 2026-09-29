@@ -16,6 +16,8 @@ import androidx.navigation.compose.rememberNavController
 import com.smartcity.greenpassport.core.designsystem.component.GpBottomBar
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.navigation.TopLevelDestination
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
 
 @Composable
 fun GreenPassportAppShell(modifier: Modifier = Modifier) {
@@ -25,13 +27,15 @@ fun GreenPassportAppShell(modifier: Modifier = Modifier) {
         backStackEntry?.destination?.hasRoute(tab.destination::class) == true
     }
     val visibleTab = currentTab ?: previousTabUnderDialog(navController)
+    val hazeState = rememberHazeState()
 
     Box(modifier = modifier.fillMaxSize()) {
-        AppNavHost(navController = navController)
+        AppNavHost(navController = navController, modifier = Modifier.hazeSource(hazeState))
         if (visibleTab != null) {
             GpBottomBar(
                 selected = visibleTab,
                 onSelect = { tab -> navController.navigateToTopLevel(tab) },
+                hazeState = hazeState,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .navigationBarsPadding()

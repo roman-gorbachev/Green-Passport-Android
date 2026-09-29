@@ -85,7 +85,7 @@ fun PuzzleScreen(
                 vertical = Dimens.SpacingSmall,
             ),
             horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
-            verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+            verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
         ) {
             items(uiState.cards) { card ->
                 GpSurfaceCard(

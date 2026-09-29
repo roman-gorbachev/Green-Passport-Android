@@ -71,7 +71,7 @@ fun QuizScreen(
             modifier = Modifier.padding(vertical = Dimens.SpacingLarge),
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall)) {
+        Column(verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing)) {
             options.forEachIndexed { index, option ->
                 val isSelected = uiState.selectedOptionIndex == index
                 val isCorrect = index == question.correctOptionIndex

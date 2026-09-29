@@ -82,7 +82,7 @@ fun WasteSortingScreen(
         LazyVerticalGrid(
             columns = GridCells.Fixed(SORTING_BIN_COLUMNS),
             horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
-            verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+            verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
         ) {
             items(WasteCategory.entries) { category ->
                 Button(

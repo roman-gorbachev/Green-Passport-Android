@@ -16,11 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,6 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -39,6 +37,7 @@ import com.smartcity.greenpassport.core.common.formatEventTime
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpListRow
+import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.HeroImageCard
 import com.smartcity.greenpassport.core.designsystem.component.LevelProgressCard
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
@@ -114,7 +113,7 @@ private fun HomeContent(
             top = systemBars.calculateTopPadding() + Dimens.SpacingLarge,
             bottom = systemBars.calculateBottomPadding() + Dimens.BottomBarReservedHeight + Dimens.SpacingMedium,
         ),
-        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+        verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
     ) {
         item {
             HomeHeader(displayName = uiState.displayName, onProfileClick = onProfileClick)
@@ -170,7 +169,7 @@ private fun HomeContent(
                 GpListRow(
                     title = task.title,
                     subtitle = stringResource(CoreR.string.points_reward, task.rewardPoints),
-                    leading = { MascotWidget(size = Dimens.IconSizeExtraLarge) },
+                    leading = { MascotWidget(size = Dimens.ListRowMascotSize) },
                     onClick = { onTaskSelected(task.id) },
                 )
             }
@@ -213,19 +212,16 @@ private fun HomeHeader(
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        Surface(
+        val profileLabel = stringResource(R.string.profile)
+        GpSurfaceCard(
             onClick = onProfileClick,
             shape = CircleShape,
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
-            modifier = Modifier.size(Dimens.AvatarSize),
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Person,
-                contentDescription = stringResource(R.string.profile),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(Dimens.SpacingMedium),
-            )
-        }
+            color = MaterialTheme.colorScheme.surfaceDim,
+            modifier = Modifier
+                .size(Dimens.AvatarSize)
+                .semantics { contentDescription = profileLabel },
+            content = {},
+        )
     }
 }
 
@@ -237,13 +233,13 @@ private fun QuickActionsRow(
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val tileWidth = remember(screenWidth) {
         val available = screenWidth - 2 * Dimens.ScreenHorizontalPadding.value -
-            (QUICK_ACTIONS_VISIBLE - 1) * Dimens.SpacingMedium.value
+            (QUICK_ACTIONS_VISIBLE - 1) * Dimens.ItemSpacing.value
         available / QUICK_ACTIONS_VISIBLE
     }
 
     LazyRow(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+        horizontalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
     ) {
         items(HomeQuickAction.entries) { action ->
             QuickActionTile(

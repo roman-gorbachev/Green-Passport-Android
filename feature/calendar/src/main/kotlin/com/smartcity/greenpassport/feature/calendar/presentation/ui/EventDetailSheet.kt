@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,11 +24,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.common.formatEventDate
 import com.smartcity.greenpassport.core.common.formatEventTime
+import com.smartcity.greenpassport.core.designsystem.component.ConfirmHapticOnSuccess
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSheetScaffold
@@ -42,6 +45,7 @@ import java.util.Locale
 import com.smartcity.greenpassport.core.R as CoreR
 
 private const val EVENT_IMAGE_ASPECT_RATIO = 1.5f
+private const val DESCRIPTION_MAX_LINES = 2
 
 @Composable
 fun EventDetailSheet(
@@ -51,6 +55,8 @@ fun EventDetailSheet(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = uiState.event
+
+    ConfirmHapticOnSuccess(inProgress = uiState.isRegistering, succeeded = uiState.isRegistered)
 
     GpSheetScaffold(onDismiss = onDismiss, modifier = modifier) {
         when {
@@ -97,6 +103,7 @@ private fun EventDetailContent(
             NetworkImage(
                 url = event.imageUrl,
                 contentDescription = null,
+                fallback = painterResource(CoreR.drawable.event_placeholder),
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(EVENT_IMAGE_ASPECT_RATIO)
@@ -104,12 +111,12 @@ private fun EventDetailContent(
             )
             Text(
                 text = event.title,
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(top = Dimens.SpacingMedium),
             )
             EventInfoRow(
-                icon = Icons.Filled.CalendarMonth,
+                icon = Icons.Outlined.CalendarMonth,
                 text = stringResource(
                     R.string.date_time,
                     formatEventDate(event.startAtEpochMillis, locale),
@@ -118,14 +125,16 @@ private fun EventDetailContent(
                 modifier = Modifier.padding(top = Dimens.SpacingSmall),
             )
             EventInfoRow(
-                icon = Icons.Filled.Place,
+                icon = Icons.Outlined.Place,
                 text = event.location,
                 modifier = Modifier.padding(top = Dimens.SpacingSmall),
             )
             Text(
                 text = event.description,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.outline,
+                maxLines = DESCRIPTION_MAX_LINES,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = Dimens.SpacingMedium),
             )
         }
@@ -168,13 +177,13 @@ private fun EventInfoRow(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = MaterialTheme.colorScheme.outline,
             modifier = Modifier.size(Dimens.IconSizeSmall),
         )
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.outline,
             modifier = Modifier.padding(start = Dimens.SpacingSmall),
         )
     }

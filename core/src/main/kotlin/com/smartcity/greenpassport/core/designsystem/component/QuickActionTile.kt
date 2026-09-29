@@ -43,16 +43,16 @@ fun QuickActionTile(
                 imageVector = icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(Dimens.IconSizeMedium),
+                modifier = Modifier.size(Dimens.ListRowIconSize),
             )
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelLarge,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(top = Dimens.SpacingSmall),
+                modifier = Modifier.padding(top = Dimens.SpacingExtraSmall + Dimens.BorderWidthThin),
             )
         }
     }

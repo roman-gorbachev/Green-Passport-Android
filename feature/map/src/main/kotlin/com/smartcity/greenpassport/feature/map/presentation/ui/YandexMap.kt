@@ -22,6 +22,7 @@ import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
+import java.lang.ref.WeakReference
 
 private const val DEFAULT_ZOOM = 11f
 private const val DEFAULT_AZIMUTH = 0f
@@ -70,7 +71,7 @@ fun YandexMap(
                     geometry = Point(point.latitude, point.longitude)
                     setIcon(pinIcon)
                     setText(point.name)
-                    addTapListener(listener)
+                    addTapListener(WeakReference(listener))
                 }
             }
 

@@ -81,7 +81,7 @@ fun GroupsScreen(
                     horizontal = Dimens.ScreenHorizontalPadding,
                     vertical = Dimens.SpacingSmall,
                 ),
-                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+                verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
             ) {
                 items(uiState.groups) { group ->
                     GroupCard(

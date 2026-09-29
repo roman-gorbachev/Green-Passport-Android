@@ -73,7 +73,7 @@ private fun ShopContent(
             horizontal = Dimens.ScreenHorizontalPadding,
             vertical = Dimens.SpacingSmall,
         ),
-        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+        verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
     ) {
         item {
             BalanceCard(points = uiState.points, hasInsufficientPoints = uiState.hasInsufficientPoints)

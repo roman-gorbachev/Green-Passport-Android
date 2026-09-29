@@ -52,7 +52,7 @@ fun CalendarScreen(
                 horizontal = Dimens.ScreenHorizontalPadding,
                 vertical = Dimens.SpacingMedium,
             ),
-            verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+            verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
         ) {
             items(uiState.events, key = { it.id }) { event ->
                 HeroImageCard(

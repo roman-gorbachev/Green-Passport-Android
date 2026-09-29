@@ -26,7 +26,7 @@ fun CommunityHubScreen(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = Dimens.ScreenHorizontalPadding, vertical = Dimens.SpacingSmall),
-        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+        verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
     ) {
         GpListRow(
             title = stringResource(R.string.community_forum_title),

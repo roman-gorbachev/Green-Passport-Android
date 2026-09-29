@@ -56,7 +56,7 @@ fun HistoryScreen(
                 horizontal = Dimens.ScreenHorizontalPadding,
                 vertical = Dimens.SpacingSmall,
             ),
-            verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+            verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
         ) {
             items(uiState.entries) { entry -> HistoryRow(entry) }
         }

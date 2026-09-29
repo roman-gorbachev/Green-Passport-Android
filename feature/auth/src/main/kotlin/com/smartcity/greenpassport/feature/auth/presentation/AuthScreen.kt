@@ -66,7 +66,7 @@ private fun AuthContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        MascotWidget(size = Dimens.MascotSizeLarge)
+        MascotWidget(size = Dimens.HeroMascotSize)
 
         GpTextField(
             value = uiState.email,

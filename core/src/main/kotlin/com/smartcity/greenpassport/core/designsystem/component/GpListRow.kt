@@ -48,7 +48,7 @@ fun GpListRow(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = if (leading != null) Dimens.SpacingMedium else Dimens.SpacingExtraSmall),
+                    .padding(start = if (leading != null) Dimens.ListRowContentGap else Dimens.SpacingExtraSmall),
             ) {
                 Text(
                     text = title,
@@ -61,7 +61,7 @@ fun GpListRow(
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.outline,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -77,7 +77,7 @@ private fun ListRowChevron() {
     Icon(
         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
         contentDescription = null,
-        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        tint = MaterialTheme.colorScheme.outline,
     )
 }
 
@@ -88,7 +88,7 @@ private fun GpListRowPreview() {
         GpListRow(
             title = "Субботник",
             subtitle = "+50 оч.",
-            leading = { MascotWidget(size = Dimens.IconSizeExtraLarge) },
+            leading = { MascotWidget(size = Dimens.ListRowMascotSize) },
             onClick = {},
         )
     }

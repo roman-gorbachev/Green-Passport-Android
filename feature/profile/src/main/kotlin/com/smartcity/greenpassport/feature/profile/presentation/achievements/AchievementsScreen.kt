@@ -57,7 +57,7 @@ fun AchievementsScreen(
             horizontal = Dimens.ScreenHorizontalPadding,
             vertical = Dimens.SpacingSmall,
         ),
-        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+        verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
     ) {
         items(uiState.achievements) { achievement ->
             AchievementRow(

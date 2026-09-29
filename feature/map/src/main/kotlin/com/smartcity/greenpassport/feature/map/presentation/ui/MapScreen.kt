@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
@@ -46,7 +48,6 @@ import com.smartcity.greenpassport.feature.map.presentation.state.MapUiState
 import com.smartcity.greenpassport.feature.map.presentation.viewmodels.MapViewModel
 import com.smartcity.greenpassport.core.R as CoreR
 
-private const val OVERLAY_ALPHA = 0.85f
 
 @Composable
 fun MapScreen(
@@ -111,9 +112,9 @@ private fun MapContent(
             uiState = uiState,
             onTypeSelected = onTypeSelected,
             onSearchQueryChange = onSearchQueryChange,
+            isFloating = true,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .background(MaterialTheme.colorScheme.background.copy(alpha = OVERLAY_ALPHA))
                 .statusBarsPadding()
                 .padding(vertical = Dimens.SpacingSmall),
         )
@@ -163,7 +164,7 @@ private fun MapPointsListContent(
                     top = Dimens.SpacingSmall,
                     bottom = bottomInset + Dimens.BottomBarReservedHeight + Dimens.SpacingMedium,
                 ),
-                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+                verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
             ) {
                 items(uiState.visiblePoints, key = { it.id }) { point ->
                     GpListRow(
@@ -183,13 +184,22 @@ private fun MapFiltersOverlay(
     onTypeSelected: (MapPointType?) -> Unit,
     onSearchQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    isFloating: Boolean = false,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         GpSearchField(
             value = uiState.searchQuery,
             onValueChange = onSearchQueryChange,
             placeholder = stringResource(R.string.map_search_placeholder),
-            modifier = Modifier.padding(horizontal = Dimens.ScreenHorizontalPadding),
+            modifier = Modifier
+                .padding(horizontal = Dimens.ScreenHorizontalPadding)
+                .then(
+                    if (isFloating) {
+                        Modifier.shadow(Dimens.BottomBarElevation, RoundedCornerShape(Dimens.CornerRadiusPill))
+                    } else {
+                        Modifier
+                    },
+                ),
         )
         LazyRow(
             contentPadding = PaddingValues(horizontal = Dimens.ScreenHorizontalPadding),

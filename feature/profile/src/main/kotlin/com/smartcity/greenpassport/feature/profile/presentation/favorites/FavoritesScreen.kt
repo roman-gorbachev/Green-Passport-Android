@@ -47,12 +47,12 @@ fun FavoritesScreen(
                 horizontal = Dimens.ScreenHorizontalPadding,
                 vertical = Dimens.SpacingSmall,
             ),
-            verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+            verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
         ) {
             items(uiState.tasks) { task ->
                 GpListRow(
                     title = task.title,
-                    leading = { MascotWidget(size = Dimens.IconSizeExtraLarge) },
+                    leading = { MascotWidget(size = Dimens.ListRowMascotSize) },
                     onClick = { onTaskSelected(task.id) },
                 )
             }

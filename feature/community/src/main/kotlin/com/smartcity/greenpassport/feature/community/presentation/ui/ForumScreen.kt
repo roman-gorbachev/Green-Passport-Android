@@ -55,7 +55,7 @@ fun ForumScreen(
                     horizontal = Dimens.ScreenHorizontalPadding,
                     vertical = Dimens.SpacingSmall,
                 ),
-                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+                verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
             ) {
                 items(uiState.posts) { post -> ForumPostCard(post) }
             }

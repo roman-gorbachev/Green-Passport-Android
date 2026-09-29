@@ -66,7 +66,7 @@ fun CardsScreen(
             vertical = Dimens.SpacingSmall,
         ),
         horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
-        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+        verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
     ) {
         items(uiState.achievements) { achievement -> CardTile(achievement) }
     }

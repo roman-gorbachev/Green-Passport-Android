@@ -1,13 +1,19 @@
 package com.smartcity.greenpassport.core.designsystem.component
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
@@ -19,12 +25,26 @@ fun GpPrimaryButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val scale by rememberPressScale(interactionSource)
+
     Button(
         onClick = onClick,
         enabled = enabled,
+        interactionSource = interactionSource,
         shape = RoundedCornerShape(Dimens.CornerRadiusPill),
-        contentPadding = PaddingValues(horizontal = Dimens.SpacingLarge, vertical = Dimens.SpacingMedium),
-        modifier = modifier.fillMaxWidth(),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = Dimens.SpacingNone,
+            pressedElevation = Dimens.SpacingNone,
+        ),
+        contentPadding = PaddingValues(horizontal = Dimens.SpacingLarge),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(Dimens.PrimaryButtonHeight)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            },
     ) {
         Text(text = text, style = MaterialTheme.typography.labelLarge)
     }

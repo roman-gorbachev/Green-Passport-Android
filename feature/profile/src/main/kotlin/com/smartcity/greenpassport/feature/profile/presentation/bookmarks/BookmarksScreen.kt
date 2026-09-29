@@ -47,12 +47,12 @@ fun BookmarksScreen(
                 horizontal = Dimens.ScreenHorizontalPadding,
                 vertical = Dimens.SpacingSmall,
             ),
-            verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+            verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
         ) {
             items(uiState.tips) { tip ->
                 GpListRow(
                     title = tip.title,
-                    leading = { MascotWidget(size = Dimens.IconSizeExtraLarge) },
+                    leading = { MascotWidget(size = Dimens.ListRowMascotSize) },
                     onClick = { onTipSelected(tip.id) },
                 )
             }

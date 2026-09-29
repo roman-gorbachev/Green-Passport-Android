@@ -14,12 +14,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import com.smartcity.greenpassport.core.R
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 
 private const val SCRIM_TOP_ALPHA = 0f
-private const val SCRIM_BOTTOM_ALPHA = 0.6f
+private const val SCRIM_BOTTOM_ALPHA = 0.45f
 private const val TITLE_MAX_LINES = 2
 
 @Composable
@@ -33,7 +35,7 @@ fun HeroImageCard(
 ) {
     GpSurfaceCard(
         onClick = onClick,
-        shape = MaterialTheme.shapes.extraLarge,
+        shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
         modifier = modifier
             .fillMaxWidth()
@@ -43,6 +45,7 @@ fun HeroImageCard(
             NetworkImage(
                 url = imageUrl,
                 contentDescription = null,
+                fallback = painterResource(R.drawable.event_placeholder),
                 modifier = Modifier.fillMaxSize(),
             )
             Box(
@@ -60,11 +63,11 @@ fun HeroImageCard(
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(Dimens.SpacingLarge),
+                    .padding(horizontal = Dimens.SpacingLarge, vertical = Dimens.SheetContentPadding),
             ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.headlineLarge,
                     color = Color.White,
                     maxLines = TITLE_MAX_LINES,
                     overflow = TextOverflow.Ellipsis,

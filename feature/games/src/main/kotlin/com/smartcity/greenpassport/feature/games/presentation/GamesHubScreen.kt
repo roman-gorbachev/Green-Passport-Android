@@ -44,7 +44,7 @@ fun GamesHubScreen(
             vertical = Dimens.SpacingSmall,
         ),
         horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
-        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+        verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
     ) {
         items(GameId.entries) { gameId ->
             GameTile(

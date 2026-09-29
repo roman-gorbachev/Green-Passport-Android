@@ -117,7 +117,7 @@ private fun EcoTipsListContent(
                     horizontal = Dimens.ScreenHorizontalPadding,
                     vertical = Dimens.SpacingSmall,
                 ),
-                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+                verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
             ) {
                 items(uiState.visibleTips, key = { it.id }) { tip ->
                     val isBookmarked = uiState.bookmarkedTipIds.contains(tip.id)
@@ -137,7 +137,11 @@ private fun EcoTipsListContent(
                         trailing = {
                             IconButton(onClick = { onToggleBookmark(tip.id) }) {
                                 Icon(
-                                    imageVector = if (isBookmarked) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                                    imageVector = if (isBookmarked) {
+                                        Icons.Filled.Bookmark
+                                    } else {
+                                        Icons.Filled.BookmarkBorder
+                                    },
                                     contentDescription = null,
                                     tint = if (isBookmarked) {
                                         MaterialTheme.colorScheme.primary
