@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="map_filter_all">Усе</string>
+    <string name="map_type_eco_shop">Эка-крамы</string>
+    <string name="map_type_recycling_point">Пункты перапрацоўкі</string>
+    <string name="map_type_eco_event">Эка-падзеі</string>
+    <string name="map_search_placeholder">Пошук</string>
+    <string name="map_empty">Нічога не знойдзена</string>
+    <string name="map_route_unavailable">Пабудова маршруту пакуль недаступная</string>
+    <string name="save">Захаваць</string>
+    <string name="saved">Захавана</string>
+</resources>

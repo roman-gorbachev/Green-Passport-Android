@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Зялёны Пашпарт</string>
+    <string name="onboarding_title">Зялёны Пашпарт</string>
+    <string name="onboarding_subtitle">Выконвайце экалагічныя заданні, зарабляйце балы і абменьвайце іх на зніжкі ў партнёраў</string>
+    <string name="onboarding_get_started">Пачаць</string>
+    <string name="home_tile_tasks">Заданні</string>
+    <string name="home_tile_profile">Мой профіль</string>
+    <string name="home_tile_calendar">Каляндар падзей</string>
+    <string name="home_tile_map">Карта</string>
+    <string name="home_tile_community">Супольнасць</string>
+    <string name="home_tile_ecotips">Эка-парады</string>
+    <string name="home_tile_games">Міні-гульні</string>
+    <string name="home_tile_shop">Крама</string>
+    <string name="home_tile_feedback">Зваротная сувязь</string>
+    <string name="ecotip_detail_title">Парада</string>
+    <string name="edit_profile">Рэдагаваць профіль</string>
+</resources>

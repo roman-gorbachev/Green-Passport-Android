@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tasks_filter_all">Усе</string>
+    <string name="tasks_category_recycling">Перапрацоўка</string>
+    <string name="tasks_category_cleanup">Прыборка</string>
+    <string name="tasks_category_transport">Транспарт</string>
+    <string name="tasks_category_reusable_items">Шматразовыя рэчы</string>
+    <string name="tasks_category_lecture">Лекцыі</string>
+    <string name="tasks_empty">Пакуль няма заданняў у гэтай катэгорыі</string>
+    <string name="task_detail_completed_label">Заданне выканана</string>
+    <string name="mark_as_done">Адзначыць выкананым</string>
+    <string name="for_you">Для цябе</string>
+    <string name="task_done_points_earned">Заданне выканана: +%1$d ач.</string>
+    <string name="task_already_completed">Заданне ўжо выканана</string>
+    <string name="daily_limit_reached_msg">Ліміт такіх заданняў на сёння вычарпаны. Вяртайся заўтра</string>
+    <string name="code_does_not_match_msg">Код не падыходзіць да гэтага задання</string>
+    <string name="task_needs_other_confirmation_msg">Гэтае заданне пацвярджаецца фота або QR-кодам</string>
+    <string name="no_internet_connection">Няма падключэння да інтэрнэту</string>
+    <string name="something_went_wrong_msg">Нешта пайшло не так. Паспрабуй яшчэ раз</string>
+    <string name="honor_system">Пад сумленнае слова</string>
+    <string name="photo_confirmation">Пацвярджэнне фота</string>
+    <string name="qr_code_on_site">QR-код на месцы</string>
+    <string name="up_to_3_such_tasks_per_day_msg">Залічваецца да 3 такіх заданняў у дзень</string>
+    <string name="moderator_checks_photo_msg">Мадэратар праверыць фота, ачкі прыйдуць пасля ўхвалення</string>
+    <string name="organizer_shows_qr_code_msg">QR-код пакажа арганізатар або супрацоўнік пункта прыёму</string>
+    <string name="scan_qr_code">Сканаваць QR-код</string>
+    <string name="attach_photo">Прымацаваць фота</string>
+    <string name="send_another_photo">Адправіць іншае фота</string>
+    <string name="photo_under_review_msg">Фота на праверцы. Ачкі прыйдуць пасля ўхвалення</string>
+    <string name="photo_rejected">Фота адхілена: %1$s</string>
+    <string name="no_reason_given">прычына не пазначана</string>
+    <string name="photo_failed_automatic_check_msg">фота не прайшло аўтаматычную праверку</string>
+    <string name="under_review">На праверцы</string>
+</resources>

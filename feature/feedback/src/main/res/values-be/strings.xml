@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feedback_review_title">Ацаніць праграму</string>
+    <string name="feedback_review_message_label">Каментарый (неабавязкова)</string>
+    <string name="feedback_review_submit_button">Адправіць ацэнку</string>
+    <string name="feedback_review_submitted_label">Дзякуй за ацэнку!</string>
+    <string name="feedback_suggestion_title">Водгук або прапанова</string>
+    <string name="feedback_suggestion_message_label">Апішыце праблему або ідэю</string>
+    <string name="feedback_suggestion_submit_button">Адправіць</string>
+    <string name="feedback_suggestion_submitted_label">Дзякуй, мы атрымалі ваша паведамленне</string>
+    <string name="feedback_survey_title">Апытанне</string>
+    <string name="feedback_survey_answered_label">Дзякуй за адказ!</string>
+    <string name="feedback_support_title">Падтрымка</string>
+    <string name="feedback_support_email_format">Пошта: %1$s</string>
+    <string name="feedback_support_phone_format">Тэлефон: %1$s</string>
+    <string name="text_contains_banned_words">Тэкст змяшчае недапушчальныя словы</string>
+</resources>

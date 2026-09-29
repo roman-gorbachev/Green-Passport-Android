@@ -8,5 +8,6 @@ import com.smartcity.greenpassport.feature.profile.R
 fun appLanguageLabelRes(language: AppLanguage): Int = when (language) {
     AppLanguage.SYSTEM -> R.string.system_language
     AppLanguage.RUSSIAN -> R.string.russian_language_name
+    AppLanguage.BELARUSIAN -> R.string.belarusian_language_name
     AppLanguage.ENGLISH -> R.string.english_language_name
 }

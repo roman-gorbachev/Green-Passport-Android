@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="community_forum_title">Форум</string>
+    <string name="community_groups_title">Групы</string>
+    <string name="forum_empty">Пакуль няма паведамленняў — будзьце першымі</string>
+    <string name="forum_draft_label">Ваша паведамленне</string>
+    <string name="forum_post_button">Адправіць</string>
+    <string name="groups_empty">Пакуль няма груп — стварыце першую</string>
+    <string name="groups_draft_label">Назва групы</string>
+    <string name="groups_create_button">Стварыць</string>
+    <string name="groups_join_button">Далучыцца</string>
+    <string name="groups_joined_label">Вы ўдзельнік</string>
+    <string name="groups_member_count_format">Удзельнікаў: %1$d</string>
+    <string name="guest">Госць</string>
+    <string name="text_contains_banned_words">Тэкст змяшчае недапушчальныя словы</string>
+    <string name="report">Паскардзіцца</string>
+    <string name="report_sent">Скарга адпраўлена</string>
+    <string name="insults_or_obscenity">Абразы або мат</string>
+    <string name="spam">Спам</string>
+    <string name="inappropriate_content">Недапушчальны кантэнт</string>
+    <string name="other">Іншае</string>
+</resources>

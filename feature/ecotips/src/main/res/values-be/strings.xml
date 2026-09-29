@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ecotips_filter_all">Усе</string>
+    <string name="ecotips_category_article">Артыкулы</string>
+    <string name="ecotips_category_video">Відэа</string>
+    <string name="ecotips_category_kids">Дзецям</string>
+    <string name="ecotips_empty">Пакуль няма парад у гэтай катэгорыі</string>
+    <string name="ecotips_daily_tip_label">Парада дня</string>
+    <string name="ecotip_detail_reward_format">Узнагарода: %1$d балаў, %2$d вопыту</string>
+    <string name="ecotip_detail_mark_read_button">Адзначыць як вывучанае</string>
+    <string name="ecotip_detail_read_label">Ужо вывучана</string>
+</resources>

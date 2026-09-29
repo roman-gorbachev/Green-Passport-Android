@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="game_eco_puzzle_title">Эка-галаваломка</string>
+    <string name="game_waste_sorting_title">Сартаванне адходаў</string>
+    <string name="game_eco_maze_title">Эка-лабірынт</string>
+    <string name="game_eco_quiz_title">Эка-віктарына</string>
+    <string name="games_best_score_format">Рэкорд: %1$d</string>
+
+    <string name="puzzle_instructions">Знайдзіце пары аднолькавых картак</string>
+    <string name="puzzle_finished_format">Гатова! Хадоў: %1$d, ачкі: %2$d</string>
+
+    <string name="sorting_instructions">Выберыце правільны кантэйнер для адходу</string>
+    <string name="sorting_score_format">Ачкі: %1$d</string>
+    <string name="sorting_time_format">Засталося: %1$d с</string>
+    <string name="sorting_bin_glass">Шкло</string>
+    <string name="sorting_bin_metal">Метал</string>
+    <string name="sorting_bin_paper">Папера</string>
+    <string name="sorting_bin_plastic">Пластык</string>
+    <string name="sorting_finished_format">Гульня скончана! Ачкі: %1$d</string>
+    <string name="game_play_again">Гуляць зноў</string>
+
+    <string name="sorting_item_glass_bottle">Шкляная бутэлька</string>
+    <string name="sorting_item_glass_jar">Шкляны слоік</string>
+    <string name="sorting_item_soda_can">Бляшанка з-пад газіроўкі</string>
+    <string name="sorting_item_foil">Алюмініевая фальга</string>
+    <string name="sorting_item_newspaper">Газета</string>
+    <string name="sorting_item_cardboard_box">Кардонная скрынка</string>
+    <string name="sorting_item_plastic_bag">Пластыкавы пакет</string>
+    <string name="sorting_item_plastic_bottle">Пластыкавая бутэлька</string>
+
+    <string name="maze_score_format">Ачкі: %1$d</string>
+    <string name="maze_finished_format">Вы прайшлі лабірынт! Ачкі: %1$d</string>
+
+    <string name="quiz_score_format">Пытанне %1$d з %2$d · Ачкі: %3$d</string>
+    <string name="quiz_finished_format">Віктарына скончана! Правільных адказаў: %1$d з %2$d</string>
+
+    <string name="quiz_question_1">Што з пералічанага НЕ перапрацоўваецца паўторна?</string>
+    <string-array name="quiz_options_1">
+        <item>Шкляная бутэлька</item>
+        <item>Алюмініевая бляшанка</item>
+        <item>Выкарыстаная жуйка</item>
+        <item>Кардон</item>
+    </string-array>
+
+    <string name="quiz_question_2">Што дапамагае скараціць колькасць адходаў?</string>
+    <string-array name="quiz_options_2">
+        <item>Аднаразовы посуд</item>
+        <item>Шматразовыя сумкі для пакупак</item>
+        <item>Частая замена тэхнікі</item>
+        <item>Лішняя ўпакоўка тавараў</item>
+    </string-array>
+
+    <string name="quiz_question_3">Які газ паглынаюць дрэвы, дапамагаючы змагацца са зменай клімату?</string>
+    <string-array name="quiz_options_3">
+        <item>Кісларод</item>
+        <item>Вуглякіслы газ</item>
+        <item>Азот</item>
+        <item>Вадарод</item>
+    </string-array>
+
+    <string name="quiz_question_4">Што з гэтага — прыклад аднаўляльнай крыніцы энергіі?</string>
+    <string-array name="quiz_options_4">
+        <item>Вугаль</item>
+        <item>Нафта</item>
+        <item>Сонечная энергія</item>
+        <item>Прыродны газ</item>
+    </string-array>
+
+    <string name="quiz_question_5">Навошта патрэбна сартаванне смецця?</string>
+    <string-array name="quiz_options_5">
+        <item>Каб смецця было больш</item>
+        <item>Каб спрасціць перапрацоўку</item>
+        <item>Каб ускладніць вываз</item>
+        <item>Гэта не мае значэння</item>
+    </string-array>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calendar_empty">Пакуль няма запланаваных мерапрыемстваў</string>
+    <string name="calendar_registered_label">Вы зарэгістраваныя</string>
+    <string name="sign_up_points">Запісацца · +%1$d ач.</string>
+    <string name="sign_up">Запісацца</string>
+    <string name="date_time">%1$s · %2$s</string>
+</resources>

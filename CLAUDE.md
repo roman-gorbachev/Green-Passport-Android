@@ -183,7 +183,7 @@ The same principle applies to `domain/` and `:core`'s data layer: group files by
       }
   }
   ```
-- **Localization**: never hardcode user-facing strings. Every string shown in the UI or sent as a notification goes through string resources (`context.getString(R.string.key)` / `stringResource(R.string.key)`). Add each one to both `values/strings.xml` (Russian, default) and `values-en/strings.xml` in the module that owns the screen.
+- **Localization**: never hardcode user-facing strings. Every string shown in the UI or sent as a notification goes through string resources (`context.getString(R.string.key)` / `stringResource(R.string.key)`). Add each one to `values/strings.xml` (Russian, default), `values-be/strings.xml` (Belarusian) and `values-en/strings.xml` in the module that owns the screen. The in-app language picker lives in the profile (`AppLanguage`, applied with `AppCompatDelegate.setApplicationLocales`); a new language also needs an entry in `app/src/main/res/xml/locales_config.xml`.
 - **String resource naming**: the key mirrors the string's own (English) content, lowercased and snake_cased. Never use a category/role prefix like `task_error_load` or a `_title`/`_label` suffix. When the content is too long to spell out in full, take the first few meaningful words and append `_msg`.
 
   ```xml

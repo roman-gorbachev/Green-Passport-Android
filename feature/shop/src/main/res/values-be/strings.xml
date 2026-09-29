@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shop_catalog_title">Купоны партнёраў</string>
+    <string name="shop_history_title">Мае пакупкі</string>
+    <string name="shop_purchase_button">Абмяняць</string>
+    <string name="shop_cost_format">%1$d балаў</string>
+    <string name="shop_insufficient_points">Недастаткова балаў для абмену</string>
+    <string name="shop_empty_rewards">Пакуль няма даступных купонаў</string>
+    <string name="shop_empty_purchases">Вы яшчэ не абменьвалі балы на купоны</string>
+</resources>

@@ -51,5 +51,6 @@
     <string name="language">Язык</string>
     <string name="system_language">Как в системе</string>
     <string name="russian_language_name" translatable="false">Русский</string>
+    <string name="belarusian_language_name" translatable="false">Беларуская</string>
     <string name="english_language_name" translatable="false">English</string>
 </resources>

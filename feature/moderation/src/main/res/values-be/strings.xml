@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="moderation">Мадэрацыя</string>
+    <string name="moderators_only_msg">Гэты раздзел даступны толькі мадэратарам</string>
+    <string name="task_photos_count">Фота заданняў (%1$d)</string>
+    <string name="reports_count">Скаргі (%1$d)</string>
+    <string name="action_failed_msg">Не ўдалося выканаць дзеянне. Праверце інтэрнэт і паспрабуйце яшчэ раз</string>
+    <string name="no_photos_to_review">Няма фота на праверцы</string>
+    <string name="no_reports">Скаргаў няма</string>
+    <string name="no_name">Без імя</string>
+    <string name="approve">Ухваліць</string>
+    <string name="reject">Адхіліць</string>
+    <string name="task_not_visible_in_photo">На фота не відаць выканання задання</string>
+    <string name="photo_not_taken_by_user">Фота ўзята з інтэрнэту</string>
+    <string name="inappropriate_photo">Недапушчальнае фота</string>
+    <string name="hidden_reports_count">Схаваны · скаргаў: %1$d</string>
+    <string name="visible_reports_count">Бачны · скаргаў: %1$d</string>
+    <string name="restore">Вярнуць</string>
+    <string name="hide">Схаваць</string>
+    <string name="delete">Выдаліць</string>
+</resources>
