@@ -1,6 +1,7 @@
 package com.smartcity.greenpassport.feature.profile.presentation.profile
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,9 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -27,6 +31,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,6 +51,7 @@ import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.designsystem.theme.SectionColors
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
+import com.smartcity.greenpassport.core.model.settings.AppLanguage
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.profile.R
 import com.smartcity.greenpassport.core.R as CoreR
@@ -161,6 +169,10 @@ private fun ProfileContent(
             )
         }
 
+        item {
+            LanguageRow()
+        }
+
         items(profileMenuEntries) { entry ->
             GpListRow(
                 title = stringResource(entry.labelRes),
@@ -232,6 +244,43 @@ private fun ProfileMenuIcon(
         icon = icon,
         color = color,
         size = Dimens.IconCircleSmallSize,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun LanguageRow(
+    modifier: Modifier = Modifier,
+    viewModel: AppLanguageViewModel = hiltViewModel(),
+) {
+    val selected by viewModel.language.collectAsStateWithLifecycle()
+    var isMenuOpen by remember { mutableStateOf(false) }
+    GpListRow(
+        title = stringResource(R.string.language),
+        leading = {
+            ProfileMenuIcon(icon = Icons.Filled.Translate, color = GreenPassportTheme.sectionColors.calendar)
+        },
+        trailing = {
+            Box {
+                Text(
+                    text = stringResource(appLanguageLabelRes(selected)),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                DropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }) {
+                    AppLanguage.entries.forEach { language ->
+                        DropdownMenuItem(
+                            text = { Text(stringResource(appLanguageLabelRes(language))) },
+                            onClick = {
+                                isMenuOpen = false
+                                viewModel.onLanguageSelected(language)
+                            },
+                        )
+                    }
+                }
+            }
+        },
+        onClick = { isMenuOpen = true },
         modifier = modifier,
     )
 }

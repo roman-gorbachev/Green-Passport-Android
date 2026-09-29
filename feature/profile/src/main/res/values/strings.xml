@@ -48,4 +48,8 @@
     <string name="edit_profile">Редактировать профиль</string>
     <string name="city_and_points">%1$s · %2$d оч.</string>
     <string name="moderation">Модерация</string>
+    <string name="language">Язык</string>
+    <string name="system_language">Как в системе</string>
+    <string name="russian_language_name" translatable="false">Русский</string>
+    <string name="english_language_name" translatable="false">English</string>
 </resources>

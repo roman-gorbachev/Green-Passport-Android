@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.googleid)
 
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.appcompat)
 
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
