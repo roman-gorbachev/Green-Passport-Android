@@ -86,4 +86,7 @@ sealed interface Destination {
 
     @Serializable
     data object Feedback : Destination
+
+    @Serializable
+    data object Moderation : Destination
 }

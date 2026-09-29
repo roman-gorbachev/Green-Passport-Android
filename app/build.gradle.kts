@@ -79,6 +79,7 @@ dependencies {
     implementation(project(":feature:ecotips"))
     implementation(project(":feature:feedback"))
     implementation(project(":feature:games"))
+    implementation(project(":feature:moderation"))
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

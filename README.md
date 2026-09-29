@@ -70,7 +70,18 @@ The app talks to the Firebase project `chatroom-85fb8` (see `.firebaserc`). Unti
    ```
 
    Or paste the contents of `firestore.rules` into Firestore → Rules (and `storage.rules` into Storage → Rules) in the console and press Publish. The app doesn't read from Storage yet, so the storage step can be skipped if the console asks for the Blaze plan.
-4. Seed the demo data: `cd scripts && npm install && node seed-firestore.js` (see `scripts/README.md`).
+4. Switch the project to the **Blaze** plan, enable the **Cloud Vision API** in Google Cloud, then deploy the backend:
+
+   ```bash
+   cd functions && npm install && cd ..
+   firebase deploy --only functions,firestore:rules,firestore:indexes,storage --project chatroom-85fb8
+   ```
+
+   Points are awarded and spent only by Cloud Functions (`functions/`, region `europe-central2`); the rules forbid the app
+   from writing `availablePoints`/`lifetimeXp`.
+5. Make yourself a moderator: `node scripts/seed-firestore.js --only=none --admin=<your uid>` (uid from Authentication).
+   Moderators see "Moderation" in the profile: the task photo queue and reported posts.
+6. Seed the demo data: `cd scripts && npm install && node seed-firestore.js` (see `scripts/README.md`).
 
 ## Known limitations of the pilot
 

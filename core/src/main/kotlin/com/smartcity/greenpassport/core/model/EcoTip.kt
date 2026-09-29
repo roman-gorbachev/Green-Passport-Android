@@ -20,5 +20,4 @@ data class EcoTip(
 interface EcoTipsRepository {
     suspend fun getTips(): List<EcoTip>
     suspend fun getReadTipIds(userId: String): Set<String>
-    suspend fun markTipRead(userId: String, tipId: String)
 }

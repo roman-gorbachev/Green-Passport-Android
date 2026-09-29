@@ -1,8 +1,21 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    function isAdmin() {
+      return request.auth != null &&
+        firestore.exists(/databases/(default)/documents/apps/greenpassport/admins/$(request.auth.uid));
+    }
+
+    match /greenpassport/submissions/{userId}/{fileName} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow create: if request.auth != null && request.auth.uid == userId &&
+        request.resource.size < 5 * 1024 * 1024 &&
+        request.resource.contentType == 'image/jpeg';
+      allow update, delete: if false;
+    }
+
     match /greenpassport/{allPaths=**} {
-      allow read: if request.auth != null;
+      allow read: if request.auth != null && !allPaths.matches('submissions/.*');
       allow write: if false;
     }
   }

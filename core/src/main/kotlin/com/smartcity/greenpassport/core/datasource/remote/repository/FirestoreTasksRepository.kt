@@ -6,6 +6,7 @@ import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
 import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.core.model.TaskCategory
 import com.smartcity.greenpassport.core.model.TasksRepository
+import com.smartcity.greenpassport.core.model.verification.TaskVerification
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -16,10 +17,10 @@ private const val FIELD_CITY = "city"
 private const val FIELD_REWARD_POINTS = "rewardPoints"
 private const val FIELD_REWARD_XP = "rewardXp"
 private const val FIELD_IMAGE_URL = "imageUrl"
+private const val FIELD_VERIFICATION = "verification"
 
 private const val FIELD_USER_ID = "userId"
 private const val FIELD_TASK_ID = "taskId"
-private const val FIELD_COMPLETED_AT = "completedAtEpochMillis"
 
 class FirestoreTasksRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
@@ -36,19 +37,6 @@ class FirestoreTasksRepository @Inject constructor(
             .get()
             .await()
         return snapshot.documents.mapNotNull { it.getString(FIELD_TASK_ID) }.toSet()
-    }
-
-    override suspend fun markTaskCompleted(userId: String, taskId: String) {
-        val progressId = "${userId}_$taskId"
-        FirestoreCollections.taskProgress(firestore).document(progressId)
-            .set(
-                mapOf(
-                    FIELD_USER_ID to userId,
-                    FIELD_TASK_ID to taskId,
-                    FIELD_COMPLETED_AT to System.currentTimeMillis(),
-                ),
-            )
-            .await()
     }
 }
 
@@ -69,5 +57,7 @@ private fun DocumentSnapshot.toTask(): Task? {
         rewardPoints = getLong(FIELD_REWARD_POINTS)?.toInt() ?: 0,
         rewardXp = getLong(FIELD_REWARD_XP)?.toInt() ?: 0,
         imageUrl = getString(FIELD_IMAGE_URL),
+        verification = TaskVerification.entries.firstOrNull { it.name == getString(FIELD_VERIFICATION) }
+            ?: TaskVerification.SELF,
     )
 }

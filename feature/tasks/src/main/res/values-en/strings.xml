@@ -9,4 +9,25 @@
     <string name="task_detail_completed_label">Task completed</string>
     <string name="mark_as_done">Mark as done</string>
     <string name="for_you">For you</string>
+    <string name="task_done_points_earned">Task done: +%1$d pts</string>
+    <string name="task_already_completed">Task already completed</string>
+    <string name="daily_limit_reached_msg">Daily limit for such tasks reached. Come back tomorrow</string>
+    <string name="code_does_not_match_msg">This code doesn\'t match the task</string>
+    <string name="task_needs_other_confirmation_msg">This task is confirmed with a photo or a QR code</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="something_went_wrong_msg">Something went wrong. Please try again</string>
+    <string name="honor_system">Honor system</string>
+    <string name="photo_confirmation">Photo confirmation</string>
+    <string name="qr_code_on_site">QR code on site</string>
+    <string name="up_to_3_such_tasks_per_day_msg">Up to 3 such tasks count per day</string>
+    <string name="moderator_checks_photo_msg">A moderator will check the photo, points arrive after approval</string>
+    <string name="organizer_shows_qr_code_msg">The organizer or the collection point staff will show the QR code</string>
+    <string name="scan_qr_code">Scan QR code</string>
+    <string name="attach_photo">Attach photo</string>
+    <string name="send_another_photo">Send another photo</string>
+    <string name="photo_under_review_msg">Photo is under review. Points arrive after approval</string>
+    <string name="photo_rejected">Photo rejected: %1$s</string>
+    <string name="no_reason_given">no reason given</string>
+    <string name="photo_failed_automatic_check_msg">the photo failed the automatic check</string>
+    <string name="under_review">Under review</string>
 </resources>

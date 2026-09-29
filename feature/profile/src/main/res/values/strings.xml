@@ -47,4 +47,5 @@
     <string name="tips">Советы</string>
     <string name="edit_profile">Редактировать профиль</string>
     <string name="city_and_points">%1$s · %2$d оч.</string>
+    <string name="moderation">Модерация</string>
 </resources>

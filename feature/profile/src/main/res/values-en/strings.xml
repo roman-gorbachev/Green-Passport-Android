@@ -47,4 +47,5 @@
     <string name="tips">Tips</string>
     <string name="edit_profile">Edit profile</string>
     <string name="city_and_points">%1$s · %2$d pts</string>
+    <string name="moderation">Moderation</string>
 </resources>

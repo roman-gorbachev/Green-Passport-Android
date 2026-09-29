@@ -21,6 +21,8 @@ private const val FIELD_AUTHOR_NAME = "authorName"
 private const val FIELD_AUTHOR_AVATAR = "authorAvatar"
 private const val FIELD_TEXT = "text"
 private const val FIELD_CREATED_AT = "createdAtEpochMillis"
+private const val FIELD_HIDDEN = "hidden"
+private const val FIELD_REPORT_COUNT = "reportCount"
 
 private const val FIELD_NAME = "name"
 private const val FIELD_MEMBER_IDS = "memberIds"
@@ -35,7 +37,7 @@ class FirestoreCommunityRepository @Inject constructor(
     override fun observeForumPosts(): Flow<List<ForumPost>> = callbackFlow {
         val query = FirestoreCollections.posts(firestore).orderBy(FIELD_CREATED_AT, Query.Direction.DESCENDING)
         val registration = query.addSnapshotListener { snapshot, _ ->
-            trySend(snapshot?.documents.orEmpty().mapNotNull { it.toForumPost() })
+            trySend(snapshot?.documents.orEmpty().mapNotNull { it.toForumPost() }.filterNot { it.isHidden })
         }
         awaitClose { registration.remove() }
     }
@@ -93,7 +95,7 @@ class FirestoreCommunityRepository @Inject constructor(
     }
 }
 
-private fun DocumentSnapshot.toForumPost(): ForumPost? {
+internal fun DocumentSnapshot.toForumPost(): ForumPost? {
     val authorId = getString(FIELD_AUTHOR_ID) ?: return null
     val text = getString(FIELD_TEXT) ?: return null
     val createdAt = getLong(FIELD_CREATED_AT) ?: return null
@@ -106,6 +108,8 @@ private fun DocumentSnapshot.toForumPost(): ForumPost? {
         authorAvatar = authorAvatar,
         text = text,
         createdAtEpochMillis = createdAt,
+        isHidden = getBoolean(FIELD_HIDDEN) == true,
+        reportCount = getLong(FIELD_REPORT_COUNT)?.toInt() ?: 0,
     )
 }
 

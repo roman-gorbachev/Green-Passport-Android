@@ -20,3 +20,9 @@ keystore.properties
 scripts/service-account.json
 scripts/node_modules/
 scripts/package-lock.json
+scripts/qr/
+functions/node_modules/
+functions/lib/
+functions/src/moderation/wordlists/
+rules-tests/node_modules/
+*-debug.log

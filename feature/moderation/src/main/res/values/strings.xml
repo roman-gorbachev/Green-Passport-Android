@@ -1,0 +1,20 @@
+<resources>
+    <string name="moderation">Модерация</string>
+    <string name="moderators_only_msg">Этот раздел доступен только модераторам</string>
+    <string name="task_photos_count">Фото заданий (%1$d)</string>
+    <string name="reports_count">Жалобы (%1$d)</string>
+    <string name="action_failed_msg">Не удалось выполнить действие. Проверьте интернет и попробуйте ещё раз</string>
+    <string name="no_photos_to_review">Нет фото на проверке</string>
+    <string name="no_reports">Жалоб нет</string>
+    <string name="no_name">Без имени</string>
+    <string name="approve">Одобрить</string>
+    <string name="reject">Отклонить</string>
+    <string name="task_not_visible_in_photo">На фото не видно выполнения задания</string>
+    <string name="photo_not_taken_by_user">Фото взято из интернета</string>
+    <string name="inappropriate_photo">Неприемлемое фото</string>
+    <string name="hidden_reports_count">Скрыт · жалоб: %1$d</string>
+    <string name="visible_reports_count">Виден · жалоб: %1$d</string>
+    <string name="restore">Вернуть</string>
+    <string name="hide">Скрыть</string>
+    <string name="delete">Удалить</string>
+</resources>

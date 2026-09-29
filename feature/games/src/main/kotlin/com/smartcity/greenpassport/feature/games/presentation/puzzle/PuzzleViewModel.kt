@@ -78,9 +78,9 @@ class PuzzleViewModel @Inject constructor(
         val score = (BASE_SCORE - extraMoves * PENALTY_PER_EXTRA_MOVE).coerceAtLeast(MINIMUM_SCORE)
         _uiState.update { it.copy(isFinished = true, score = score) }
 
-        val userId = observeSession().first()?.userId ?: return
+        if (observeSession().first() == null) return
         runCatching {
-            submitGameResult(userId, GameId.ECO_PUZZLE, score)
+            submitGameResult(GameId.ECO_PUZZLE, score)
         }.onFailure { error ->
             Log.e("PuzzleViewModel::maybeFinish()", error.message.orEmpty())
         }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.model.LevelProgression
 import com.smartcity.greenpassport.feature.profile.domain.GetExperienceUseCase
 import com.smartcity.greenpassport.feature.profile.domain.GetPointsBalanceUseCase
+import com.smartcity.greenpassport.feature.profile.domain.ObserveIsModeratorUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveNotificationsEnabledUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveProfileSessionUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveUserProfileUseCase
@@ -34,6 +35,7 @@ class ProfileViewModel @Inject constructor(
     observeNotificationsEnabled: ObserveNotificationsEnabledUseCase,
     private val setNotificationsEnabled: SetNotificationsEnabledUseCase,
     observeUserProfile: ObserveUserProfileUseCase,
+    observeIsModerator: ObserveIsModeratorUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -48,6 +50,14 @@ class ProfileViewModel @Inject constructor(
                     if (session == null) flowOf(null) else observeUserProfile(session.userId).catch { emit(null) }
                 }
                 .collectLatest { profile -> _uiState.update { it.copy(profile = profile) } }
+        }
+
+        viewModelScope.launch {
+            observeSession()
+                .flatMapLatest { session ->
+                    if (session == null) flowOf(false) else observeIsModerator(session.userId).catch { emit(false) }
+                }
+                .collectLatest { isModerator -> _uiState.update { it.copy(isModerator = isModerator) } }
         }
 
         viewModelScope.launch {

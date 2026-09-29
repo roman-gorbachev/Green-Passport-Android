@@ -38,6 +38,7 @@ listOf(
     "ecotips",
     "feedback",
     "games",
+    "moderation",
 ).forEach { feature ->
     include(":feature:$feature")
 }

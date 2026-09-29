@@ -8,6 +8,7 @@ data class ProfileUiState(
     val email: String? = null,
     val isAnonymous: Boolean = false,
     val profile: UserProfile? = null,
+    val isModerator: Boolean = false,
     val level: Level? = null,
     val points: Int = 0,
     val notificationsEnabled: Boolean = false,

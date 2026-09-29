@@ -12,4 +12,10 @@
     <string name="groups_member_count_format">Members: %1$d</string>
     <string name="guest">Guest</string>
     <string name="text_contains_banned_words">Text contains banned words</string>
+    <string name="report">Report</string>
+    <string name="report_sent">Report sent</string>
+    <string name="insults_or_obscenity">Insults or obscenity</string>
+    <string name="spam">Spam</string>
+    <string name="inappropriate_content">Inappropriate content</string>
+    <string name="other">Other</string>
 </resources>

@@ -54,9 +54,9 @@ class MazeViewModel @Inject constructor(
 
         if (isFinished) {
             viewModelScope.launch {
-                val userId = observeSession().first()?.userId ?: return@launch
+                if (observeSession().first() == null) return@launch
                 runCatching {
-                    submitGameResult(userId, GameId.ECO_MAZE, score)
+                    submitGameResult(GameId.ECO_MAZE, score)
                 }.onFailure { error ->
                     Log.e("MazeViewModel::onMove()", error.message.orEmpty())
                 }

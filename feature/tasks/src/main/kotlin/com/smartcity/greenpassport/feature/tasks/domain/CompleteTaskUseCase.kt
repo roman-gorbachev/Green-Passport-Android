@@ -1,25 +1,12 @@
 package com.smartcity.greenpassport.feature.tasks.domain
 
-import com.smartcity.greenpassport.core.model.PointsAward
-import com.smartcity.greenpassport.core.model.PointsEarnReason
-import com.smartcity.greenpassport.core.model.PointsRepository
 import com.smartcity.greenpassport.core.model.Task
-import com.smartcity.greenpassport.core.model.TasksRepository
+import com.smartcity.greenpassport.core.model.rewards.RewardResult
+import com.smartcity.greenpassport.core.model.rewards.RewardsRepository
 import javax.inject.Inject
 
 class CompleteTaskUseCase @Inject constructor(
-    private val tasksRepository: TasksRepository,
-    private val pointsRepository: PointsRepository,
+    private val rewardsRepository: RewardsRepository,
 ) {
-    suspend operator fun invoke(userId: String, task: Task) {
-        tasksRepository.markTaskCompleted(userId, task.id)
-        pointsRepository.award(
-            userId = userId,
-            award = PointsAward(
-                points = task.rewardPoints,
-                xp = task.rewardXp,
-                reason = PointsEarnReason.TASK_COMPLETED,
-            ),
-        )
-    }
+    suspend operator fun invoke(task: Task): RewardResult = rewardsRepository.completeSelfTask(task.id)
 }

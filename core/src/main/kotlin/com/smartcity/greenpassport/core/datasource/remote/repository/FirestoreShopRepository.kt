@@ -34,22 +34,6 @@ class FirestoreShopRepository @Inject constructor(
             .await()
         return snapshot.documents.mapNotNull { it.toCoupon() }
     }
-
-    override suspend fun recordPurchase(userId: String, reward: Reward): Coupon {
-        val redeemedAt = System.currentTimeMillis()
-        val data = mapOf(
-            FIELD_USER_ID to userId,
-            FIELD_REWARD_ID to reward.id,
-            FIELD_REDEEMED_AT to redeemedAt,
-        )
-        val documentRef = FirestoreCollections.purchases(firestore).add(data).await()
-        return Coupon(
-            id = documentRef.id,
-            rewardId = reward.id,
-            redeemedAtEpochMillis = redeemedAt,
-            expiresAtEpochMillis = null,
-        )
-    }
 }
 
 private fun DocumentSnapshot.toReward(): Reward? {

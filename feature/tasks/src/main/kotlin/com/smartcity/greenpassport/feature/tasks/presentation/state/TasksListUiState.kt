@@ -7,6 +7,7 @@ data class TasksListUiState(
     val tasks: List<Task> = emptyList(),
     val completedTaskIds: Set<String> = emptySet(),
     val favoriteTaskIds: Set<String> = emptySet(),
+    val pendingTaskIds: Set<String> = emptySet(),
     val profile: UserProfile? = null,
     val filter: TaskFilter = TaskFilter.ForYou,
     val isLoading: Boolean = true,

@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Icon
@@ -122,6 +123,16 @@ private fun ProfileContent(
 
         item {
             ProgressHeroCard(points = uiState.points, level = uiState.level)
+        }
+
+        if (uiState.isModerator) {
+            item {
+                GpListRow(
+                    title = stringResource(R.string.moderation),
+                    leading = { ProfileMenuIcon(icon = Icons.Filled.Shield, color = MaterialTheme.colorScheme.error) },
+                    onClick = { onMenuEntrySelected(Destination.Moderation) },
+                )
+            }
         }
 
         if (!uiState.isAnonymous) {

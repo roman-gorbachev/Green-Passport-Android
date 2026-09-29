@@ -67,9 +67,9 @@ class WasteSortingViewModel @Inject constructor(
     private fun finishGame() {
         _uiState.update { it.copy(isFinished = true, currentItem = null) }
         viewModelScope.launch {
-            val userId = observeSession().first()?.userId ?: return@launch
+            if (observeSession().first() == null) return@launch
             runCatching {
-                submitGameResult(userId, GameId.WASTE_SORTING, _uiState.value.score)
+                submitGameResult(GameId.WASTE_SORTING, _uiState.value.score)
             }.onFailure { error ->
                 Log.e("WasteSortingViewModel::finishGame()", error.message.orEmpty())
             }

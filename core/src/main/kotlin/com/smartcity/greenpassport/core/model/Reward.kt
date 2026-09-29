@@ -17,5 +17,4 @@ data class Coupon(
 interface ShopRepository {
     suspend fun getRewards(): List<Reward>
     suspend fun getPurchases(userId: String): List<Coupon>
-    suspend fun recordPurchase(userId: String, reward: Reward): Coupon
 }

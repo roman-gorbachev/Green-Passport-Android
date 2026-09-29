@@ -25,6 +25,9 @@ private const val SURVEYS_COLLECTION = "surveys"
 private const val SURVEY_ANSWERS_COLLECTION = "surveyAnswers"
 private const val FAVORITE_TASKS_COLLECTION = "favoriteTasks"
 private const val BOOKMARKED_TIPS_COLLECTION = "bookmarkedTips"
+private const val TASK_SUBMISSIONS_COLLECTION = "taskSubmissions"
+private const val REPORTS_COLLECTION = "reports"
+private const val ADMINS_COLLECTION = "admins"
 
 object FirestoreCollections {
     fun appRoot(firestore: FirebaseFirestore): DocumentReference =
@@ -83,4 +86,13 @@ object FirestoreCollections {
 
     fun bookmarkedTips(firestore: FirebaseFirestore): CollectionReference =
         appRoot(firestore).collection(BOOKMARKED_TIPS_COLLECTION)
+
+    fun taskSubmissions(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(TASK_SUBMISSIONS_COLLECTION)
+
+    fun reports(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(REPORTS_COLLECTION)
+
+    fun admins(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(ADMINS_COLLECTION)
 }

@@ -1,0 +1,20 @@
+<resources>
+    <string name="moderation">Moderation</string>
+    <string name="moderators_only_msg">This section is available to moderators only</string>
+    <string name="task_photos_count">Task photos (%1$d)</string>
+    <string name="reports_count">Reports (%1$d)</string>
+    <string name="action_failed_msg">Couldn\'t complete the action. Check your connection and try again</string>
+    <string name="no_photos_to_review">No photos to review</string>
+    <string name="no_reports">No reports</string>
+    <string name="no_name">No name</string>
+    <string name="approve">Approve</string>
+    <string name="reject">Reject</string>
+    <string name="task_not_visible_in_photo">The photo doesn\'t show the task being done</string>
+    <string name="photo_not_taken_by_user">The photo is taken from the internet</string>
+    <string name="inappropriate_photo">Inappropriate photo</string>
+    <string name="hidden_reports_count">Hidden · reports: %1$d</string>
+    <string name="visible_reports_count">Visible · reports: %1$d</string>
+    <string name="restore">Restore</string>
+    <string name="hide">Hide</string>
+    <string name="delete">Delete</string>
+</resources>

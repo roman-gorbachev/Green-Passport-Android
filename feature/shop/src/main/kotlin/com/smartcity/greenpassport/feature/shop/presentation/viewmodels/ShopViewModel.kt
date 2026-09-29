@@ -59,7 +59,7 @@ class ShopViewModel @Inject constructor(
     }
 
     fun onPurchase(reward: Reward) {
-        val userId = currentUserId ?: return
+        if (currentUserId == null) return
         if (_uiState.value.purchasingRewardId != null) return
 
         if (_uiState.value.points < reward.pointsCost) {
@@ -70,7 +70,7 @@ class ShopViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(purchasingRewardId = reward.id, hasInsufficientPoints = false) }
             try {
-                purchaseReward(userId, reward)
+                purchaseReward(reward)
                 refresh()
             } catch (_: Exception) {
                 _uiState.update { it.copy(hasInsufficientPoints = true) }

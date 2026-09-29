@@ -19,7 +19,6 @@ private const val FIELD_REWARD_XP = "rewardXp"
 
 private const val FIELD_USER_ID = "userId"
 private const val FIELD_TIP_ID = "tipId"
-private const val FIELD_READ_AT = "readAtEpochMillis"
 
 class FirestoreEcoTipsRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
@@ -36,19 +35,6 @@ class FirestoreEcoTipsRepository @Inject constructor(
             .get()
             .await()
         return snapshot.documents.mapNotNull { it.getString(FIELD_TIP_ID) }.toSet()
-    }
-
-    override suspend fun markTipRead(userId: String, tipId: String) {
-        val readId = "${userId}_$tipId"
-        FirestoreCollections.ecoTipReads(firestore).document(readId)
-            .set(
-                mapOf(
-                    FIELD_USER_ID to userId,
-                    FIELD_TIP_ID to tipId,
-                    FIELD_READ_AT to System.currentTimeMillis(),
-                ),
-            )
-            .await()
     }
 }
 

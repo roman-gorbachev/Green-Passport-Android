@@ -1,5 +1,8 @@
 package com.smartcity.greenpassport.feature.tasks.presentation.ui
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,13 +30,23 @@ import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSheetScaffold
 import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
+import com.smartcity.greenpassport.core.designsystem.component.PointsChip
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.Task
+import com.smartcity.greenpassport.core.model.verification.SubmissionStatus
+import com.smartcity.greenpassport.core.model.verification.TaskVerification
 import com.smartcity.greenpassport.feature.tasks.R
+import com.smartcity.greenpassport.feature.tasks.presentation.state.TaskDetailUiState
+import com.smartcity.greenpassport.feature.tasks.presentation.state.confirmButtonRes
+import com.smartcity.greenpassport.feature.tasks.presentation.state.rewardFailureMessageRes
+import com.smartcity.greenpassport.feature.tasks.presentation.state.verificationHintRes
+import com.smartcity.greenpassport.feature.tasks.presentation.state.verificationLabelRes
 import com.smartcity.greenpassport.feature.tasks.presentation.viewmodels.TaskDetailViewModel
 import com.smartcity.greenpassport.core.R as CoreR
 
 private const val SHEET_MIN_HEIGHT_FRACTION = 0.55f
+private const val UNSAFE_PHOTO_REASON = "unsafe_photo"
+private const val INVALID_PHOTO_REASON = "invalid_photo"
 
 @Composable
 fun TaskDetailSheet(
@@ -40,6 +56,10 @@ fun TaskDetailSheet(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val task = uiState.task
+    val context = LocalContext.current
+    val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) viewModel.onPhotoPicked(uri)
+    }
 
     GpSheetScaffold(onDismiss = onDismiss, modifier = modifier) {
         when {
@@ -54,9 +74,12 @@ fun TaskDetailSheet(
 
             else -> TaskDetailContent(
                 task = task,
-                isCompleted = uiState.isCompleted,
-                isSubmitting = uiState.isSubmitting,
+                uiState = uiState,
                 onCompleteTask = viewModel::onCompleteTask,
+                onScanCode = { viewModel.onScanCode(context) },
+                onPickPhoto = {
+                    photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                },
             )
         }
     }
@@ -65,9 +88,10 @@ fun TaskDetailSheet(
 @Composable
 private fun TaskDetailContent(
     task: Task,
-    isCompleted: Boolean,
-    isSubmitting: Boolean,
+    uiState: TaskDetailUiState,
     onCompleteTask: () -> Unit,
+    onScanCode: () -> Unit,
+    onPickPhoto: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val minHeight = LocalConfiguration.current.screenHeightDp.dp * SHEET_MIN_HEIGHT_FRACTION
@@ -87,11 +111,18 @@ private fun TaskDetailContent(
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
-                    Text(
-                        text = stringResource(CoreR.string.points_reward, task.rewardPoints),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.outline,
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = Dimens.SpacingExtraSmall),
+                    ) {
+                        PointsChip(points = task.rewardPoints)
+                        Text(
+                            text = stringResource(verificationLabelRes(task.verification)),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.padding(start = Dimens.SpacingSmall),
+                        )
+                    }
                 }
             }
 
@@ -103,28 +134,97 @@ private fun TaskDetailContent(
             )
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = Dimens.SpacingExtraLarge),
-            contentAlignment = Alignment.Center,
-        ) {
-            when {
-                isCompleted -> Text(
-                    text = stringResource(R.string.task_detail_completed_label),
-                    style = MaterialTheme.typography.titleMedium,
+        ConfirmationSection(
+            task = task,
+            uiState = uiState,
+            onCompleteTask = onCompleteTask,
+            onScanCode = onScanCode,
+            onPickPhoto = onPickPhoto,
+            modifier = Modifier.padding(top = Dimens.SpacingExtraLarge),
+        )
+    }
+}
+
+@Composable
+private fun ConfirmationSection(
+    task: Task,
+    uiState: TaskDetailUiState,
+    onCompleteTask: () -> Unit,
+    onScanCode: () -> Unit,
+    onPickPhoto: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val submission = uiState.submission
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        when {
+            uiState.isCompleted -> StatusText(
+                text = uiState.earnedPoints?.let { stringResource(R.string.task_done_points_earned, it) }
+                    ?: stringResource(R.string.task_detail_completed_label),
+                color = MaterialTheme.colorScheme.primary,
+            )
+
+            task.verification == TaskVerification.PHOTO && submission?.status == SubmissionStatus.PENDING ->
+                StatusText(
+                    text = stringResource(R.string.photo_under_review_msg),
                     color = MaterialTheme.colorScheme.primary,
                 )
 
-                isSubmitting -> CircularProgressIndicator()
-
-                else -> GpPrimaryButton(
-                    text = stringResource(R.string.mark_as_done),
-                    onClick = onCompleteTask,
+            else -> {
+                if (task.verification == TaskVerification.PHOTO && submission?.status == SubmissionStatus.REJECTED) {
+                    StatusText(
+                        text = stringResource(R.string.photo_rejected, rejectionReasonText(submission.rejectionReason)),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+                Text(
+                    text = stringResource(verificationHintRes(task.verification)),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.outline,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = Dimens.SpacingMedium),
+                )
+                GpPrimaryButton(
+                    text = stringResource(confirmButtonRes(task.verification, submission?.status)),
+                    onClick = when (task.verification) {
+                        TaskVerification.SELF -> onCompleteTask
+                        TaskVerification.QR -> onScanCode
+                        TaskVerification.PHOTO -> onPickPhoto
+                    },
+                    isLoading = uiState.isSubmitting,
                 )
             }
         }
+        uiState.failure?.let { failure ->
+            Text(
+                text = stringResource(rewardFailureMessageRes(failure)),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = Dimens.SpacingSmall),
+            )
+        }
     }
+}
+
+@Composable
+private fun StatusText(text: String, color: Color) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleMedium,
+        color = color,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.padding(bottom = Dimens.SpacingSmall),
+    )
+}
+
+@Composable
+private fun rejectionReasonText(reason: String?): String = when (reason) {
+    null, "" -> stringResource(R.string.no_reason_given)
+    UNSAFE_PHOTO_REASON, INVALID_PHOTO_REASON -> stringResource(R.string.photo_failed_automatic_check_msg)
+    else -> reason
 }
 
 @Composable

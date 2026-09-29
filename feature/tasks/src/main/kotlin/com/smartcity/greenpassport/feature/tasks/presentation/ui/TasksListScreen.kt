@@ -128,6 +128,7 @@ private fun TasksListContent(
                     TaskRow(
                         task = task,
                         isCompleted = uiState.completedTaskIds.contains(task.id),
+                        isPending = uiState.pendingTaskIds.contains(task.id),
                         isFavorite = uiState.favoriteTaskIds.contains(task.id),
                         onClick = { onTaskSelected(task.id) },
                         onToggleFavorite = { onToggleFavorite(task.id) },
@@ -143,6 +144,7 @@ private fun TasksListContent(
 private fun TaskRow(
     task: Task,
     isCompleted: Boolean,
+    isPending: Boolean,
     isFavorite: Boolean,
     onClick: () -> Unit,
     onToggleFavorite: () -> Unit,
@@ -150,7 +152,11 @@ private fun TaskRow(
 ) {
     GpListRow(
         title = task.title,
-        subtitle = if (isCompleted) stringResource(R.string.task_detail_completed_label) else null,
+        subtitle = when {
+            isCompleted -> stringResource(R.string.task_detail_completed_label)
+            isPending -> stringResource(R.string.under_review)
+            else -> null
+        },
         leading = { MascotWidget(size = Dimens.ListRowMascotSize) },
         trailing = {
             Row(verticalAlignment = Alignment.CenterVertically) {

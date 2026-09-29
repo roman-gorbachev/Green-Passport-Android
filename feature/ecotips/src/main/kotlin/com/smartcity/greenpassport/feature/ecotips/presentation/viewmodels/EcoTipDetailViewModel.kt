@@ -59,13 +59,13 @@ class EcoTipDetailViewModel @Inject constructor(
     fun onMarkAsRead() {
         val state = _uiState.value
         val tip = state.tip ?: return
-        val userId = currentUserId ?: return
+        if (currentUserId == null) return
         if (state.isRead || state.isSubmitting) return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true) }
             runCatching {
-                markTipRead(userId, tip)
+                markTipRead(tip)
                 _uiState.update { it.copy(isSubmitting = false, isRead = true) }
             }.onFailure {
                 _uiState.update { it.copy(isSubmitting = false) }

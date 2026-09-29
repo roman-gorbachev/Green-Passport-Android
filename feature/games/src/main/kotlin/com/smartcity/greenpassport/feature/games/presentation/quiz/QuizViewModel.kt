@@ -57,9 +57,9 @@ class QuizViewModel @Inject constructor(
 
         if (nextIndex >= quizQuestions.size) {
             _uiState.update { it.copy(isFinished = true, selectedOptionIndex = null) }
-            val userId = observeSession().first()?.userId ?: return
+            if (observeSession().first() == null) return
             runCatching {
-                submitGameResult(userId, GameId.ECO_QUIZ, _uiState.value.score)
+                submitGameResult(GameId.ECO_QUIZ, _uiState.value.score)
             }.onFailure { error ->
                 Log.e("QuizViewModel::advance()", error.message.orEmpty())
             }

@@ -1,11 +1,14 @@
 package com.smartcity.greenpassport.feature.community.presentation.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartcity.greenpassport.core.model.moderation.ReportReason
 import com.smartcity.greenpassport.core.moderation.ContentRejectedException
 import com.smartcity.greenpassport.feature.community.domain.ObserveCommunitySessionUseCase
 import com.smartcity.greenpassport.feature.community.domain.ObserveForumPostsUseCase
 import com.smartcity.greenpassport.feature.community.domain.PostToForumUseCase
+import com.smartcity.greenpassport.feature.community.domain.ReportPostUseCase
 import com.smartcity.greenpassport.feature.community.presentation.state.ForumUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +23,7 @@ import javax.inject.Inject
 class ForumViewModel @Inject constructor(
     observeForumPosts: ObserveForumPostsUseCase,
     private val postToForum: PostToForumUseCase,
+    private val reportPost: ReportPostUseCase,
     observeSession: ObserveCommunitySessionUseCase,
 ) : ViewModel() {
 
@@ -30,7 +34,10 @@ class ForumViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            observeSession().collectLatest { session -> currentUserId = session?.userId }
+            observeSession().collectLatest { session ->
+                currentUserId = session?.userId
+                _uiState.update { it.copy(currentUserId = session?.userId) }
+            }
         }
         viewModelScope.launch {
             observeForumPosts().collectLatest { posts ->
@@ -56,6 +63,16 @@ class ForumViewModel @Inject constructor(
             }.onFailure { error ->
                 _uiState.update { it.copy(isPosting = false, isTextRejected = error is ContentRejectedException) }
             }
+        }
+    }
+
+    fun onReport(postId: String, reason: ReportReason) {
+        val reporterId = currentUserId ?: return
+        if (postId in _uiState.value.reportedPostIds) return
+        viewModelScope.launch {
+            runCatching { reportPost(postId, reporterId, reason) }
+                .onSuccess { _uiState.update { it.copy(reportedPostIds = it.reportedPostIds + postId) } }
+                .onFailure { error -> Log.w("ForumViewModel", "Failed to report post", error) }
         }
     }
 }

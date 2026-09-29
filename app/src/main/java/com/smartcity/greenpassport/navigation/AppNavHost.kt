@@ -29,6 +29,7 @@ import com.smartcity.greenpassport.feature.games.presentation.quiz.QuizScreen
 import com.smartcity.greenpassport.feature.games.presentation.sorting.WasteSortingScreen
 import com.smartcity.greenpassport.feature.home.presentation.ui.HomeScreen
 import com.smartcity.greenpassport.feature.map.presentation.ui.MapScreen
+import com.smartcity.greenpassport.feature.moderation.presentation.ui.ModerationScreen
 import com.smartcity.greenpassport.feature.profile.presentation.CardsScreen
 import com.smartcity.greenpassport.feature.profile.presentation.ExchangeScreen
 import com.smartcity.greenpassport.feature.profile.presentation.achievements.AchievementsScreen
@@ -41,6 +42,7 @@ import com.smartcity.greenpassport.feature.shop.presentation.ui.ShopScreen
 import com.smartcity.greenpassport.feature.tasks.presentation.ui.TaskDetailSheet
 import com.smartcity.greenpassport.feature.tasks.presentation.ui.TasksListScreen
 import com.smartcity.greenpassport.feature.community.R as CommunityR
+import com.smartcity.greenpassport.feature.moderation.R as ModerationR
 import com.smartcity.greenpassport.feature.profile.R as ProfileR
 
 @Composable
@@ -284,6 +286,14 @@ fun AppNavHost(
                 onNavigateBack = null,
             ) { innerPadding ->
                 ShopScreen(modifier = Modifier.padding(innerPadding))
+            }
+        }
+        composable<Destination.Moderation> {
+            FeatureScaffold(
+                title = stringResource(ModerationR.string.moderation),
+                onNavigateBack = navController::popBackStack,
+            ) { innerPadding ->
+                ModerationScreen(modifier = Modifier.padding(innerPadding))
             }
         }
         composable<Destination.Feedback> {

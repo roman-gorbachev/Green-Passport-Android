@@ -10,6 +10,8 @@ data class ForumPost(
     val authorAvatar: AvatarStyle?,
     val text: String,
     val createdAtEpochMillis: Long,
+    val isHidden: Boolean = false,
+    val reportCount: Int = 0,
 )
 
 data class CommunityGroup(

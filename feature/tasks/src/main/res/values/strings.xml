@@ -9,4 +9,25 @@
     <string name="task_detail_completed_label">Задание выполнено</string>
     <string name="mark_as_done">Отметить выполненной</string>
     <string name="for_you">Для тебя</string>
+    <string name="task_done_points_earned">Задание выполнено: +%1$d оч.</string>
+    <string name="task_already_completed">Задание уже выполнено</string>
+    <string name="daily_limit_reached_msg">Лимит таких заданий на сегодня исчерпан. Возвращайся завтра</string>
+    <string name="code_does_not_match_msg">Код не подходит к этому заданию</string>
+    <string name="task_needs_other_confirmation_msg">Это задание подтверждается фото или QR-кодом</string>
+    <string name="no_internet_connection">Нет подключения к интернету</string>
+    <string name="something_went_wrong_msg">Что-то пошло не так. Попробуй ещё раз</string>
+    <string name="honor_system">Под честное слово</string>
+    <string name="photo_confirmation">Подтверждение фото</string>
+    <string name="qr_code_on_site">QR-код на месте</string>
+    <string name="up_to_3_such_tasks_per_day_msg">Засчитывается до 3 таких заданий в день</string>
+    <string name="moderator_checks_photo_msg">Модератор проверит фото, очки придут после одобрения</string>
+    <string name="organizer_shows_qr_code_msg">QR-код покажет организатор или сотрудник пункта приёма</string>
+    <string name="scan_qr_code">Сканировать QR-код</string>
+    <string name="attach_photo">Прикрепить фото</string>
+    <string name="send_another_photo">Отправить другое фото</string>
+    <string name="photo_under_review_msg">Фото на проверке. Очки придут после одобрения</string>
+    <string name="photo_rejected">Фото отклонено: %1$s</string>
+    <string name="no_reason_given">причина не указана</string>
+    <string name="photo_failed_automatic_check_msg">фото не прошло автоматическую проверку</string>
+    <string name="under_review">На проверке</string>
 </resources>

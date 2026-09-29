@@ -12,4 +12,10 @@
     <string name="groups_member_count_format">Участников: %1$d</string>
     <string name="guest">Гость</string>
     <string name="text_contains_banned_words">Текст содержит недопустимые слова</string>
+    <string name="report">Пожаловаться</string>
+    <string name="report_sent">Жалоба отправлена</string>
+    <string name="insults_or_obscenity">Оскорбления или мат</string>
+    <string name="spam">Спам</string>
+    <string name="inappropriate_content">Неприемлемый контент</string>
+    <string name="other">Другое</string>
 </resources>

@@ -3,9 +3,11 @@ package com.smartcity.greenpassport.feature.tasks.presentation.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartcity.greenpassport.core.model.verification.SubmissionStatus
 import com.smartcity.greenpassport.feature.tasks.domain.GetCompletedTaskIdsUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.GetTasksUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.ObserveFavoriteTaskIdsUseCase
+import com.smartcity.greenpassport.feature.tasks.domain.ObserveTaskSubmissionsUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.ObserveTasksSessionUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.ObserveUserProfileUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.ToggleTaskFavoriteUseCase
@@ -30,6 +32,7 @@ class TasksListViewModel @Inject constructor(
     private val toggleTaskFavorite: ToggleTaskFavoriteUseCase,
     observeSession: ObserveTasksSessionUseCase,
     observeUserProfile: ObserveUserProfileUseCase,
+    observeTaskSubmissions: ObserveTaskSubmissionsUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TasksListUiState())
@@ -44,6 +47,17 @@ class TasksListViewModel @Inject constructor(
                 refresh()
                 if (session != null) {
                     coroutineScope {
+                        launch {
+                            observeTaskSubmissions(session.userId)
+                                .catch { emit(emptyList()) }
+                                .collectLatest { submissions ->
+                                    val pendingIds = submissions
+                                        .filter { it.status == SubmissionStatus.PENDING }
+                                        .map { it.taskId }
+                                        .toSet()
+                                    _uiState.update { it.copy(pendingTaskIds = pendingIds) }
+                                }
+                        }
                         launch {
                             observeUserProfile(session.userId)
                                 .catch { emit(null) }

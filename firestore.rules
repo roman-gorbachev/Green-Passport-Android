@@ -4,12 +4,25 @@ service cloud.firestore {
     return request.auth != null && request.auth.uid == userId;
   }
 
-  function maxSingleAward() {
-    return 100000;
+  function isAdmin() {
+    return request.auth != null &&
+      exists(/databases/(default)/documents/apps/greenpassport/admins/$(request.auth.uid));
+  }
+
+  function isOwnerOrAdmin(data) {
+    return request.auth != null && (data.userId == request.auth.uid || isAdmin());
+  }
+
+  function keepsPoints() {
+    return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['availablePoints', 'lifetimeXp']);
+  }
+
+  function hasNoPoints(data) {
+    return data.get('availablePoints', 0) == 0 && data.get('lifetimeXp', 0) == 0;
   }
 
   function hasBannedWords(text) {
-    return text.lower().matches('(?s).*(хуй|хуя|пизд|бляд|блят|еблан|мудак|мудил|пидор|залуп|шлюх|гандон|гондон|fuck|cunt|nigger|faggot).*');
+    return text.matches('(?is).*(хуй|хуя|пизд|бляд|блят|еблан|мудак|мудил|пидор|залуп|шлюх|гандон|гондон|fuck|cunt|nigger|faggot).*');
   }
 
   function isCleanText(text, maxLength) {
@@ -18,6 +31,15 @@ service cloud.firestore {
 
   function isCleanOptionalText(data, field, maxLength) {
     return !(field in data) || data[field] == null || isCleanText(data[field], maxLength);
+  }
+
+  function isValidSubmission(data) {
+    return data.userId == request.auth.uid &&
+      data.status == 'PENDING' &&
+      data.photoPath is string &&
+      data.photoPath.matches('greenpassport/submissions/' + request.auth.uid + '/[A-Za-z0-9_-]+[.]jpg') &&
+      data.createdAtEpochMillis is int &&
+      isCleanOptionalText(data, 'userName', 61);
   }
 
   function hasCleanProfileNames(data) {
@@ -29,34 +51,55 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow delete: if false;
 
-      allow create: if isOwner(userId) &&
-        hasCleanProfileNames(request.resource.data) &&
-        request.resource.data.get('availablePoints', 0) is int &&
-        request.resource.data.get('availablePoints', 0) >= 0 &&
-        request.resource.data.get('availablePoints', 0) <= maxSingleAward() &&
-        request.resource.data.get('lifetimeXp', 0) is int &&
-        request.resource.data.get('lifetimeXp', 0) >= 0 &&
-        request.resource.data.get('lifetimeXp', 0) <= maxSingleAward();
+      allow create: if isOwner(userId) && hasCleanProfileNames(request.resource.data) &&
+        hasNoPoints(request.resource.data);
 
-      allow update: if isOwner(userId) &&
-        hasCleanProfileNames(request.resource.data) &&
-        request.resource.data.get('availablePoints', 0) is int &&
-        request.resource.data.get('availablePoints', 0) >= 0 &&
-        request.resource.data.get('availablePoints', 0) <= resource.data.get('availablePoints', 0) + maxSingleAward() &&
-        request.resource.data.get('lifetimeXp', 0) is int &&
-        request.resource.data.get('lifetimeXp', 0) >= resource.data.get('lifetimeXp', 0) &&
-        request.resource.data.get('lifetimeXp', 0) <= resource.data.get('lifetimeXp', 0) + maxSingleAward();
+      allow update: if isOwner(userId) && hasCleanProfileNames(request.resource.data) && keepsPoints();
     }
 
     match /apps/greenpassport/taskProgress/{progressId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if false;
+      allow read: if isOwnerOrAdmin(resource.data);
+      allow write: if false;
     }
 
     match /apps/greenpassport/purchases/{purchaseId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read: if isOwnerOrAdmin(resource.data);
+      allow write: if false;
+    }
+
+    match /apps/greenpassport/pointsLedger/{entryId} {
+      allow read: if isOwnerOrAdmin(resource.data);
+      allow write: if false;
+    }
+
+    match /apps/greenpassport/admins/{adminId} {
+      allow read: if request.auth != null && request.auth.uid == adminId;
+      allow write: if false;
+    }
+
+    match /apps/greenpassport/taskSecrets/{taskId} {
+      allow read, write: if false;
+    }
+
+    match /apps/greenpassport/taskSubmissions/{submissionId} {
+      allow read: if isOwnerOrAdmin(resource.data);
+      allow create: if request.auth != null &&
+        submissionId == request.auth.uid + '_' + request.resource.data.taskId &&
+        isValidSubmission(request.resource.data) &&
+        get(/databases/$(database)/documents/apps/greenpassport/tasks/$(request.resource.data.taskId)).data.get('verification', 'SELF') == 'PHOTO';
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid &&
+        resource.data.status == 'REJECTED' &&
+        request.resource.data.taskId == resource.data.taskId &&
+        isValidSubmission(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /apps/greenpassport/reports/{reportId} {
+      allow read: if isAdmin();
+      allow create: if request.auth != null &&
+        request.resource.data.reporterId == request.auth.uid &&
+        reportId == request.resource.data.postId + '_' + request.auth.uid &&
+        request.resource.data.reason in ['OFFENSIVE', 'SPAM', 'INAPPROPRIATE_IMAGE', 'OTHER'];
       allow update, delete: if false;
     }
 
@@ -67,9 +110,8 @@ service cloud.firestore {
     }
 
     match /apps/greenpassport/ecoTipReads/{readId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if false;
+      allow read: if isOwnerOrAdmin(resource.data);
+      allow write: if false;
     }
 
     match /apps/greenpassport/feedback/{feedbackId} {
@@ -123,7 +165,10 @@ service cloud.firestore {
     }
 
     match /apps/greenpassport/{collection}/{document=**} {
-      allow read: if request.auth != null;
+      allow read: if request.auth != null && !(collection in [
+        'taskSecrets', 'admins', 'reports', 'taskSubmissions', 'pointsLedger',
+        'taskProgress', 'purchases', 'ecoTipReads',
+      ]);
       allow write: if false;
     }
   }
