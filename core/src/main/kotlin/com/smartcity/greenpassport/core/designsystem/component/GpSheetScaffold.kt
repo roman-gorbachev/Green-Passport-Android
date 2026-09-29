@@ -73,7 +73,7 @@ fun GpSheetScaffold(
         )
         Surface(
             shape = RoundedCornerShape(topStart = Dimens.CornerRadiusSheet, topEnd = Dimens.CornerRadiusSheet),
-            color = MaterialTheme.colorScheme.surfaceContainer,
+            color = MaterialTheme.colorScheme.surface,
             modifier = modifier
                 .align(Alignment.BottomCenter)
                 .statusBarsPadding()

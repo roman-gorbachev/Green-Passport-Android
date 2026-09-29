@@ -28,7 +28,7 @@ import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.navigation.TopLevelDestination
 
-private const val SHADOW_ALPHA = 0.12f
+private const val SHADOW_ALPHA = 0.18f
 
 @Composable
 fun GpBottomBar(

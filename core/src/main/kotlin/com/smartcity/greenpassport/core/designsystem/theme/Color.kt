@@ -4,8 +4,9 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-private val MintBackgroundLight = Color(0xFFF1FEF5)
-private val CardLight = Color(0xFFFFFFFF)
+private val WhiteBackgroundLight = Color(0xFFFFFFFF)
+private val MintCardLight = Color(0xFFE6F5EC)
+private val MintCardLowLight = Color(0xFFF1FAF4)
 private val ForestLight = Color(0xFF1F6B47)
 private val OnForestLight = Color(0xFFFFFFFF)
 private val LimeLight = Color(0xFFC3EE5A)
@@ -47,15 +48,15 @@ val GreenPassportLightColorScheme = lightColorScheme(
     onSecondaryContainer = MossLight,
     tertiary = ForestLight,
     onTertiary = OnForestLight,
-    background = MintBackgroundLight,
+    background = WhiteBackgroundLight,
     onBackground = InkLight,
-    surface = MintBackgroundLight,
+    surface = WhiteBackgroundLight,
     onSurface = InkLight,
-    surfaceVariant = MintSurfaceLight,
+    surfaceVariant = MintCardLight,
     onSurfaceVariant = MossLight,
-    surfaceContainerLowest = CardLight,
-    surfaceContainerLow = CardLight,
-    surfaceContainer = CardLight,
+    surfaceContainerLowest = WhiteBackgroundLight,
+    surfaceContainerLow = MintCardLowLight,
+    surfaceContainer = MintCardLight,
     surfaceContainerHigh = MintSurfaceLight,
     surfaceContainerHighest = MintSurfaceHighLight,
     outline = MossSecondaryLight,

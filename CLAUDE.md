@@ -56,7 +56,7 @@ Module graph: `:app` → `:core` + every `:feature:<name>`; each `:feature:<name
 
 ## Known limitations
 
-- Firebase Authentication isn't enabled in the console yet, so sign-in doesn't work until it's turned on.
+- Sign-in and Firestore reads only work once Authentication (Email/Password + Anonymous) is enabled and the rules from `firestore.rules` are deployed; see "Firebase setup" in `README.md`. `FirebaseAuthRepository` maps Firebase errors to `AuthFailure` (a disabled sign-in method surfaces as `SIGN_IN_METHOD_DISABLED`).
 - The Map tab uses Yandex MapKit (`:feature:map`, `MapKitInitializer`). The key is `YANDEX_MAPKIT_API_KEY` in `local.properties` (or an env var), exposed via the module's `BuildConfig`. Without it the tab falls back to a list. No route building.
 - Demo Firestore data is seeded with `scripts/seed-firestore.js` (see `scripts/README.md`; needs `scripts/service-account.json`, which is gitignored). Re-running it creates duplicate documents.
 

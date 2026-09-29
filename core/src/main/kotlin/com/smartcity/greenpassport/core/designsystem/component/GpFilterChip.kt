@@ -22,6 +22,7 @@ fun GpFilterChip(
         label = { Text(text = label, style = MaterialTheme.typography.labelMedium) },
         shape = RoundedCornerShape(Dimens.CornerRadiusPill),
         border = null,
+        elevation = FilterChipDefaults.filterChipElevation(elevation = Dimens.ChipElevation),
         colors = FilterChipDefaults.filterChipColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
             labelColor = MaterialTheme.colorScheme.onSurfaceVariant,

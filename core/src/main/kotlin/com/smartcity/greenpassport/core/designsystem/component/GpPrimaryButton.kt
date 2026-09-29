@@ -3,9 +3,11 @@ package com.smartcity.greenpassport.core.designsystem.component
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,21 +22,31 @@ fun GpPrimaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    isLoading: Boolean = false,
 ) {
     Button(
         onClick = onClick,
-        enabled = enabled,
+        enabled = enabled && !isLoading,
         shape = RoundedCornerShape(Dimens.CornerRadiusPill),
         elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = Dimens.SpacingNone,
+            defaultElevation = Dimens.ButtonElevation,
             pressedElevation = Dimens.SpacingNone,
+            disabledElevation = Dimens.SpacingNone,
         ),
         contentPadding = PaddingValues(horizontal = Dimens.SpacingLarge),
         modifier = modifier
             .fillMaxWidth()
             .height(Dimens.PrimaryButtonHeight),
     ) {
-        Text(text = text, style = MaterialTheme.typography.labelLarge)
+        if (isLoading) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary,
+                strokeWidth = Dimens.ProgressStrokeWidth,
+                modifier = Modifier.size(Dimens.IconSizeMedium),
+            )
+        } else {
+            Text(text = text, style = MaterialTheme.typography.labelLarge)
+        }
     }
 }
 

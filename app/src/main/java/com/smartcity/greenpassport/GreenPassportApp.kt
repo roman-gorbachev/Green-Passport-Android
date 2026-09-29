@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
-import com.smartcity.greenpassport.feature.auth.presentation.AuthScreen
+import com.smartcity.greenpassport.feature.auth.presentation.ui.AuthScreen
 import com.smartcity.greenpassport.navigation.GreenPassportAppShell
 import com.smartcity.greenpassport.onboarding.OnboardingScreen
 
@@ -27,7 +27,7 @@ fun GreenPassportApp(
                 onGetStarted = viewModel::markOnboardingSeen,
                 modifier = Modifier.safeDrawingPadding(),
             )
-            AppStartupState.NeedsAuth -> AuthScreen(onSignedIn = {}, modifier = Modifier.safeDrawingPadding())
+            AppStartupState.NeedsAuth -> AuthScreen(modifier = Modifier.safeDrawingPadding())
             AppStartupState.Ready -> GreenPassportAppShell()
         }
     }

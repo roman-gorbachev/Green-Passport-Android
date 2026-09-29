@@ -21,9 +21,14 @@ object Dimens {
     val IconSizeExtraLarge = 48.dp
 
     val BottomBarHeight = 60.dp
-    val BottomBarElevation = 8.dp
+    val BottomBarOuterPadding = 12.dp
+    val BottomBarElevation = 12.dp
     val BottomBarSelectedSize = 44.dp
-    val BottomBarReservedHeight = 76.dp
+    val BottomBarReservedHeight = BottomBarHeight + BottomBarOuterPadding + SpacingSmall
+    val CardElevation = 2.dp
+    val ButtonElevation = 2.dp
+    val ChipElevation = 1.dp
+    val ProgressStrokeWidth = 2.dp
     val QuickActionWidth = 76.dp
     val IconCircleSize = 52.dp
     val IconCircleSmallSize = 36.dp

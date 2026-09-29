@@ -35,7 +35,7 @@ fun GreenPassportAppShell(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .navigationBarsPadding()
-                    .padding(horizontal = Dimens.ScreenHorizontalPadding, vertical = Dimens.SpacingSmall),
+                    .padding(Dimens.BottomBarOuterPadding),
             )
         }
     }

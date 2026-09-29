@@ -1,8 +1,18 @@
 <resources>
-    <string name="auth_email_label">Эл. почта</string>
-    <string name="auth_password_label">Пароль</string>
-    <string name="auth_sign_in">Войти</string>
-    <string name="auth_register">Зарегистрироваться</string>
-    <string name="auth_continue_anonymously">Продолжить без регистрации</string>
-    <string name="auth_error_generic">Не получилось войти. Проверьте данные и попробуйте ещё раз</string>
+    <string name="sign_in">Вход</string>
+    <string name="email">Эл. почта</string>
+    <string name="password">Пароль</string>
+    <string name="show_password">Показать пароль</string>
+    <string name="log_in">Войти</string>
+    <string name="create_account">Создать аккаунт</string>
+    <string name="continue_without_account">Продолжить без регистрации</string>
+    <string name="enter_valid_email">Введите корректную почту</string>
+    <string name="password_at_least_6_characters">Пароль — минимум 6 символов</string>
+    <string name="wrong_email_or_password">Неверная почта или пароль</string>
+    <string name="email_already_registered">Эта почта уже зарегистрирована</string>
+    <string name="password_too_weak">Пароль слишком простой</string>
+    <string name="no_internet_connection">Нет подключения к интернету</string>
+    <string name="too_many_attempts_msg">Слишком много попыток. Подождите немного и попробуйте снова</string>
+    <string name="sign_in_method_disabled_msg">Этот способ входа сейчас недоступен. Попробуйте позже</string>
+    <string name="could_not_sign_in_msg">Не получилось войти. Попробуйте ещё раз</string>
 </resources>
