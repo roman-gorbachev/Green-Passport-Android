@@ -42,10 +42,10 @@ const mapPoints = [
 ];
 
 const events = [
-  { title: 'Эко-субботник в парке Горького', description: 'Совместная уборка территории парка, инвентарь предоставляется.', location: 'Парк Горького, главный вход', city: 'Москва', startAtEpochMillis: 1787472000000 },
-  { title: 'Лекция «Осознанное потребление»', description: 'Открытая лекция о том, как сократить количество отходов в быту.', location: 'Библиотека им. Некрасова', city: 'Москва', startAtEpochMillis: 1787931000000 },
-  { title: 'День вторсырья', description: 'Приём макулатуры, пластика и стекла на переработку.', location: 'Сокольники, площадь у ДК', city: 'Москва', startAtEpochMillis: 1788591600000 },
-  { title: 'Велопробег за чистый воздух', description: 'Массовый велопробег по центру города в поддержку чистого воздуха.', location: 'Старт у ВДНХ', city: 'Москва', startAtEpochMillis: 1789192800000 },
+  { title: 'Эко-субботник в парке Горького', description: 'Совместная уборка территории парка, инвентарь предоставляется.', location: 'Парк Горького, главный вход', city: 'Москва', startAtEpochMillis: 1787472000000, imageUrl: null, rewardPoints: 50 },
+  { title: 'Лекция «Осознанное потребление»', description: 'Открытая лекция о том, как сократить количество отходов в быту.', location: 'Библиотека им. Некрасова', city: 'Москва', startAtEpochMillis: 1787931000000, imageUrl: null, rewardPoints: 20 },
+  { title: 'День вторсырья', description: 'Приём макулатуры, пластика и стекла на переработку.', location: 'Сокольники, площадь у ДК', city: 'Москва', startAtEpochMillis: 1788591600000, imageUrl: null, rewardPoints: 30 },
+  { title: 'Велопробег за чистый воздух', description: 'Массовый велопробег по центру города в поддержку чистого воздуха.', location: 'Старт у ВДНХ', city: 'Москва', startAtEpochMillis: 1789192800000, imageUrl: null, rewardPoints: 40 },
 ];
 
 const ecoTips = [

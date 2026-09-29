@@ -6,4 +6,5 @@
     <string name="shop_insufficient_points">Not enough points to redeem this</string>
     <string name="shop_empty_rewards">No coupons available yet</string>
     <string name="shop_empty_purchases">You haven\'t redeemed any points yet</string>
+    <string name="balance">Balance</string>
 </resources>

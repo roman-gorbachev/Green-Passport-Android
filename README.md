@@ -34,9 +34,10 @@ On Windows PowerShell, use `gradlew.bat` instead of `./gradlew` — it wraps the
 ## Project structure
 
 ```
-:app                    — entry point, DI graph, navigation, home screen
+:app                    — entry point, DI graph, navigation shell (bottom bar)
 :core                    — shared models, Firebase repositories, design system, navigation
 :feature:auth            — sign in / sign up
+:feature:home            — home screen
 :feature:profile         — profile, achievements, history
 :feature:tasks           — eco tasks
 :feature:shop            — rewards shop
@@ -53,5 +54,5 @@ On Windows PowerShell, use `gradlew.bat` instead of `./gradlew` — it wraps the
 ## Known limitations of the pilot
 
 - **Firebase Authentication** isn't enabled in the project console yet — sign-in (including anonymous) won't work until the product is turned on in the Firebase Console.
-- **Map** is a list of points, not an interactive map; **route building** isn't implemented — both need a Google Maps/Directions API key.
+- **Map** uses Yandex MapKit. Put `YANDEX_MAPKIT_API_KEY=<key>` into `local.properties` (key from the Yandex developer console, product "MapKit Mobile SDK"). Without a key the Map tab falls back to a list of points. **Route building** isn't implemented.
 - Firestore demo data (tasks, rewards, map points, events, eco tips) can be seeded with `scripts/seed-firestore.js` — see `scripts/README.md`.

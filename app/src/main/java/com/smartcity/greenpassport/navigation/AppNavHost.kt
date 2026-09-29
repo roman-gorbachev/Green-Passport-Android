@@ -4,12 +4,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.dialog
 import com.smartcity.greenpassport.R
+import com.smartcity.greenpassport.core.designsystem.component.SheetDialogProperties
 import com.smartcity.greenpassport.core.navigation.Destination
-import com.smartcity.greenpassport.feature.calendar.presentation.CalendarScreen
+import com.smartcity.greenpassport.feature.calendar.presentation.ui.CalendarScreen
+import com.smartcity.greenpassport.feature.calendar.presentation.ui.EventDetailSheet
 import com.smartcity.greenpassport.feature.community.presentation.ui.CommunityHubScreen
 import com.smartcity.greenpassport.feature.community.presentation.ui.ForumScreen
 import com.smartcity.greenpassport.feature.community.presentation.ui.GroupsScreen
@@ -23,39 +26,45 @@ import com.smartcity.greenpassport.feature.games.presentation.maze.MazeScreen
 import com.smartcity.greenpassport.feature.games.presentation.puzzle.PuzzleScreen
 import com.smartcity.greenpassport.feature.games.presentation.quiz.QuizScreen
 import com.smartcity.greenpassport.feature.games.presentation.sorting.WasteSortingScreen
-import com.smartcity.greenpassport.feature.map.presentation.MapScreen
+import com.smartcity.greenpassport.feature.home.presentation.ui.HomeScreen
+import com.smartcity.greenpassport.feature.map.presentation.ui.MapScreen
 import com.smartcity.greenpassport.feature.profile.presentation.CardsScreen
 import com.smartcity.greenpassport.feature.profile.presentation.ExchangeScreen
 import com.smartcity.greenpassport.feature.profile.presentation.achievements.AchievementsScreen
 import com.smartcity.greenpassport.feature.profile.presentation.bookmarks.BookmarksScreen
-import com.smartcity.greenpassport.feature.profile.presentation.favorites.FavoritesScreen
+import com.smartcity.greenpassport.feature.profile.presentation.favorites.FavoritesTabScreen
 import com.smartcity.greenpassport.feature.profile.presentation.history.HistoryScreen
 import com.smartcity.greenpassport.feature.profile.presentation.notifications.NotificationsScreen
 import com.smartcity.greenpassport.feature.profile.presentation.profile.ProfileScreen
-import com.smartcity.greenpassport.feature.shop.presentation.ShopScreen
-import com.smartcity.greenpassport.feature.tasks.presentation.ui.TaskDetailScreen
+import com.smartcity.greenpassport.feature.shop.presentation.ui.ShopScreen
+import com.smartcity.greenpassport.feature.tasks.presentation.ui.TaskDetailSheet
 import com.smartcity.greenpassport.feature.tasks.presentation.ui.TasksListScreen
-import com.smartcity.greenpassport.home.HomeScreen
-import com.smartcity.greenpassport.home.homeMenuLabelRes
 import com.smartcity.greenpassport.feature.community.R as CommunityR
 import com.smartcity.greenpassport.feature.profile.R as ProfileR
 
 @Composable
-fun AppNavHost(modifier: Modifier = Modifier) {
-    val navController = rememberNavController()
-
+fun AppNavHost(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+) {
     NavHost(
         navController = navController,
         startDestination = Destination.Home,
         modifier = modifier,
     ) {
         composable<Destination.Home> {
-            HomeScreen(onDestinationSelected = { destination -> navController.navigate(destination) })
+            HomeScreen(
+                onProfileClick = { navController.navigate(Destination.Profile) },
+                onEventSelected = { eventId -> navController.navigate(Destination.EventDetail(eventId)) },
+                onTaskSelected = { taskId -> navController.navigate(Destination.TaskDetail(taskId)) },
+                onAllTasksClick = { navController.navigate(Destination.Tasks) },
+                onDestinationSelected = { destination -> navController.navigate(destination) },
+            )
         }
 
         composable<Destination.Tasks> {
             FeatureScaffold(
-                title = stringResource(homeMenuLabelRes(Destination.Tasks)),
+                title = stringResource(destinationTitleRes(Destination.Tasks)),
                 onNavigateBack = navController::popBackStack,
             ) { innerPadding ->
                 TasksListScreen(
@@ -64,17 +73,15 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                 )
             }
         }
-        composable<Destination.TaskDetail> {
-            FeatureScaffold(
-                title = stringResource(R.string.task_detail_title),
-                onNavigateBack = navController::popBackStack,
-            ) { innerPadding ->
-                TaskDetailScreen(modifier = Modifier.padding(innerPadding))
-            }
+        dialog<Destination.TaskDetail>(dialogProperties = SheetDialogProperties) {
+            TaskDetailSheet(onDismiss = navController::popBackStack)
+        }
+        dialog<Destination.EventDetail>(dialogProperties = SheetDialogProperties) {
+            EventDetailSheet(onDismiss = navController::popBackStack)
         }
         composable<Destination.Profile> {
             FeatureScaffold(
-                title = stringResource(homeMenuLabelRes(Destination.Profile)),
+                title = stringResource(destinationTitleRes(Destination.Profile)),
                 onNavigateBack = navController::popBackStack,
             ) { innerPadding ->
                 ProfileScreen(
@@ -126,10 +133,11 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         composable<Destination.Favorites> {
             FeatureScaffold(
                 title = stringResource(ProfileR.string.favorites_screen_title),
-                onNavigateBack = navController::popBackStack,
+                onNavigateBack = null,
             ) { innerPadding ->
-                FavoritesScreen(
+                FavoritesTabScreen(
                     onTaskSelected = { taskId -> navController.navigate(Destination.TaskDetail(taskId)) },
+                    onTipSelected = { tipId -> navController.navigate(Destination.EcoTipDetail(tipId)) },
                     modifier = Modifier.padding(innerPadding),
                 )
             }
@@ -147,23 +155,21 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         }
         composable<Destination.Calendar> {
             FeatureScaffold(
-                title = stringResource(homeMenuLabelRes(Destination.Calendar)),
+                title = stringResource(destinationTitleRes(Destination.Calendar)),
                 onNavigateBack = navController::popBackStack,
             ) { innerPadding ->
-                CalendarScreen(modifier = Modifier.padding(innerPadding))
+                CalendarScreen(
+                    onEventSelected = { eventId -> navController.navigate(Destination.EventDetail(eventId)) },
+                    modifier = Modifier.padding(innerPadding),
+                )
             }
         }
         composable<Destination.Map> {
-            FeatureScaffold(
-                title = stringResource(homeMenuLabelRes(Destination.Map)),
-                onNavigateBack = navController::popBackStack,
-            ) { innerPadding ->
-                MapScreen(modifier = Modifier.padding(innerPadding))
-            }
+            MapScreen()
         }
         composable<Destination.Community> {
             FeatureScaffold(
-                title = stringResource(homeMenuLabelRes(Destination.Community)),
+                title = stringResource(destinationTitleRes(Destination.Community)),
                 onNavigateBack = navController::popBackStack,
             ) { innerPadding ->
                 CommunityHubScreen(
@@ -191,7 +197,7 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         }
         composable<Destination.EcoTips> {
             FeatureScaffold(
-                title = stringResource(homeMenuLabelRes(Destination.EcoTips)),
+                title = stringResource(destinationTitleRes(Destination.EcoTips)),
                 onNavigateBack = navController::popBackStack,
             ) { innerPadding ->
                 EcoTipsListScreen(
@@ -210,7 +216,7 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         }
         composable<Destination.Games> {
             FeatureScaffold(
-                title = stringResource(homeMenuLabelRes(Destination.Games)),
+                title = stringResource(destinationTitleRes(Destination.Games)),
                 onNavigateBack = navController::popBackStack,
             ) { innerPadding ->
                 GamesHubScreen(
@@ -261,15 +267,15 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         }
         composable<Destination.Shop> {
             FeatureScaffold(
-                title = stringResource(homeMenuLabelRes(Destination.Shop)),
-                onNavigateBack = navController::popBackStack,
+                title = stringResource(destinationTitleRes(Destination.Shop)),
+                onNavigateBack = null,
             ) { innerPadding ->
                 ShopScreen(modifier = Modifier.padding(innerPadding))
             }
         }
         composable<Destination.Feedback> {
             FeatureScaffold(
-                title = stringResource(homeMenuLabelRes(Destination.Feedback)),
+                title = stringResource(destinationTitleRes(Destination.Feedback)),
                 onNavigateBack = navController::popBackStack,
             ) { innerPadding ->
                 FeedbackScreen(modifier = Modifier.padding(innerPadding))

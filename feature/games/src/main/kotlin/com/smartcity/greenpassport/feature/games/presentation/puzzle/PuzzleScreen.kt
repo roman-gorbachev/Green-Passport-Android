@@ -18,8 +18,6 @@ import androidx.compose.material.icons.filled.Recycling
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,6 +29,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.feature.games.R
 
@@ -81,23 +80,24 @@ fun PuzzleScreen(
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(PUZZLE_GRID_COLUMNS),
-            contentPadding = PaddingValues(Dimens.SpacingMedium),
+            contentPadding = PaddingValues(
+                horizontal = Dimens.ScreenHorizontalPadding,
+                vertical = Dimens.SpacingSmall,
+            ),
             horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
             verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
         ) {
             items(uiState.cards) { card ->
-                Card(
+                GpSurfaceCard(
                     onClick = { viewModel.onCardClick(card.id) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (card.isFaceUp || card.isMatched) {
-                            MaterialTheme.colorScheme.primaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.primary
-                        },
-                    ),
+                    color = if (card.isFaceUp || card.isMatched) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    },
                 ) {
                     Column(
                         modifier = Modifier.fillMaxSize(),

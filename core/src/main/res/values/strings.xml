@@ -10,4 +10,13 @@
     <string name="reward_notification_body_format">+%1$d баллов, +%2$d опыта</string>
     <string name="error_generic_message">Не удалось загрузить данные. Проверьте соединение и попробуйте снова</string>
     <string name="retry_button">Повторить</string>
+    <string name="back">Назад</string>
+    <string name="home">Главная</string>
+    <string name="shop">Магазин</string>
+    <string name="map">Карта</string>
+    <string name="favorites">Избранное</string>
+    <string name="see_more">Ещё</string>
+    <string name="level_number">ур. %1$d</string>
+    <string name="xp_progress">%1$d / %2$d оч.</string>
+    <string name="points_reward">+%1$d оч.</string>
 </resources>

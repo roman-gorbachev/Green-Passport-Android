@@ -1,6 +1,4 @@
 <resources>
-    <string name="profile_level_format">Уровень %1$d</string>
-    <string name="profile_xp_format">%1$d/%2$d опыта</string>
     <string name="profile_anonymous_label">Гость</string>
     <string name="profile_notifications_label">Уведомления</string>
     <string name="profile_achievements">Достижения</string>
@@ -42,6 +40,9 @@
 
     <string name="notifications_empty">Уведомлений пока не было</string>
 
-    <string name="favorites_empty">Пока нет избранных заданий — отметьте звёздочкой на экране заданий</string>
+    <string name="favorites_empty">Пока нет избранных заданий — отметьте сердечком на экране заданий</string>
     <string name="bookmarks_empty">Пока нет закладок — отметьте совет закладкой на экране эко-советов</string>
+    <string name="points_balance">%1$d оч. на счету</string>
+    <string name="tasks">Задания</string>
+    <string name="tips">Советы</string>
 </resources>

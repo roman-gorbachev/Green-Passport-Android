@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.feature.games.R
 import com.smartcity.greenpassport.feature.games.domain.GameId
@@ -39,7 +39,10 @@ fun GamesHubScreen(
     LazyVerticalGrid(
         columns = GridCells.Fixed(GAMES_GRID_COLUMNS),
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(Dimens.SpacingMedium),
+        contentPadding = PaddingValues(
+            horizontal = Dimens.ScreenHorizontalPadding,
+            vertical = Dimens.SpacingSmall,
+        ),
         horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
         verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
     ) {
@@ -59,7 +62,7 @@ private fun GameTile(
     bestScore: Int?,
     onClick: () -> Unit,
 ) {
-    Card(
+    GpSurfaceCard(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()

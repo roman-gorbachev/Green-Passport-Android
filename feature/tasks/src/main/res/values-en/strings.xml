@@ -6,7 +6,6 @@
     <string name="tasks_category_reusable_items">Reusable items</string>
     <string name="tasks_category_lecture">Lectures</string>
     <string name="tasks_empty">No tasks in this category yet</string>
-    <string name="task_detail_reward_format">Reward: %1$d points, %2$d XP</string>
-    <string name="task_detail_complete_button">Complete</string>
     <string name="task_detail_completed_label">Task completed</string>
+    <string name="mark_as_done">Mark as done</string>
 </resources>

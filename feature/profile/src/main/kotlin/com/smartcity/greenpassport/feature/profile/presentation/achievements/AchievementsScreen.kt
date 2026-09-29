@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
+import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.Achievement
@@ -53,7 +53,10 @@ fun AchievementsScreen(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(Dimens.SpacingMedium),
+        contentPadding = PaddingValues(
+            horizontal = Dimens.ScreenHorizontalPadding,
+            vertical = Dimens.SpacingSmall,
+        ),
         verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
     ) {
         items(uiState.achievements) { achievement ->
@@ -66,7 +69,7 @@ fun AchievementsScreen(
 
 @Composable
 private fun AchievementRow(achievement: Achievement) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    GpSurfaceCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Dimens.SpacingMedium)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(

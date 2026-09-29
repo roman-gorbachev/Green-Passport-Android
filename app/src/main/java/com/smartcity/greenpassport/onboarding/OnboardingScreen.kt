@@ -1,10 +1,9 @@
 package com.smartcity.greenpassport.onboarding
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.smartcity.greenpassport.R
+import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
@@ -26,10 +26,11 @@ fun OnboardingScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(Dimens.SpacingExtraLarge),
+            .padding(horizontal = Dimens.ScreenHorizontalPadding, vertical = Dimens.SpacingLarge),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
     ) {
+        Spacer(modifier = Modifier.weight(1f))
+
         MascotWidget(size = Dimens.MascotSizeLarge)
 
         Text(
@@ -42,16 +43,17 @@ fun OnboardingScreen(
         Text(
             text = stringResource(R.string.onboarding_subtitle),
             style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = Dimens.SpacingMedium),
         )
 
-        Button(
+        Spacer(modifier = Modifier.weight(1f))
+
+        GpPrimaryButton(
+            text = stringResource(R.string.onboarding_get_started),
             onClick = onGetStarted,
-            modifier = Modifier.padding(top = Dimens.SpacingExtraLarge),
-        ) {
-            Text(stringResource(R.string.onboarding_get_started))
-        }
+        )
     }
 }
 

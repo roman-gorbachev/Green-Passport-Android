@@ -3,34 +3,29 @@ package com.smartcity.greenpassport.feature.tasks.presentation.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.RadioButtonUnchecked
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
+import com.smartcity.greenpassport.core.designsystem.component.GpFilterChip
+import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
-import com.smartcity.greenpassport.core.designsystem.component.PillListItem
+import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.core.model.TaskCategory
@@ -47,7 +42,10 @@ fun TasksListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) { viewModel.refresh() }
+    LifecycleResumeEffect(viewModel) {
+        viewModel.refresh()
+        onPauseOrDispose {}
+    }
 
     TasksListContent(
         uiState = uiState,
@@ -59,7 +57,6 @@ fun TasksListScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TasksListContent(
     uiState: TasksListUiState,
@@ -71,21 +68,24 @@ private fun TasksListContent(
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         LazyRow(
-            contentPadding = PaddingValues(Dimens.SpacingMedium),
+            contentPadding = PaddingValues(
+                horizontal = Dimens.ScreenHorizontalPadding,
+                vertical = Dimens.SpacingSmall,
+            ),
             horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
         ) {
             item {
-                FilterChip(
+                GpFilterChip(
+                    label = stringResource(R.string.tasks_filter_all),
                     selected = uiState.selectedCategory == null,
                     onClick = { onCategorySelected(null) },
-                    label = { Text(stringResource(R.string.tasks_filter_all)) },
                 )
             }
             items(TaskCategory.entries) { category ->
-                FilterChip(
+                GpFilterChip(
+                    label = stringResource(taskCategoryLabelRes(category)),
                     selected = uiState.selectedCategory == category,
                     onClick = { onCategorySelected(category) },
-                    label = { Text(stringResource(taskCategoryLabelRes(category))) },
                 )
             }
         }
@@ -104,10 +104,13 @@ private fun TasksListContent(
             )
 
             else -> LazyColumn(
-                contentPadding = PaddingValues(Dimens.SpacingMedium),
-                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+                contentPadding = PaddingValues(
+                    horizontal = Dimens.ScreenHorizontalPadding,
+                    vertical = Dimens.SpacingSmall,
+                ),
+                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
             ) {
-                items(uiState.visibleTasks) { task ->
+                items(uiState.visibleTasks, key = { it.id }) { task ->
                     TaskRow(
                         task = task,
                         isCompleted = uiState.completedTaskIds.contains(task.id),
@@ -129,19 +132,23 @@ private fun TaskRow(
     onClick: () -> Unit,
     onToggleFavorite: () -> Unit,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        PillListItem(
-            title = task.title,
-            leadingIcon = if (isCompleted) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked,
-            onClick = onClick,
-            modifier = Modifier.weight(1f),
-        )
-        IconButton(onClick = onToggleFavorite) {
-            Icon(
-                imageVector = if (isFavorite) Icons.Filled.Star else Icons.Filled.StarBorder,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-            )
-        }
-    }
+    GpListRow(
+        title = task.title,
+        subtitle = if (isCompleted) {
+            stringResource(R.string.task_detail_completed_label)
+        } else {
+            stringResource(CoreR.string.points_reward, task.rewardPoints)
+        },
+        leading = { MascotWidget(size = Dimens.IconSizeExtraLarge) },
+        trailing = {
+            IconButton(onClick = onToggleFavorite) {
+                Icon(
+                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    contentDescription = stringResource(CoreR.string.favorites),
+                    tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        },
+        onClick = onClick,
+    )
 }

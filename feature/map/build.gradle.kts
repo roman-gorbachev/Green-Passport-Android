@@ -1,9 +1,19 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
 }
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+val yandexMapkitApiKey = localProperties.getProperty("YANDEX_MAPKIT_API_KEY")
+    ?: System.getenv("YANDEX_MAPKIT_API_KEY")
+    ?: ""
 
 android {
     namespace = "com.smartcity.greenpassport.feature.map"
@@ -15,6 +25,7 @@ android {
 
     defaultConfig {
         minSdk = 26
+        buildConfigField("String", "YANDEX_MAPKIT_API_KEY", "\"$yandexMapkitApiKey\"")
     }
 
     compileOptions {
@@ -24,11 +35,13 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
 dependencies {
     implementation(project(":core"))
+    implementation(libs.yandex.mapkit)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)

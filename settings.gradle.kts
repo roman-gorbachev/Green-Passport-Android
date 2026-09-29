@@ -28,6 +28,7 @@ include(":core")
 
 listOf(
     "auth",
+    "home",
     "profile",
     "tasks",
     "shop",

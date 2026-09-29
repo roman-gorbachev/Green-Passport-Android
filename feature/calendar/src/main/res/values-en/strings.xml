@@ -1,5 +1,7 @@
 <resources>
     <string name="calendar_empty">No upcoming events yet</string>
-    <string name="calendar_register_button">Register</string>
     <string name="calendar_registered_label">You\'re registered</string>
+    <string name="sign_up_points">Sign up · +%1$d pt.</string>
+    <string name="sign_up">Sign up</string>
+    <string name="date_time">%1$s · %2$s</string>
 </resources>

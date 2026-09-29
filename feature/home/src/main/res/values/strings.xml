@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_name">Привет, %1$s</string>
+    <string name="hello">Привет!</string>
+    <string name="your_tasks">Твои задания</string>
+    <string name="all_tasks_completed">Все задания выполнены — загляни позже</string>
+    <string name="community">Сообщество</string>
+    <string name="mini_games">Мини-игры</string>
+    <string name="eco_tips">Эко-советы</string>
+    <string name="calendar">Календарь</string>
+    <string name="feedback">Отзывы</string>
+    <string name="profile">Профиль</string>
+    <string name="date_time_place">%1$s · %2$s · %3$s</string>
+</resources>

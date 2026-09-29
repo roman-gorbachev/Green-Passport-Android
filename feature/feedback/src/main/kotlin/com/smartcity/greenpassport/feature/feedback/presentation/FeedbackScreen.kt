@@ -12,13 +12,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
+import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
+import com.smartcity.greenpassport.core.designsystem.component.GpTextField
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.SurveyQuestion
@@ -61,7 +61,10 @@ fun FeedbackScreen(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(Dimens.SpacingMedium),
+        contentPadding = PaddingValues(
+            horizontal = Dimens.ScreenHorizontalPadding,
+            vertical = Dimens.SpacingSmall,
+        ),
         verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
     ) {
         item {
@@ -109,7 +112,7 @@ private fun ReviewSection(
     onMessageChanged: (String) -> Unit,
     onSubmit: () -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    GpSurfaceCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Dimens.SpacingMedium)) {
             Text(text = stringResource(R.string.feedback_review_title), style = MaterialTheme.typography.titleMedium)
 
@@ -125,7 +128,7 @@ private fun ReviewSection(
                 }
             }
 
-            OutlinedTextField(
+            GpTextField(
                 value = message,
                 onValueChange = onMessageChanged,
                 label = { Text(stringResource(R.string.feedback_review_message_label)) },
@@ -162,14 +165,14 @@ private fun SuggestionSection(
     onMessageChanged: (String) -> Unit,
     onSubmit: () -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    GpSurfaceCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Dimens.SpacingMedium)) {
             Text(
                 text = stringResource(R.string.feedback_suggestion_title),
                 style = MaterialTheme.typography.titleMedium,
             )
 
-            OutlinedTextField(
+            GpTextField(
                 value = message,
                 onValueChange = onMessageChanged,
                 label = { Text(stringResource(R.string.feedback_suggestion_message_label)) },
@@ -207,7 +210,7 @@ private fun SurveySection(
     isSubmitting: Boolean,
     onOptionSelected: (Int) -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    GpSurfaceCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Dimens.SpacingMedium)) {
             Text(text = stringResource(R.string.feedback_survey_title), style = MaterialTheme.typography.titleMedium)
             Text(
@@ -244,7 +247,7 @@ private fun SurveySection(
 
 @Composable
 private fun SupportSection() {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    GpSurfaceCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Dimens.SpacingMedium)) {
             Text(text = stringResource(R.string.feedback_support_title), style = MaterialTheme.typography.titleMedium)
             Text(

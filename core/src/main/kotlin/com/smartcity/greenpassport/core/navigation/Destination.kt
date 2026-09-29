@@ -43,6 +43,9 @@ sealed interface Destination {
     data object Calendar : Destination
 
     @Serializable
+    data class EventDetail(val eventId: String) : Destination
+
+    @Serializable
     data object Map : Destination
 
     @Serializable
@@ -81,15 +84,3 @@ sealed interface Destination {
     @Serializable
     data object Feedback : Destination
 }
-
-val homeMenuDestinations: List<Destination> = listOf(
-    Destination.Tasks,
-    Destination.Profile,
-    Destination.Calendar,
-    Destination.Map,
-    Destination.Community,
-    Destination.EcoTips,
-    Destination.Games,
-    Destination.Shop,
-    Destination.Feedback,
-)

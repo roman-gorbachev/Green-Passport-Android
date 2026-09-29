@@ -3,7 +3,6 @@ package com.smartcity.greenpassport.feature.ecotips.presentation.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,11 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.RadioButtonUnchecked
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,15 +22,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
+import com.smartcity.greenpassport.core.designsystem.component.GpFilterChip
+import com.smartcity.greenpassport.core.designsystem.component.GpListRow
+import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
-import com.smartcity.greenpassport.core.designsystem.component.PillListItem
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.EcoTip
 import com.smartcity.greenpassport.core.model.EcoTipCategory
@@ -80,21 +77,24 @@ private fun EcoTipsListContent(
         }
 
         LazyRow(
-            contentPadding = PaddingValues(Dimens.SpacingMedium),
+            contentPadding = PaddingValues(
+                horizontal = Dimens.ScreenHorizontalPadding,
+                vertical = Dimens.SpacingSmall,
+            ),
             horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
         ) {
             item {
-                FilterChip(
+                GpFilterChip(
+                    label = stringResource(R.string.ecotips_filter_all),
                     selected = uiState.selectedCategory == null,
                     onClick = { onCategorySelected(null) },
-                    label = { Text(stringResource(R.string.ecotips_filter_all)) },
                 )
             }
             items(EcoTipCategory.entries) { category ->
-                FilterChip(
+                GpFilterChip(
+                    label = stringResource(ecoTipCategoryLabelRes(category)),
                     selected = uiState.selectedCategory == category,
                     onClick = { onCategorySelected(category) },
-                    label = { Text(stringResource(ecoTipCategoryLabelRes(category))) },
                 )
             }
         }
@@ -113,33 +113,42 @@ private fun EcoTipsListContent(
             )
 
             else -> LazyColumn(
-                contentPadding = PaddingValues(Dimens.SpacingMedium),
-                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+                contentPadding = PaddingValues(
+                    horizontal = Dimens.ScreenHorizontalPadding,
+                    vertical = Dimens.SpacingSmall,
+                ),
+                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
             ) {
-                items(uiState.visibleTips) { tip ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        PillListItem(
-                            title = tip.title,
-                            leadingIcon = if (uiState.readTipIds.contains(tip.id)) {
-                                Icons.Filled.CheckCircle
-                            } else {
-                                Icons.Filled.RadioButtonUnchecked
-                            },
-                            onClick = { onTipSelected(tip.id) },
-                            modifier = Modifier.weight(1f),
-                        )
-                        IconButton(onClick = { onToggleBookmark(tip.id) }) {
+                items(uiState.visibleTips, key = { it.id }) { tip ->
+                    val isBookmarked = uiState.bookmarkedTipIds.contains(tip.id)
+                    GpListRow(
+                        title = tip.title,
+                        leading = {
                             Icon(
-                                imageVector = if (uiState.bookmarkedTipIds.contains(tip.id)) {
-                                    Icons.Filled.Bookmark
+                                imageVector = if (uiState.readTipIds.contains(tip.id)) {
+                                    Icons.Filled.CheckCircle
                                 } else {
-                                    Icons.Filled.BookmarkBorder
+                                    Icons.Filled.Eco
                                 },
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                        }
-                    }
+                        },
+                        trailing = {
+                            IconButton(onClick = { onToggleBookmark(tip.id) }) {
+                                Icon(
+                                    imageVector = if (isBookmarked) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                                    contentDescription = null,
+                                    tint = if (isBookmarked) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    },
+                                )
+                            }
+                        },
+                        onClick = { onTipSelected(tip.id) },
+                    )
                 }
             }
         }
@@ -151,14 +160,15 @@ private fun DailyTipCard(
     tip: EcoTip,
     onClick: () -> Unit,
 ) {
-    Card(
+    GpSurfaceCard(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(Dimens.SpacingMedium),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+            .padding(horizontal = Dimens.ScreenHorizontalPadding, vertical = Dimens.SpacingSmall),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
-        Column(modifier = Modifier.padding(Dimens.SpacingMedium)) {
+        Column(modifier = Modifier.padding(Dimens.CardPadding)) {
             Text(
                 text = stringResource(R.string.ecotips_daily_tip_label),
                 style = MaterialTheme.typography.labelLarge,
@@ -166,7 +176,8 @@ private fun DailyTipCard(
             )
             Text(
                 text = tip.title,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(top = Dimens.SpacingExtraSmall),
             )
         }

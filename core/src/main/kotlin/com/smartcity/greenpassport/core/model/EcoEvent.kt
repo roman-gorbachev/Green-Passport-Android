@@ -7,6 +7,8 @@ data class EcoEvent(
     val location: String,
     val city: String,
     val startAtEpochMillis: Long,
+    val imageUrl: String?,
+    val rewardPoints: Int,
 )
 
 interface EventsRepository {

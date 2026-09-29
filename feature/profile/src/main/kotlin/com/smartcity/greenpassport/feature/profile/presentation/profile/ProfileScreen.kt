@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Bookmark
@@ -18,13 +20,12 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,10 +35,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
+import com.smartcity.greenpassport.core.designsystem.component.GpListRow
+import com.smartcity.greenpassport.core.designsystem.component.LevelProgressCard
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
-import com.smartcity.greenpassport.core.designsystem.component.PillListItem
-import com.smartcity.greenpassport.core.designsystem.component.PointsBadge
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.profile.R
@@ -101,76 +102,50 @@ private fun ProfileContent(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(Dimens.SpacingMedium),
+        contentPadding = PaddingValues(
+            horizontal = Dimens.ScreenHorizontalPadding,
+            vertical = Dimens.SpacingMedium,
+        ),
         verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
     ) {
         item {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                MascotWidget(size = Dimens.MascotSizeMedium)
+            ProfileHeader(uiState = uiState)
+        }
 
-                Text(
-                    text = uiState.email?.takeIf { !uiState.isAnonymous }
-                        ?: stringResource(R.string.profile_anonymous_label),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(top = Dimens.SpacingSmall),
-                )
-
-                uiState.level?.let { level ->
-                    Text(
-                        text = stringResource(R.string.profile_level_format, level.number),
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(top = Dimens.SpacingMedium),
-                    )
-                    LinearProgressIndicator(
-                        progress = { level.currentXp.toFloat() / level.xpForNextLevel.toFloat() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = Dimens.SpacingSmall),
-                    )
-                    Text(
-                        text = stringResource(R.string.profile_xp_format, level.currentXp, level.xpForNextLevel),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(top = Dimens.SpacingExtraSmall),
-                    )
-                }
-
-                PointsBadge(
-                    points = uiState.points,
-                    modifier = Modifier.padding(top = Dimens.SpacingMedium),
+        uiState.level?.let { level ->
+            item {
+                LevelProgressCard(
+                    level = level.number,
+                    currentXp = level.currentXp,
+                    xpForNextLevel = level.xpForNextLevel,
                 )
             }
         }
 
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    text = stringResource(R.string.profile_notifications_label),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Switch(
-                    checked = uiState.notificationsEnabled,
-                    onCheckedChange = onNotificationsToggle,
-                )
-            }
-            HorizontalDivider(modifier = Modifier.padding(top = Dimens.SpacingSmall))
+            GpListRow(
+                title = stringResource(R.string.profile_notifications_label),
+                leading = { ProfileMenuIcon(icon = Icons.Filled.Notifications) },
+                trailing = {
+                    Switch(
+                        checked = uiState.notificationsEnabled,
+                        onCheckedChange = onNotificationsToggle,
+                    )
+                },
+                onClick = { onNotificationsToggle(!uiState.notificationsEnabled) },
+            )
         }
 
         items(profileMenuEntries) { entry ->
-            PillListItem(
+            GpListRow(
                 title = stringResource(entry.labelRes),
-                leadingIcon = entry.icon,
+                leading = { ProfileMenuIcon(icon = entry.icon) },
                 onClick = { entry.destination?.let(onMenuEntrySelected) },
             )
         }
 
         item {
-            OutlinedButton(
+            TextButton(
                 onClick = onSignOut,
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -179,8 +154,56 @@ private fun ProfileContent(
                     contentDescription = null,
                     modifier = Modifier.padding(end = Dimens.SpacingSmall),
                 )
-                Text(stringResource(R.string.profile_sign_out))
+                Text(
+                    text = stringResource(R.string.profile_sign_out),
+                    style = MaterialTheme.typography.labelLarge,
+                )
             }
         }
     }
+}
+
+@Composable
+private fun ProfileHeader(
+    uiState: ProfileUiState,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            modifier = Modifier.size(Dimens.AvatarSize),
+        ) {
+            MascotWidget(size = Dimens.AvatarSize)
+        }
+        Column(modifier = Modifier.padding(start = Dimens.SpacingMedium)) {
+            Text(
+                text = uiState.email?.takeIf { !uiState.isAnonymous }
+                    ?: stringResource(R.string.profile_anonymous_label),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Text(
+                text = stringResource(R.string.points_balance, uiState.points),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProfileMenuIcon(
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+) {
+    Icon(
+        imageVector = icon,
+        contentDescription = null,
+        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = modifier.size(Dimens.IconSizeMedium),
+    )
 }

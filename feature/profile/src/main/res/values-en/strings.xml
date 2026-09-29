@@ -1,6 +1,4 @@
 <resources>
-    <string name="profile_level_format">Level %1$d</string>
-    <string name="profile_xp_format">%1$d/%2$d XP</string>
     <string name="profile_anonymous_label">Guest</string>
     <string name="profile_notifications_label">Notifications</string>
     <string name="profile_achievements">Achievements</string>
@@ -42,6 +40,9 @@
 
     <string name="notifications_empty">No notifications yet</string>
 
-    <string name="favorites_empty">No favorite tasks yet — star one on the tasks screen</string>
+    <string name="favorites_empty">No favorite tasks yet — tap the heart on the tasks screen</string>
     <string name="bookmarks_empty">No bookmarks yet — bookmark a tip on the eco tips screen</string>
+    <string name="points_balance">%1$d pt. available</string>
+    <string name="tasks">Tasks</string>
+    <string name="tips">Tips</string>
 </resources>

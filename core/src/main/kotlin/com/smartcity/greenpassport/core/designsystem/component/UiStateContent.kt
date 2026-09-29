@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,10 +38,13 @@ fun EmptyContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+        MascotWidget(size = Dimens.MascotSizeLarge)
         Text(
             text = message,
             style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = Dimens.SpacingMedium),
         )
     }
 }
@@ -61,18 +63,15 @@ fun ErrorContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+        MascotWidget(size = Dimens.MascotSizeLarge)
         Text(
             text = message,
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.error,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(vertical = Dimens.SpacingMedium),
         )
-        Button(
-            onClick = onRetry,
-            modifier = Modifier.padding(top = Dimens.SpacingMedium),
-        ) {
-            Text(retryLabel)
-        }
+        GpPrimaryButton(text = retryLabel, onClick = onRetry)
     }
 }
 

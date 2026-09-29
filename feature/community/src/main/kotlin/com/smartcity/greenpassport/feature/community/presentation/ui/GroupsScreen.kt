@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +22,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
+import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
+import com.smartcity.greenpassport.core.designsystem.component.GpTextField
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.CommunityGroup
@@ -44,7 +44,7 @@ fun GroupsScreen(
                 .padding(Dimens.SpacingMedium),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            OutlinedTextField(
+            GpTextField(
                 value = uiState.draftName,
                 onValueChange = viewModel::onDraftNameChanged,
                 label = { Text(stringResource(R.string.groups_draft_label)) },
@@ -77,7 +77,10 @@ fun GroupsScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
-                contentPadding = PaddingValues(Dimens.SpacingMedium),
+                contentPadding = PaddingValues(
+                    horizontal = Dimens.ScreenHorizontalPadding,
+                    vertical = Dimens.SpacingSmall,
+                ),
                 verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
             ) {
                 items(uiState.groups) { group ->
@@ -100,7 +103,7 @@ private fun GroupCard(
     isJoining: Boolean,
     onJoin: () -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    GpSurfaceCard(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

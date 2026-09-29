@@ -10,4 +10,13 @@
     <string name="reward_notification_body_format">+%1$d points, +%2$d XP</string>
     <string name="error_generic_message">Couldn\'t load data. Check your connection and try again</string>
     <string name="retry_button">Retry</string>
+    <string name="back">Back</string>
+    <string name="home">Home</string>
+    <string name="shop">Shop</string>
+    <string name="map">Map</string>
+    <string name="favorites">Favorites</string>
+    <string name="see_more">See more</string>
+    <string name="level_number">lvl %1$d</string>
+    <string name="xp_progress">%1$d / %2$d pt.</string>
+    <string name="points_reward">+%1$d pts.</string>
 </resources>

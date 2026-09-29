@@ -1,5 +1,7 @@
 <resources>
     <string name="calendar_empty">Пока нет запланированных мероприятий</string>
-    <string name="calendar_register_button">Зарегистрироваться</string>
     <string name="calendar_registered_label">Вы зарегистрированы</string>
+    <string name="sign_up_points">Записаться · +%1$d оч.</string>
+    <string name="sign_up">Записаться</string>
+    <string name="date_time">%1$s · %2$s</string>
 </resources>

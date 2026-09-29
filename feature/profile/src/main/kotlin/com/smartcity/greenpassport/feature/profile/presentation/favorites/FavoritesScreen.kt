@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -15,8 +13,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
+import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
-import com.smartcity.greenpassport.core.designsystem.component.PillListItem
+import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.feature.profile.R
 import com.smartcity.greenpassport.core.R as CoreR
@@ -44,13 +43,16 @@ fun FavoritesScreen(
 
         else -> LazyColumn(
             modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(Dimens.SpacingMedium),
-            verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+            contentPadding = PaddingValues(
+                horizontal = Dimens.ScreenHorizontalPadding,
+                vertical = Dimens.SpacingSmall,
+            ),
+            verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
         ) {
             items(uiState.tasks) { task ->
-                PillListItem(
+                GpListRow(
                     title = task.title,
-                    leadingIcon = Icons.Filled.Star,
+                    leading = { MascotWidget(size = Dimens.IconSizeExtraLarge) },
                     onClick = { onTaskSelected(task.id) },
                 )
             }

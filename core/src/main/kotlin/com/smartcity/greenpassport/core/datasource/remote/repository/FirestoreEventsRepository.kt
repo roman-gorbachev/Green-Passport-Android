@@ -13,6 +13,8 @@ private const val FIELD_DESCRIPTION = "description"
 private const val FIELD_LOCATION = "location"
 private const val FIELD_CITY = "city"
 private const val FIELD_START_AT = "startAtEpochMillis"
+private const val FIELD_IMAGE_URL = "imageUrl"
+private const val FIELD_REWARD_POINTS = "rewardPoints"
 
 private const val FIELD_USER_ID = "userId"
 private const val FIELD_EVENT_ID = "eventId"
@@ -63,5 +65,7 @@ private fun DocumentSnapshot.toEcoEvent(): EcoEvent? {
         location = location,
         city = city,
         startAtEpochMillis = startAt,
+        imageUrl = getString(FIELD_IMAGE_URL),
+        rewardPoints = getLong(FIELD_REWARD_POINTS)?.toInt() ?: 0,
     )
 }

@@ -6,4 +6,6 @@
     <string name="map_search_placeholder">Поиск</string>
     <string name="map_empty">Ничего не найдено</string>
     <string name="map_route_unavailable">Построение маршрута пока недоступно</string>
+    <string name="save">Сохранить</string>
+    <string name="saved">Сохранено</string>
 </resources>

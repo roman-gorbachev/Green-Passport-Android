@@ -6,10 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -22,6 +20,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
+import com.smartcity.greenpassport.core.designsystem.component.GpTextField
 import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.feature.auth.R
@@ -62,13 +62,13 @@ private fun AuthContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(Dimens.SpacingLarge),
+            .padding(horizontal = Dimens.ScreenHorizontalPadding, vertical = Dimens.SpacingLarge),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        MascotWidget(size = Dimens.MascotSizeMedium)
+        MascotWidget(size = Dimens.MascotSizeLarge)
 
-        OutlinedTextField(
+        GpTextField(
             value = uiState.email,
             onValueChange = onEmailChange,
             label = { Text(stringResource(R.string.auth_email_label)) },
@@ -79,7 +79,7 @@ private fun AuthContent(
                 .padding(top = Dimens.SpacingLarge),
         )
 
-        OutlinedTextField(
+        GpTextField(
             value = uiState.password,
             onValueChange = onPasswordChange,
             label = { Text(stringResource(R.string.auth_password_label)) },
@@ -103,14 +103,11 @@ private fun AuthContent(
         if (uiState.isLoading) {
             CircularProgressIndicator(modifier = Modifier.padding(top = Dimens.SpacingLarge))
         } else {
-            Button(
+            GpPrimaryButton(
+                text = stringResource(R.string.auth_sign_in),
                 onClick = onSignIn,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = Dimens.SpacingLarge),
-            ) {
-                Text(stringResource(R.string.auth_sign_in))
-            }
+                modifier = Modifier.padding(top = Dimens.SpacingLarge),
+            )
 
             TextButton(
                 onClick = onRegister,

@@ -47,5 +47,6 @@ private fun AuthResult.requireUser(): FirebaseUser =
 private fun FirebaseUser.toAuthSession() = AuthSession(
     userId = uid,
     email = email,
-    isAnonymous = isAnonymous
+    isAnonymous = isAnonymous,
+    displayName = displayName?.takeIf { it.isNotBlank() },
 )

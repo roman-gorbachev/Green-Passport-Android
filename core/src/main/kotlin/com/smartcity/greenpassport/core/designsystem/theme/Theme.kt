@@ -26,6 +26,7 @@ fun GreenPassportTheme(
         MaterialTheme(
             colorScheme = colorScheme,
             typography = GreenPassportTypography,
+            shapes = GreenPassportShapes,
             content = content,
         )
     }

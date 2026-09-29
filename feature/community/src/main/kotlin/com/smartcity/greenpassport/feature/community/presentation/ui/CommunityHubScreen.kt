@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.smartcity.greenpassport.core.designsystem.component.PillListItem
+import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.feature.community.R
 
@@ -23,17 +25,29 @@ fun CommunityHubScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(Dimens.SpacingMedium),
+            .padding(horizontal = Dimens.ScreenHorizontalPadding, vertical = Dimens.SpacingSmall),
         verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
     ) {
-        PillListItem(
+        GpListRow(
             title = stringResource(R.string.community_forum_title),
-            leadingIcon = Icons.Filled.Forum,
+            leading = {
+                Icon(
+                    imageVector = Icons.Filled.Forum,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
             onClick = onForumSelected,
         )
-        PillListItem(
+        GpListRow(
             title = stringResource(R.string.community_groups_title),
-            leadingIcon = Icons.Filled.Groups,
+            leading = {
+                Icon(
+                    imageVector = Icons.Filled.Groups,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
             onClick = onGroupsSelected,
         )
     }
