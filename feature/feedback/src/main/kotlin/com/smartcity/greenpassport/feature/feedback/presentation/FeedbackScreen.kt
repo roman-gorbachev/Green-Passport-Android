@@ -69,10 +69,7 @@ fun FeedbackScreen(
     ) {
         item {
             ReviewSection(
-                rating = uiState.rating,
-                message = uiState.reviewMessage,
-                isSubmitting = uiState.isSubmittingReview,
-                isSubmitted = uiState.reviewSubmitted,
+                uiState = uiState,
                 onRatingChanged = viewModel::onRatingChanged,
                 onMessageChanged = viewModel::onReviewMessageChanged,
                 onSubmit = viewModel::onSubmitReview,
@@ -83,6 +80,7 @@ fun FeedbackScreen(
                 message = uiState.suggestionMessage,
                 isSubmitting = uiState.isSubmittingSuggestion,
                 isSubmitted = uiState.suggestionSubmitted,
+                isRejected = uiState.isSuggestionRejected,
                 onMessageChanged = viewModel::onSuggestionMessageChanged,
                 onSubmit = viewModel::onSubmitSuggestion,
             )
@@ -104,14 +102,16 @@ fun FeedbackScreen(
 
 @Composable
 private fun ReviewSection(
-    rating: Int,
-    message: String,
-    isSubmitting: Boolean,
-    isSubmitted: Boolean,
+    uiState: FeedbackUiState,
     onRatingChanged: (Int) -> Unit,
     onMessageChanged: (String) -> Unit,
     onSubmit: () -> Unit,
 ) {
+    val rating = uiState.rating
+    val message = uiState.reviewMessage
+    val isSubmitting = uiState.isSubmittingReview
+    val isSubmitted = uiState.reviewSubmitted
+    val isRejected = uiState.isReviewRejected
     GpSurfaceCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Dimens.SpacingMedium)) {
             Text(text = stringResource(R.string.feedback_review_title), style = MaterialTheme.typography.titleMedium)
@@ -132,6 +132,8 @@ private fun ReviewSection(
                 value = message,
                 onValueChange = onMessageChanged,
                 label = { Text(stringResource(R.string.feedback_review_message_label)) },
+                isError = isRejected,
+                supportingText = rejectedText(isRejected),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = Dimens.SpacingSmall),
@@ -162,6 +164,7 @@ private fun SuggestionSection(
     message: String,
     isSubmitting: Boolean,
     isSubmitted: Boolean,
+    isRejected: Boolean,
     onMessageChanged: (String) -> Unit,
     onSubmit: () -> Unit,
 ) {
@@ -176,6 +179,8 @@ private fun SuggestionSection(
                 value = message,
                 onValueChange = onMessageChanged,
                 label = { Text(stringResource(R.string.feedback_suggestion_message_label)) },
+                isError = isRejected,
+                supportingText = rejectedText(isRejected),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = Dimens.SpacingSmall),
@@ -263,3 +268,10 @@ private fun SupportSection() {
         }
     }
 }
+
+private fun rejectedText(isRejected: Boolean): (@Composable () -> Unit)? =
+    if (isRejected) {
+        { Text(stringResource(R.string.text_contains_banned_words)) }
+    } else {
+        null
+    }

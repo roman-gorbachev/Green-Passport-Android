@@ -48,6 +48,12 @@ fun GroupsScreen(
                 value = uiState.draftName,
                 onValueChange = viewModel::onDraftNameChanged,
                 label = { Text(stringResource(R.string.groups_draft_label)) },
+                isError = uiState.isNameRejected,
+                supportingText = if (uiState.isNameRejected) {
+                    { Text(stringResource(R.string.text_contains_banned_words)) }
+                } else {
+                    null
+                },
                 modifier = Modifier.weight(1f),
             )
             if (uiState.isCreating) {

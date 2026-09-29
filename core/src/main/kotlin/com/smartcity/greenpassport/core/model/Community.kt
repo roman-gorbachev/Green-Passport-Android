@@ -1,10 +1,13 @@
 package com.smartcity.greenpassport.core.model
 
+import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import kotlinx.coroutines.flow.Flow
 
 data class ForumPost(
     val id: String,
     val authorId: String,
+    val authorName: String?,
+    val authorAvatar: AvatarStyle?,
     val text: String,
     val createdAtEpochMillis: Long,
 )
@@ -24,7 +27,7 @@ data class ChatMessage(
 
 interface CommunityRepository {
     fun observeForumPosts(): Flow<List<ForumPost>>
-    suspend fun postToForum(authorId: String, text: String)
+    suspend fun postToForum(authorId: String, authorName: String?, authorAvatar: AvatarStyle?, text: String)
 
     fun observeGroups(): Flow<List<CommunityGroup>>
     suspend fun createGroup(name: String, creatorId: String)

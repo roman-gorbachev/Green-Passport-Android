@@ -8,12 +8,29 @@ service cloud.firestore {
     return 100000;
   }
 
+  function hasBannedWords(text) {
+    return text.lower().matches('(?s).*(хуй|хуя|пизд|бляд|блят|еблан|мудак|мудил|пидор|залуп|шлюх|гандон|гондон|fuck|cunt|nigger|faggot).*');
+  }
+
+  function isCleanText(text, maxLength) {
+    return text is string && text.size() > 0 && text.size() <= maxLength && !hasBannedWords(text);
+  }
+
+  function isCleanOptionalText(data, field, maxLength) {
+    return !(field in data) || data[field] == null || isCleanText(data[field], maxLength);
+  }
+
+  function hasCleanProfileNames(data) {
+    return isCleanOptionalText(data, 'firstName', 30) && isCleanOptionalText(data, 'lastName', 30);
+  }
+
   match /databases/{database}/documents {
     match /apps/greenpassport/users/{userId} {
       allow read: if request.auth != null;
       allow delete: if false;
 
       allow create: if isOwner(userId) &&
+        hasCleanProfileNames(request.resource.data) &&
         request.resource.data.get('availablePoints', 0) is int &&
         request.resource.data.get('availablePoints', 0) >= 0 &&
         request.resource.data.get('availablePoints', 0) <= maxSingleAward() &&
@@ -22,6 +39,7 @@ service cloud.firestore {
         request.resource.data.get('lifetimeXp', 0) <= maxSingleAward();
 
       allow update: if isOwner(userId) &&
+        hasCleanProfileNames(request.resource.data) &&
         request.resource.data.get('availablePoints', 0) is int &&
         request.resource.data.get('availablePoints', 0) >= 0 &&
         request.resource.data.get('availablePoints', 0) <= resource.data.get('availablePoints', 0) + maxSingleAward() &&
@@ -56,7 +74,8 @@ service cloud.firestore {
 
     match /apps/greenpassport/feedback/{feedbackId} {
       allow read: if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid &&
+        (request.resource.data.message == '' || isCleanText(request.resource.data.message, 2000));
       allow update, delete: if false;
     }
 
@@ -82,20 +101,24 @@ service cloud.firestore {
 
     match /apps/greenpassport/posts/{postId} {
       allow read: if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.authorId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.authorId == request.auth.uid &&
+        isCleanText(request.resource.data.text, 2000) &&
+        isCleanOptionalText(request.resource.data, 'authorName', 61);
       allow update, delete: if false;
     }
 
     match /apps/greenpassport/groups/{groupId} {
       allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null;
+      allow create: if request.auth != null && isCleanText(request.resource.data.name, 60);
+      allow update: if request.auth != null &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds']);
       allow delete: if false;
     }
 
     match /apps/greenpassport/chats/{chatId}/messages/{messageId} {
       allow read: if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.senderId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.senderId == request.auth.uid &&
+        isCleanText(request.resource.data.text, 2000);
       allow update, delete: if false;
     }
 

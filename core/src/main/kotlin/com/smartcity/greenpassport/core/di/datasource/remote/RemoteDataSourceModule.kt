@@ -10,6 +10,7 @@ import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreHi
 import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreMapPointsRepository
 import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreShopRepository
 import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreTasksRepository
+import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreUserProfileRepository
 import com.smartcity.greenpassport.core.model.AchievementsRepository
 import com.smartcity.greenpassport.core.model.CommunityRepository
 import com.smartcity.greenpassport.core.model.EcoTipsRepository
@@ -20,6 +21,7 @@ import com.smartcity.greenpassport.core.model.HistoryRepository
 import com.smartcity.greenpassport.core.model.MapPointsRepository
 import com.smartcity.greenpassport.core.model.ShopRepository
 import com.smartcity.greenpassport.core.model.TasksRepository
+import com.smartcity.greenpassport.core.model.profile.UserProfileRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -45,6 +47,9 @@ interface RemoteDataSourceModule {
 
     @Binds
     fun bindShopRepository(impl: FirestoreShopRepository): ShopRepository
+
+    @Binds
+    fun bindUserProfileRepository(impl: FirestoreUserProfileRepository): UserProfileRepository
 
     @Binds
     fun bindTasksRepository(impl: FirestoreTasksRepository): TasksRepository

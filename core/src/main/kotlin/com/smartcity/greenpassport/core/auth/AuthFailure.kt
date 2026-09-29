@@ -8,5 +8,7 @@ enum class AuthFailure {
     NETWORK,
     TOO_MANY_REQUESTS,
     SIGN_IN_METHOD_DISABLED,
+    GOOGLE_CANCELLED,
+    GOOGLE_UNAVAILABLE,
     UNKNOWN,
 }

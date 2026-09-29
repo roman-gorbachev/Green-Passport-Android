@@ -44,12 +44,15 @@ Module graph: `:app` → `:core` + every `:feature:<name>`; each `:feature:<name
 - Feature screens take navigation callbacks (e.g. `onTaskSelected`). They don't touch `NavController`.
 
 **`:app`** owns wiring:
-- `GreenPassportApp` switches on `AppStartupState` (onboarding → auth → main). The main state renders `navigation/GreenPassportAppShell`: `AppNavHost` plus a floating `GpBottomBar`, shown only on the four `TopLevelDestination` tabs (Home, Shop, Map, Favorites). The app is edge-to-edge, so screens handle insets themselves.
+- `GreenPassportApp` switches on `AppStartupState` (onboarding → auth → profile setup → main). `MainViewModel` shows the `ProfileSetupScreen` wizard (name, city, interests, avatar) to any non-anonymous user whose `users/{uid}` document has no `profileCompletedAt`; the same wizard is reused for `Destination.EditProfile`. The main state renders `navigation/GreenPassportAppShell`: `AppNavHost` plus a floating `GpBottomBar`, shown only on the four `TopLevelDestination` tabs (Home, Shop, Map, Favorites). The app is edge-to-edge, so screens handle insets themselves.
 - `navigation/AppNavHost.kt` registers every `Destination`. Nested screens are wrapped in `FeatureScaffold`: no top app bar, a `ScreenHeader` (round back button + title as part of the page) that scrolls away with the content; pass `onNavigateBack = null` for a tab, which also reserves space for the bottom bar. Details that open from several features (`TaskDetail`, `EventDetail`) are `dialog<>` destinations rendered with `GpSheetScaffold`, a full-width bottom sheet with a rounded top over a dimmed scrim (no blur). Features can't depend on each other, so a sheet can't be embedded in the caller's screen.
 - Adding a screen means: add a `Destination` in `:core`, then an entry in `AppNavHost`. A home shortcut is a `HomeQuickAction` in `:feature:home`.
 - UI is built from `core/designsystem/component` (`Gp*` components, `ProgressHeroCard`, `QuickActionButton`, `IconCircle`, `PointsChip`, `HeroImageCard`, …) and theme tokens. Section accents (community, games, tips, calendar, feedback) come from `GreenPassportTheme.sectionColors`. Don't use raw Material `Card`/`Button`/`TopAppBar` in feature screens.
 
 ## Conventions
+
+- User profile (`core/model/profile`: `UserProfile`, `UserProfileRepository`) lives in the same `apps/greenpassport/users/{uid}` document as points; write it with `SetOptions.merge()` so points are never overwritten. Personalize screens from the profile, not from `AuthSession.displayName`.
+- Every piece of user-generated text (forum posts, chat messages, group names, feedback, profile names) goes through `core/moderation/TextModerator` in the use case before it is written, and the UI shows `ContentRejectedException` as a field error. `firestore.rules` repeats a shorter check (`hasBannedWords`) so the filter can't be bypassed; keep both word lists (`core/src/main/res/raw/banned_roots.txt`, rules regex) in sync.
 
 - Screens have to survive Firestore failures (e.g. `PERMISSION_DENIED` while Auth isn't enabled). ViewModels wrap repository calls in `runCatching`/`resultOf` and surface an error state rather than crashing.
 - Firestore security rules and indexes are in `firestore.rules`, `firestore.indexes.json` and `storage.rules` (project config in `firebase.json` / `.firebaserc`).

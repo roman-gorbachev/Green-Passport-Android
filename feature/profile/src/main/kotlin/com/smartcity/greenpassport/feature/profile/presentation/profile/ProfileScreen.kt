@@ -7,13 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
@@ -22,7 +21,6 @@ import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -39,11 +37,12 @@ import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.component.IconCircle
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
-import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
+import com.smartcity.greenpassport.core.designsystem.component.ProfileAvatar
 import com.smartcity.greenpassport.core.designsystem.component.ProgressHeroCard
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.designsystem.theme.SectionColors
+import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.profile.R
 import com.smartcity.greenpassport.core.R as CoreR
@@ -125,6 +124,16 @@ private fun ProfileContent(
             ProgressHeroCard(points = uiState.points, level = uiState.level)
         }
 
+        if (!uiState.isAnonymous) {
+            item {
+                GpListRow(
+                    title = stringResource(R.string.edit_profile),
+                    leading = { ProfileMenuIcon(icon = Icons.Filled.Edit, color = MaterialTheme.colorScheme.primary) },
+                    onClick = { onMenuEntrySelected(Destination.EditProfile) },
+                )
+            }
+        }
+
         item {
             GpListRow(
                 title = stringResource(R.string.profile_notifications_label),
@@ -177,22 +186,24 @@ private fun ProfileHeader(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.size(Dimens.AvatarSize),
-        ) {
-            MascotWidget(size = Dimens.AvatarSize, modifier = Modifier.padding(Dimens.SpacingExtraSmall))
-        }
+        val profile = uiState.profile
+        ProfileAvatar(style = profile?.avatar ?: AvatarStyle.LIME, size = Dimens.ProfileHeaderAvatarSize)
         Column(modifier = Modifier.padding(start = Dimens.SpacingMedium)) {
             Text(
-                text = uiState.email?.takeIf { !uiState.isAnonymous }
-                    ?: stringResource(R.string.profile_anonymous_label),
+                text = when {
+                    profile != null -> "${profile.firstName} ${profile.lastName}".trim()
+                    uiState.isAnonymous -> stringResource(R.string.profile_anonymous_label)
+                    else -> uiState.email.orEmpty()
+                },
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground,
             )
             Text(
-                text = stringResource(R.string.points_balance, uiState.points),
+                text = if (profile != null && profile.city.isNotBlank()) {
+                    stringResource(R.string.city_and_points, profile.city, uiState.points)
+                } else {
+                    stringResource(R.string.points_balance, uiState.points)
+                },
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.outline,
             )

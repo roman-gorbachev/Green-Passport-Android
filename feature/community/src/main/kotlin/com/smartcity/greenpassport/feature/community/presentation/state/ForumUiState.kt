@@ -7,4 +7,5 @@ data class ForumUiState(
     val draft: String = "",
     val isLoading: Boolean = true,
     val isPosting: Boolean = false,
+    val isTextRejected: Boolean = false,
 )

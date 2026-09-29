@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +40,11 @@ class FirebaseAuthRepository @Inject constructor(
 
     override suspend fun registerWithEmail(email: String, password: String): AuthSession = mapAuthFailures {
         firebaseAuth.createUserWithEmailAndPassword(email, password).await().requireUser().toAuthSession()
+    }
+
+    override suspend fun signInWithGoogle(idToken: String): AuthSession = mapAuthFailures {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        firebaseAuth.signInWithCredential(credential).await().requireUser().toAuthSession()
     }
 
     override suspend fun signOut() {
@@ -79,4 +85,5 @@ private fun FirebaseUser.toAuthSession() = AuthSession(
     email = email,
     isAnonymous = isAnonymous,
     displayName = displayName?.takeIf { it.isNotBlank() },
+    isGoogleAccount = providerData.any { it.providerId == GoogleAuthProvider.PROVIDER_ID },
 )

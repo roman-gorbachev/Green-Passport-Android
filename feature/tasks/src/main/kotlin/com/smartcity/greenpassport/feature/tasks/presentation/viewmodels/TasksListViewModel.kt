@@ -3,17 +3,20 @@ package com.smartcity.greenpassport.feature.tasks.presentation.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.smartcity.greenpassport.core.model.TaskCategory
 import com.smartcity.greenpassport.feature.tasks.domain.GetCompletedTaskIdsUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.GetTasksUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.ObserveFavoriteTaskIdsUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.ObserveTasksSessionUseCase
+import com.smartcity.greenpassport.feature.tasks.domain.ObserveUserProfileUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.ToggleTaskFavoriteUseCase
+import com.smartcity.greenpassport.feature.tasks.presentation.state.TaskFilter
 import com.smartcity.greenpassport.feature.tasks.presentation.state.TasksListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,6 +29,7 @@ class TasksListViewModel @Inject constructor(
     private val observeFavoriteTaskIds: ObserveFavoriteTaskIdsUseCase,
     private val toggleTaskFavorite: ToggleTaskFavoriteUseCase,
     observeSession: ObserveTasksSessionUseCase,
+    observeUserProfile: ObserveUserProfileUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TasksListUiState())
@@ -39,16 +43,23 @@ class TasksListViewModel @Inject constructor(
                 currentUserId = session?.userId
                 refresh()
                 if (session != null) {
-                    observeFavoriteTaskIds(session.userId).collectLatest { favoriteIds ->
-                        _uiState.update { it.copy(favoriteTaskIds = favoriteIds) }
+                    coroutineScope {
+                        launch {
+                            observeUserProfile(session.userId)
+                                .catch { emit(null) }
+                                .collectLatest { profile -> _uiState.update { it.copy(profile = profile) } }
+                        }
+                        observeFavoriteTaskIds(session.userId).collectLatest { favoriteIds ->
+                            _uiState.update { it.copy(favoriteTaskIds = favoriteIds) }
+                        }
                     }
                 }
             }
         }
     }
 
-    fun onCategorySelected(category: TaskCategory?) {
-        _uiState.update { it.copy(selectedCategory = category) }
+    fun onFilterSelected(filter: TaskFilter) {
+        _uiState.update { it.copy(filter = filter) }
     }
 
     fun onToggleFavorite(taskId: String) {

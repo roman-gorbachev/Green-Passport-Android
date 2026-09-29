@@ -45,4 +45,6 @@
     <string name="points_balance">%1$d pt. available</string>
     <string name="tasks">Tasks</string>
     <string name="tips">Tips</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="city_and_points">%1$s · %2$d pts</string>
 </resources>

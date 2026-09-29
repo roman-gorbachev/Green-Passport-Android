@@ -8,4 +8,5 @@
     <string name="tasks_empty">No tasks in this category yet</string>
     <string name="task_detail_completed_label">Task completed</string>
     <string name="mark_as_done">Mark as done</string>
+    <string name="for_you">For you</string>
 </resources>

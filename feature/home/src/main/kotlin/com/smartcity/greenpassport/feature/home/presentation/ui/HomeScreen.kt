@@ -46,12 +46,15 @@ import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.HeroImageCard
 import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
 import com.smartcity.greenpassport.core.designsystem.component.PointsChip
+import com.smartcity.greenpassport.core.designsystem.component.ProfileAvatar
 import com.smartcity.greenpassport.core.designsystem.component.ProgressHeroCard
 import com.smartcity.greenpassport.core.designsystem.component.QuickActionButton
 import com.smartcity.greenpassport.core.designsystem.component.SectionHeader
+import com.smartcity.greenpassport.core.designsystem.component.avatarColor
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.model.EcoEvent
+import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.home.R
 import com.smartcity.greenpassport.feature.home.presentation.state.HomeQuickAction
@@ -128,6 +131,7 @@ private fun HomeContent(
         item(key = KEY_HEADER) {
             HomeHeader(
                 displayName = uiState.displayName,
+                avatar = uiState.avatar,
                 onProfileClick = onProfileClick,
                 modifier = Modifier.screenPadding(),
             )
@@ -216,6 +220,7 @@ private fun LazyListScope.homeTasks(
 @Composable
 private fun HomeHeader(
     displayName: String?,
+    avatar: AvatarStyle,
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -252,14 +257,12 @@ private fun HomeHeader(
         GpSurfaceCard(
             onClick = onProfileClick,
             shape = CircleShape,
-            color = MaterialTheme.colorScheme.secondary,
+            color = avatarColor(avatar),
             modifier = Modifier
                 .size(Dimens.AvatarSize)
                 .semantics { contentDescription = profileLabel },
         ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                MascotWidget(size = Dimens.ListRowMascotSize)
-            }
+            ProfileAvatar(style = avatar, size = Dimens.AvatarSize)
         }
     }
 }

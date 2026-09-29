@@ -7,6 +7,7 @@ data class GroupsUiState(
     val draftName: String = "",
     val isLoading: Boolean = true,
     val isCreating: Boolean = false,
+    val isNameRejected: Boolean = false,
     val joiningGroupId: String? = null,
     val currentUserId: String? = null,
 )

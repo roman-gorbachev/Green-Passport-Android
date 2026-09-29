@@ -10,4 +10,6 @@
     <string name="groups_join_button">Вступить</string>
     <string name="groups_joined_label">Вы участник</string>
     <string name="groups_member_count_format">Участников: %1$d</string>
+    <string name="guest">Гость</string>
+    <string name="text_contains_banned_words">Текст содержит недопустимые слова</string>
 </resources>

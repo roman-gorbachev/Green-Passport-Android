@@ -9,6 +9,7 @@ import com.smartcity.greenpassport.core.model.ChatMessage
 import com.smartcity.greenpassport.core.model.CommunityGroup
 import com.smartcity.greenpassport.core.model.CommunityRepository
 import com.smartcity.greenpassport.core.model.ForumPost
+import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -16,6 +17,8 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 private const val FIELD_AUTHOR_ID = "authorId"
+private const val FIELD_AUTHOR_NAME = "authorName"
+private const val FIELD_AUTHOR_AVATAR = "authorAvatar"
 private const val FIELD_TEXT = "text"
 private const val FIELD_CREATED_AT = "createdAtEpochMillis"
 
@@ -37,9 +40,16 @@ class FirestoreCommunityRepository @Inject constructor(
         awaitClose { registration.remove() }
     }
 
-    override suspend fun postToForum(authorId: String, text: String) {
+    override suspend fun postToForum(
+        authorId: String,
+        authorName: String?,
+        authorAvatar: AvatarStyle?,
+        text: String,
+    ) {
         val data = mapOf(
             FIELD_AUTHOR_ID to authorId,
+            FIELD_AUTHOR_NAME to authorName,
+            FIELD_AUTHOR_AVATAR to authorAvatar?.name,
             FIELD_TEXT to text,
             FIELD_CREATED_AT to System.currentTimeMillis(),
         )
@@ -87,7 +97,16 @@ private fun DocumentSnapshot.toForumPost(): ForumPost? {
     val authorId = getString(FIELD_AUTHOR_ID) ?: return null
     val text = getString(FIELD_TEXT) ?: return null
     val createdAt = getLong(FIELD_CREATED_AT) ?: return null
-    return ForumPost(id = id, authorId = authorId, text = text, createdAtEpochMillis = createdAt)
+    val avatarName = getString(FIELD_AUTHOR_AVATAR)
+    val authorAvatar = AvatarStyle.entries.firstOrNull { it.name == avatarName }
+    return ForumPost(
+        id = id,
+        authorId = authorId,
+        authorName = getString(FIELD_AUTHOR_NAME),
+        authorAvatar = authorAvatar,
+        text = text,
+        createdAtEpochMillis = createdAt,
+    )
 }
 
 private fun DocumentSnapshot.toCommunityGroup(): CommunityGroup? {

@@ -5,4 +5,5 @@ data class AuthSession(
     val email: String?,
     val isAnonymous: Boolean,
     val displayName: String? = null,
+    val isGoogleAccount: Boolean = false,
 )

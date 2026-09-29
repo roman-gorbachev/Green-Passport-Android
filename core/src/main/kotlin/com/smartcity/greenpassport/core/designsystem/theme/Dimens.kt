@@ -39,6 +39,7 @@ object Dimens {
     val EventCardHeight = 160.dp
     val ProgressBarHeight = 8.dp
     val AvatarSize = 44.dp
+    val ProfileHeaderAvatarSize = 64.dp
     val BackButtonSize = 44.dp
     val BackIconOpticalOffset = 2.dp
     val ListRowHeight = 67.dp
@@ -64,4 +65,5 @@ object Dimens {
 
     val BorderWidthThin = 1.dp
     val BorderWidthMedium = 1.5.dp
+    val SelectionBorderWidth = 3.dp
 }

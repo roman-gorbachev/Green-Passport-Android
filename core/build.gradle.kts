@@ -55,6 +55,10 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.messaging)
 
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services)
+    implementation(libs.googleid)
+
     implementation(libs.androidx.datastore.preferences)
 
     implementation(libs.androidx.room.runtime)

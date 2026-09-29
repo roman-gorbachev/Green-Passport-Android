@@ -12,4 +12,5 @@
     <string name="feedback_support_title">Support</string>
     <string name="feedback_support_email_format">Email: %1$s</string>
     <string name="feedback_support_phone_format">Phone: %1$s</string>
+    <string name="text_contains_banned_words">Text contains banned words</string>
 </resources>

@@ -25,8 +25,10 @@ import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.GpTextField
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
+import com.smartcity.greenpassport.core.designsystem.component.ProfileAvatar
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.ForumPost
+import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import com.smartcity.greenpassport.feature.community.R
 import com.smartcity.greenpassport.feature.community.presentation.viewmodels.ForumViewModel
 import java.text.DateFormat
@@ -71,6 +73,12 @@ fun ForumScreen(
                 value = uiState.draft,
                 onValueChange = viewModel::onDraftChanged,
                 label = { Text(stringResource(R.string.forum_draft_label)) },
+                isError = uiState.isTextRejected,
+                supportingText = if (uiState.isTextRejected) {
+                    { Text(stringResource(R.string.text_contains_banned_words)) }
+                } else {
+                    null
+                },
                 modifier = Modifier.weight(1f),
             )
             if (uiState.isPosting) {
@@ -95,15 +103,25 @@ fun ForumScreen(
 private fun ForumPostCard(post: ForumPost) {
     GpSurfaceCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Dimens.SpacingMedium)) {
-            Text(
-                text = DateFormat.getDateTimeInstance().format(Date(post.createdAtEpochMillis)),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                ProfileAvatar(style = post.authorAvatar ?: AvatarStyle.LIME, size = Dimens.IconCircleSmallSize)
+                Column(modifier = Modifier.padding(start = Dimens.SpacingSmall)) {
+                    Text(
+                        text = post.authorName ?: stringResource(R.string.guest),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        text = DateFormat.getDateTimeInstance().format(Date(post.createdAtEpochMillis)),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline,
+                    )
+                }
+            }
             Text(
                 text = post.text,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = Dimens.SpacingExtraSmall),
+                modifier = Modifier.padding(top = Dimens.SpacingSmall),
             )
         }
     }

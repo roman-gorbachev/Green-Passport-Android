@@ -12,4 +12,5 @@
     <string name="feedback_support_title">Поддержка</string>
     <string name="feedback_support_email_format">Почта: %1$s</string>
     <string name="feedback_support_phone_format">Телефон: %1$s</string>
+    <string name="text_contains_banned_words">Текст содержит недопустимые слова</string>
 </resources>

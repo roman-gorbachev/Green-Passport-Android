@@ -8,17 +8,23 @@ import com.smartcity.greenpassport.feature.profile.domain.GetExperienceUseCase
 import com.smartcity.greenpassport.feature.profile.domain.GetPointsBalanceUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveNotificationsEnabledUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveProfileSessionUseCase
+import com.smartcity.greenpassport.feature.profile.domain.ObserveUserProfileUseCase
 import com.smartcity.greenpassport.feature.profile.domain.SetNotificationsEnabledUseCase
 import com.smartcity.greenpassport.feature.profile.domain.SignOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val observeSession: ObserveProfileSessionUseCase,
@@ -27,6 +33,7 @@ class ProfileViewModel @Inject constructor(
     private val signOutUseCase: SignOutUseCase,
     observeNotificationsEnabled: ObserveNotificationsEnabledUseCase,
     private val setNotificationsEnabled: SetNotificationsEnabledUseCase,
+    observeUserProfile: ObserveUserProfileUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -34,6 +41,14 @@ class ProfileViewModel @Inject constructor(
 
     init {
         refresh()
+
+        viewModelScope.launch {
+            observeSession()
+                .flatMapLatest { session ->
+                    if (session == null) flowOf(null) else observeUserProfile(session.userId).catch { emit(null) }
+                }
+                .collectLatest { profile -> _uiState.update { it.copy(profile = profile) } }
+        }
 
         viewModelScope.launch {
             observeNotificationsEnabled().collectLatest { enabled ->

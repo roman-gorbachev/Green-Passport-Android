@@ -19,6 +19,9 @@ sealed interface Destination {
     data object Profile : Destination
 
     @Serializable
+    data object EditProfile : Destination
+
+    @Serializable
     data object Achievements : Destination
 
     @Serializable

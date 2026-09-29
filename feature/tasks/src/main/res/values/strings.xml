@@ -8,4 +8,5 @@
     <string name="tasks_empty">Пока нет заданий в этой категории</string>
     <string name="task_detail_completed_label">Задание выполнено</string>
     <string name="mark_as_done">Отметить выполненной</string>
+    <string name="for_you">Для тебя</string>
 </resources>

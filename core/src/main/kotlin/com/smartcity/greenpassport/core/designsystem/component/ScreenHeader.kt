@@ -1,11 +1,13 @@
 package com.smartcity.greenpassport.core.designsystem.component
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
@@ -66,26 +69,25 @@ private fun ScreenHeaderRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
-            .padding(
-                start = Dimens.ScreenHorizontalPadding,
-                end = Dimens.ScreenHorizontalPadding,
-                top = Dimens.SpacingMedium,
-                bottom = Dimens.SpacingMedium,
-            ),
+            .padding(horizontal = Dimens.ScreenHorizontalPadding, vertical = Dimens.SpacingSmall),
     ) {
-        if (onNavigateBack != null) {
-            GpBackButton(onClick = onNavigateBack)
+        Box(modifier = Modifier.size(Dimens.BackButtonSize)) {
+            if (onNavigateBack != null) {
+                GpBackButton(onClick = onNavigateBack)
+            }
         }
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineLarge,
+            style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .weight(1f)
-                .padding(start = if (onNavigateBack != null) Dimens.SpacingMedium else Dimens.SpacingNone),
+                .padding(horizontal = Dimens.SpacingSmall),
         )
+        Spacer(modifier = Modifier.size(Dimens.BackButtonSize))
     }
 }
 

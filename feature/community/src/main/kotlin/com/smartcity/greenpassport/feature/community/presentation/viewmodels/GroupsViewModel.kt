@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.model.CommunityGroup
+import com.smartcity.greenpassport.core.moderation.ContentRejectedException
 import com.smartcity.greenpassport.feature.community.domain.CreateGroupUseCase
 import com.smartcity.greenpassport.feature.community.domain.JoinGroupUseCase
 import com.smartcity.greenpassport.feature.community.domain.ObserveCommunitySessionUseCase
@@ -43,7 +44,7 @@ class GroupsViewModel @Inject constructor(
     }
 
     fun onDraftNameChanged(name: String) {
-        _uiState.update { it.copy(draftName = name) }
+        _uiState.update { it.copy(draftName = name, isNameRejected = false) }
     }
 
     fun onCreateGroup() {
@@ -58,7 +59,7 @@ class GroupsViewModel @Inject constructor(
                 _uiState.update { it.copy(isCreating = false, draftName = "") }
             }.onFailure { error ->
                 Log.e("GroupsViewModel::onCreateGroup()", error.message.orEmpty())
-                _uiState.update { it.copy(isCreating = false) }
+                _uiState.update { it.copy(isCreating = false, isNameRejected = error is ContentRejectedException) }
             }
         }
     }

@@ -2,6 +2,7 @@ package com.smartcity.greenpassport.feature.community.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartcity.greenpassport.core.moderation.ContentRejectedException
 import com.smartcity.greenpassport.feature.community.domain.ObserveCommunitySessionUseCase
 import com.smartcity.greenpassport.feature.community.domain.ObserveForumPostsUseCase
 import com.smartcity.greenpassport.feature.community.domain.PostToForumUseCase
@@ -39,7 +40,7 @@ class ForumViewModel @Inject constructor(
     }
 
     fun onDraftChanged(text: String) {
-        _uiState.update { it.copy(draft = text) }
+        _uiState.update { it.copy(draft = text, isTextRejected = false) }
     }
 
     fun onPost() {
@@ -52,8 +53,8 @@ class ForumViewModel @Inject constructor(
             runCatching {
                 postToForum(authorId, text)
                 _uiState.update { it.copy(isPosting = false, draft = "") }
-            }.onFailure {
-                _uiState.update { it.copy(isPosting = false) }
+            }.onFailure { error ->
+                _uiState.update { it.copy(isPosting = false, isTextRejected = error is ContentRejectedException) }
             }
         }
     }

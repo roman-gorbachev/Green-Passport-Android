@@ -34,6 +34,7 @@ import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.core.model.TaskCategory
 import com.smartcity.greenpassport.feature.tasks.R
+import com.smartcity.greenpassport.feature.tasks.presentation.state.TaskFilter
 import com.smartcity.greenpassport.feature.tasks.presentation.state.TasksListUiState
 import com.smartcity.greenpassport.feature.tasks.presentation.viewmodels.TasksListViewModel
 import com.smartcity.greenpassport.core.R as CoreR
@@ -53,7 +54,7 @@ fun TasksListScreen(
 
     TasksListContent(
         uiState = uiState,
-        onCategorySelected = viewModel::onCategorySelected,
+        onFilterSelected = viewModel::onFilterSelected,
         onTaskSelected = onTaskSelected,
         onToggleFavorite = viewModel::onToggleFavorite,
         onRetry = viewModel::refresh,
@@ -64,7 +65,7 @@ fun TasksListScreen(
 @Composable
 private fun TasksListContent(
     uiState: TasksListUiState,
-    onCategorySelected: (TaskCategory?) -> Unit,
+    onFilterSelected: (TaskFilter) -> Unit,
     onTaskSelected: (String) -> Unit,
     onToggleFavorite: (String) -> Unit,
     onRetry: () -> Unit,
@@ -78,18 +79,27 @@ private fun TasksListContent(
             ),
             horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
         ) {
+            if (uiState.profile != null) {
+                item {
+                    GpFilterChip(
+                        label = stringResource(R.string.for_you),
+                        selected = uiState.effectiveFilter == TaskFilter.ForYou,
+                        onClick = { onFilterSelected(TaskFilter.ForYou) },
+                    )
+                }
+            }
             item {
                 GpFilterChip(
                     label = stringResource(R.string.tasks_filter_all),
-                    selected = uiState.selectedCategory == null,
-                    onClick = { onCategorySelected(null) },
+                    selected = uiState.effectiveFilter == TaskFilter.All,
+                    onClick = { onFilterSelected(TaskFilter.All) },
                 )
             }
             items(TaskCategory.entries) { category ->
                 GpFilterChip(
                     label = stringResource(taskCategoryLabelRes(category)),
-                    selected = uiState.selectedCategory == category,
-                    onClick = { onCategorySelected(category) },
+                    selected = uiState.effectiveFilter == TaskFilter.Category(category),
+                    onClick = { onFilterSelected(TaskFilter.Category(category)) },
                 )
             }
         }

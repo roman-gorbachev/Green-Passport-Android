@@ -3,6 +3,7 @@ package com.smartcity.greenpassport.feature.feedback.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.model.FeedbackType
+import com.smartcity.greenpassport.core.moderation.ContentRejectedException
 import com.smartcity.greenpassport.feature.feedback.domain.GetActiveSurveyUseCase
 import com.smartcity.greenpassport.feature.feedback.domain.HasAnsweredSurveyUseCase
 import com.smartcity.greenpassport.feature.feedback.domain.ObserveFeedbackSessionUseCase
@@ -63,7 +64,7 @@ class FeedbackViewModel @Inject constructor(
     }
 
     fun onReviewMessageChanged(text: String) {
-        _uiState.update { it.copy(reviewMessage = text) }
+        _uiState.update { it.copy(reviewMessage = text, isReviewRejected = false) }
     }
 
     fun onSubmitReview() {
@@ -76,14 +77,16 @@ class FeedbackViewModel @Inject constructor(
             runCatching {
                 submitFeedback(userId, FeedbackType.REVIEW, state.reviewMessage.trim(), state.rating)
                 _uiState.update { it.copy(isSubmittingReview = false, reviewSubmitted = true) }
-            }.onFailure {
-                _uiState.update { it.copy(isSubmittingReview = false) }
+            }.onFailure { error ->
+                _uiState.update {
+                    it.copy(isSubmittingReview = false, isReviewRejected = error is ContentRejectedException)
+                }
             }
         }
     }
 
     fun onSuggestionMessageChanged(text: String) {
-        _uiState.update { it.copy(suggestionMessage = text) }
+        _uiState.update { it.copy(suggestionMessage = text, isSuggestionRejected = false) }
     }
 
     fun onSubmitSuggestion() {
@@ -99,8 +102,10 @@ class FeedbackViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(isSubmittingSuggestion = false, suggestionSubmitted = true, suggestionMessage = "")
                 }
-            }.onFailure {
-                _uiState.update { it.copy(isSubmittingSuggestion = false) }
+            }.onFailure { error ->
+                _uiState.update {
+                    it.copy(isSubmittingSuggestion = false, isSuggestionRejected = error is ContentRejectedException)
+                }
             }
         }
     }

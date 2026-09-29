@@ -55,7 +55,10 @@ On Windows PowerShell, use `gradlew.bat` instead of `./gradlew` — it wraps the
 
 The app talks to the Firebase project `chatroom-85fb8` (see `.firebaserc`). Until these steps are done, sign-in fails and every Firestore read returns `PERMISSION_DENIED`.
 
-1. **Authentication** → Get started → Sign-in method: enable **Email/Password** and **Anonymous**.
+1. **Authentication** → Get started → Sign-in method: enable **Email/Password**, **Anonymous** and **Google**.
+   For Google sign-in also add the app's SHA-1 and SHA-256 (`./gradlew signingReport`, debug and release keys) in
+   Project settings → Android app `com.smartcity.greenpassport`, then download the fresh `google-services.json` into
+   `app/`. Until then the "Continue with Google" button reports that Google sign-in is unavailable.
 2. **Firestore Database**: create the database (production mode) if it doesn't exist yet.
 3. Publish the security rules from this repo — `firestore.rules`, `storage.rules` and `firestore.indexes.json` are the source of truth, there are no separate JSON rule files:
 

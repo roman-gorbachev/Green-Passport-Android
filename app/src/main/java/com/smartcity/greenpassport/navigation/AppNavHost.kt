@@ -11,6 +11,7 @@ import androidx.navigation.compose.dialog
 import com.smartcity.greenpassport.R
 import com.smartcity.greenpassport.core.designsystem.component.SheetDialogProperties
 import com.smartcity.greenpassport.core.navigation.Destination
+import com.smartcity.greenpassport.feature.auth.presentation.profilesetup.ui.ProfileSetupScreen
 import com.smartcity.greenpassport.feature.calendar.presentation.ui.CalendarScreen
 import com.smartcity.greenpassport.feature.calendar.presentation.ui.EventDetailSheet
 import com.smartcity.greenpassport.feature.community.presentation.ui.CommunityHubScreen
@@ -86,6 +87,18 @@ fun AppNavHost(
             ) { innerPadding ->
                 ProfileScreen(
                     onMenuEntrySelected = { destination -> navController.navigate(destination) },
+                    modifier = Modifier.padding(innerPadding),
+                )
+            }
+        }
+        composable<Destination.EditProfile> {
+            FeatureScaffold(
+                title = stringResource(R.string.edit_profile),
+                onNavigateBack = navController::popBackStack,
+            ) { innerPadding ->
+                ProfileSetupScreen(
+                    isEditing = true,
+                    onFinished = navController::popBackStack,
                     modifier = Modifier.padding(innerPadding),
                 )
             }

@@ -8,5 +8,6 @@ interface AuthRepository {
     suspend fun signInAnonymously(): AuthSession
     suspend fun signInWithEmail(email: String, password: String): AuthSession
     suspend fun registerWithEmail(email: String, password: String): AuthSession
+    suspend fun signInWithGoogle(idToken: String): AuthSession
     suspend fun signOut()
 }
