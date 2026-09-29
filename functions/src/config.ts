@@ -1,4 +1,5 @@
 export const REGION = 'europe-central2';
+export const FIRESTORE_TRIGGER_REGION = 'us-central1';
 export const APP_ROOT = 'apps/greenpassport';
 export const TIME_ZONE = 'Europe/Minsk';
 

@@ -3,7 +3,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions/v2';
 import { onDocumentCreated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
-import { APP_ROOT, REGION, REPORTS_TO_HIDE, SUBMISSIONS_STORAGE_PREFIX } from '../config';
+import { APP_ROOT, FIRESTORE_TRIGGER_REGION, REGION, REPORTS_TO_HIDE, SUBMISSIONS_STORAGE_PREFIX } from '../config';
 import { db, paths, storage } from '../db';
 import { requireAdmin, requireString } from '../guards';
 import { isTextAllowed } from './wordFilter';
@@ -18,7 +18,7 @@ const UNSAFE_LIKELIHOODS = new Set(['LIKELY', 'VERY_LIKELY']);
 const MODERATION_ACTIONS = new Set(['hide', 'restore', 'delete']);
 
 export const screenForumPost = onDocumentCreated(
-  { region: REGION, document: `${APP_ROOT}/posts/{postId}` },
+  { region: FIRESTORE_TRIGGER_REGION, document: `${APP_ROOT}/posts/{postId}` },
   async (event) => {
     const snapshot = event.data;
     if (!snapshot) return;
@@ -31,7 +31,7 @@ export const screenForumPost = onDocumentCreated(
 );
 
 export const countContentReport = onDocumentCreated(
-  { region: REGION, document: `${APP_ROOT}/reports/{reportId}` },
+  { region: FIRESTORE_TRIGGER_REGION, document: `${APP_ROOT}/reports/{reportId}` },
   async (event) => {
     const postId = event.data?.get('postId') as string | undefined;
     if (!postId) return;
@@ -51,7 +51,7 @@ export const countContentReport = onDocumentCreated(
 );
 
 export const screenSubmissionPhoto = onDocumentWritten(
-  { region: REGION, document: `${APP_ROOT}/taskSubmissions/{submissionId}` },
+  { region: FIRESTORE_TRIGGER_REGION, document: `${APP_ROOT}/taskSubmissions/{submissionId}` },
   async (event) => {
     const after = event.data?.after;
     const before = event.data?.before;
