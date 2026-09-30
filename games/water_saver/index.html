@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Green Passport</title>
+<link rel="stylesheet" href="../common/theme.css">
+<style>
+.taps { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-content: center; }
+.tap { aspect-ratio: 1; border: none; border-radius: var(--radius-large); background: var(--card); font-size: 42px; position: relative; }
+.tap.leaking { background: color-mix(in srgb, #4DA3FF 25%, var(--card)); animation: shake 0.4s infinite; }
+.tap.leaking::after { content: '💧'; position: absolute; bottom: 8px; left: 50%; font-size: 22px; transform: translateX(-50%); animation: drip 0.6s infinite; }
+.tank { height: 14px; border-radius: 7px; background: var(--mint-surface-high); overflow: hidden; }
+.tank div { height: 100%; background: #4DA3FF; transition: width 0.2s; }
+@keyframes shake { 50% { transform: rotate(-3deg); } }
+@keyframes drip { to { transform: translate(-50%, 10px); opacity: 0; } }
+.warning { color: var(--error); }
+</style>
+</head>
+<body>
+<div class="hud"><span id="score"></span><span id="time"></span></div>
+<div class="tank"><div id="tank"></div></div>
+<p class="hint" id="hint"></p>
+<div class="taps" id="taps"></div>
+<script src="../common/game.js"></script>
+<script>
+const TEXT = {
+  hint: { ru: 'Закрывай краны, пока вода не утекла', be: 'Закрывай краны, пакуль вада не выцякла', en: 'Close the taps before the water runs out' },
+  score: { ru: 'Закрыто: {0}', be: 'Закрыта: {0}', en: 'Closed: {0}' },
+  time: { ru: 'Осталось: {0} с', be: 'Засталося: {0} с', en: 'Left: {0} s' },
+  finished: { ru: 'Сэкономлено воды! Очки: {0}', be: 'Зэканомлена вады! Ачкі: {0}', en: 'Water saved! Score: {0}' },
+  empty: { ru: 'Вода закончилась! Очки: {0}', be: 'Вада скончылася! Ачкі: {0}', en: 'Out of water! Score: {0}' },
+};
+const TAP_COUNT = 9;
+const GAME_SECONDS = 30;
+const POINTS_PER_TAP = 5;
+const START_LEAK_INTERVAL_MS = 1100;
+const MIN_LEAK_INTERVAL_MS = 450;
+const LEAK_SPEEDUP_MS = 25;
+const WATER_LOSS_PER_SECOND = 4;
+const FULL_TANK = 100;
+const TICK_MS = 100;
+const WARNING_SECONDS = 5;
+
+const tapsView = document.getElementById('taps');
+document.getElementById('hint').textContent = GP.t(TEXT.hint);
+let leaking, closed, water, secondsLeft, leakInterval, sinceLeak, timer, elapsed;
+
+const taps = Array.from({ length: TAP_COUNT }, (_, index) => {
+  const view = GP.element('button', 'tap', '🚰');
+  view.addEventListener('click', () => close(index));
+  return view;
+});
+tapsView.replaceChildren(...taps);
+
+function start() {
+  leaking = new Set();
+  closed = 0;
+  water = FULL_TANK;
+  secondsLeft = GAME_SECONDS;
+  leakInterval = START_LEAK_INTERVAL_MS;
+  sinceLeak = 0;
+  elapsed = 0;
+  render();
+  clearInterval(timer);
+  timer = setInterval(step, TICK_MS);
+}
+
+function render() {
+  taps.forEach((view, index) => view.classList.toggle('leaking', leaking.has(index)));
+  document.getElementById('score').textContent = GP.t(TEXT.score, closed);
+  const time = document.getElementById('time');
+  time.textContent = GP.t(TEXT.time, secondsLeft);
+  time.classList.toggle('warning', secondsLeft <= WARNING_SECONDS);
+  document.getElementById('tank').style.width = Math.max(0, water) + '%';
+}
+
+function close(index) {
+  if (!leaking.has(index)) return;
+  leaking.delete(index);
+  closed += 1;
+  GP.vibrate(15);
+  render();
+}
+
+function step() {
+  elapsed += TICK_MS;
+  sinceLeak += TICK_MS;
+  if (sinceLeak >= leakInterval) {
+    sinceLeak = 0;
+    leakInterval = Math.max(MIN_LEAK_INTERVAL_MS, leakInterval - LEAK_SPEEDUP_MS);
+    const dry = [...Array(TAP_COUNT).keys()].filter((index) => !leaking.has(index));
+    if (dry.length > 0) leaking.add(GP.randomItem(dry));
+  }
+  water -= (leaking.size * WATER_LOSS_PER_SECOND * TICK_MS) / 1000;
+  if (elapsed % 1000 === 0) secondsLeft -= 1;
+  render();
+  if (water <= 0 || secondsLeft <= 0) {
+    clearInterval(timer);
+    const score = closed * POINTS_PER_TAP;
+    GP.finish(score);
+    GP.showResult(GP.t(water <= 0 ? TEXT.empty : TEXT.finished, score), start);
+  }
+}
+
+start();
+</script>
+</body>
+</html>

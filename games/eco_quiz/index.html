@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Green Passport</title>
+<link rel="stylesheet" href="../common/theme.css">
+<style>
+.progress { height: 6px; border-radius: 3px; background: var(--mint-surface-high); overflow: hidden; }
+.progress div { height: 100%; background: var(--forest); transition: width 0.3s; }
+.question { font-size: 24px; font-weight: 700; margin: 0; }
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option { border: none; text-align: left; font: inherit; font-size: 17px; font-weight: 500; color: var(--text); background: var(--card); border-radius: var(--radius-medium); padding: 16px; display: flex; justify-content: space-between; }
+.option.correct { background: var(--mint-surface-high); color: var(--forest); }
+.option.wrong { background: color-mix(in srgb, var(--error) 15%, var(--card)); color: var(--error); }
+</style>
+</head>
+<body>
+<p class="hint" id="status" style="text-align:left"></p>
+<div class="progress"><div id="bar"></div></div>
+<p class="question" id="question"></p>
+<div class="options" id="options"></div>
+<script src="../common/game.js"></script>
+<script>
+const TEXT = {
+  status: {"ru": "Вопрос {0} из {1} · Очки: {2}", "be": "Пытанне {0} з {1} · Ачкі: {2}", "en": "Question {0} of {1} · Score: {2}"},
+  finished: {"ru": "Викторина окончена! Правильных ответов: {0} из {1}", "be": "Віктарына скончана! Правільных адказаў: {0} з {1}", "en": "Quiz complete! Correct answers: {0} of {1}"},
+};
+const QUESTIONS = [
+  { text: {"ru": "Что из перечисленного НЕ перерабатывается повторно?", "be": "Што з пералічанага НЕ перапрацоўваецца паўторна?", "en": "Which of these is NOT recyclable?"}, options: [{"ru": "Стеклянная бутылка", "be": "Шкляная бутэлька", "en": "Glass bottle"}, {"ru": "Алюминиевая банка", "be": "Алюмініевая бляшанка", "en": "Aluminum can"}, {"ru": "Использованная жвачка", "be": "Выкарыстаная жуйка", "en": "Used chewing gum"}, {"ru": "Картон", "be": "Кардон", "en": "Cardboard"}], correct: 2 },
+  { text: {"ru": "Что помогает сократить количество отходов?", "be": "Што дапамагае скараціць колькасць адходаў?", "en": "What helps reduce the amount of waste?"}, options: [{"ru": "Одноразовая посуда", "be": "Аднаразовы посуд", "en": "Disposable tableware"}, {"ru": "Многоразовые сумки для покупок", "be": "Шматразовыя сумкі для пакупак", "en": "Reusable shopping bags"}, {"ru": "Частая замена техники", "be": "Частая замена тэхнікі", "en": "Frequently replacing devices"}, {"ru": "Лишняя упаковка товаров", "be": "Лішняя ўпакоўка тавараў", "en": "Excess product packaging"}], correct: 1 },
+  { text: {"ru": "Какой газ поглощают деревья, помогая бороться с изменением климата?", "be": "Які газ паглынаюць дрэвы, дапамагаючы змагацца са зменай клімату?", "en": "Which gas do trees absorb, helping fight climate change?"}, options: [{"ru": "Кислород", "be": "Кісларод", "en": "Oxygen"}, {"ru": "Углекислый газ", "be": "Вуглякіслы газ", "en": "Carbon dioxide"}, {"ru": "Азот", "be": "Азот", "en": "Nitrogen"}, {"ru": "Водород", "be": "Вадарод", "en": "Hydrogen"}], correct: 1 },
+  { text: {"ru": "Что из этого — пример возобновляемого источника энергии?", "be": "Што з гэтага — прыклад аднаўляльнай крыніцы энергіі?", "en": "Which of these is an example of a renewable energy source?"}, options: [{"ru": "Уголь", "be": "Вугаль", "en": "Coal"}, {"ru": "Нефть", "be": "Нафта", "en": "Oil"}, {"ru": "Солнечная энергия", "be": "Сонечная энергія", "en": "Solar energy"}, {"ru": "Природный газ", "be": "Прыродны газ", "en": "Natural gas"}], correct: 2 },
+  { text: {"ru": "Зачем нужна сортировка мусора?", "be": "Навошта патрэбна сартаванне смецця?", "en": "Why does waste sorting matter?"}, options: [{"ru": "Чтобы мусора было больше", "be": "Каб смецця было больш", "en": "To create more waste"}, {"ru": "Чтобы упростить переработку", "be": "Каб спрасціць перапрацоўку", "en": "To make recycling easier"}, {"ru": "Чтобы усложнить вывоз", "be": "Каб ускладніць вываз", "en": "To make collection harder"}, {"ru": "Это не имеет значения", "be": "Гэта не мае значэння", "en": "It doesn't matter"}], correct: 1 },
+];
+const POINTS_PER_CORRECT_ANSWER = 20;
+const FEEDBACK_DELAY_MS = 600;
+
+let index;
+let correctAnswers;
+let answered;
+
+function start() {
+  index = 0;
+  correctAnswers = 0;
+  answered = false;
+  render();
+}
+
+function render() {
+  const question = QUESTIONS[index];
+  document.getElementById('status').textContent = GP.t(TEXT.status, index + 1, QUESTIONS.length, correctAnswers * POINTS_PER_CORRECT_ANSWER);
+  document.getElementById('bar').style.width = (index / QUESTIONS.length) * 100 + '%';
+  document.getElementById('question').textContent = GP.t(question.text);
+  document.getElementById('options').replaceChildren(...question.options.map((option, optionIndex) => {
+    const button = GP.element('button', 'option', GP.t(option));
+    button.addEventListener('click', () => choose(optionIndex, button));
+    return button;
+  }));
+}
+
+function choose(optionIndex, button) {
+  if (answered) return;
+  answered = true;
+  const question = QUESTIONS[index];
+  const buttons = document.querySelectorAll('.option');
+  buttons[question.correct].classList.add('correct');
+  buttons[question.correct].append(GP.element('span', '', '✓'));
+  if (optionIndex === question.correct) {
+    correctAnswers += 1;
+    GP.vibrate(15);
+  } else {
+    button.classList.add('wrong');
+    button.append(GP.element('span', '', '✕'));
+    GP.vibrate([30, 40, 30]);
+  }
+  setTimeout(advance, FEEDBACK_DELAY_MS);
+}
+
+function advance() {
+  answered = false;
+  index += 1;
+  if (index < QUESTIONS.length) {
+    render();
+    return;
+  }
+  GP.finish(correctAnswers * POINTS_PER_CORRECT_ANSWER);
+  GP.showResult(GP.t(TEXT.finished, correctAnswers, QUESTIONS.length), start);
+}
+
+start();
+</script>
+</body>
+</html>

@@ -22,6 +22,7 @@ export const paths = {
   purchases: () => `${APP_ROOT}/purchases`,
   purchase: (couponId: string) => `${APP_ROOT}/purchases/${couponId}`,
   rewardState: (uid: string) => `${APP_ROOT}/users/${uid}/rewardState/main`,
+  game: (gameId: string) => `${APP_ROOT}/games/${gameId}`,
   event: (eventId: string) => `${APP_ROOT}/events/${eventId}`,
   eventSecret: (eventId: string) => `${APP_ROOT}/eventSecrets/${eventId}`,
   eventAttendance: (uid: string, eventId: string) => `${APP_ROOT}/eventAttendance/${uid}_${eventId}`,

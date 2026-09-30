@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Green Passport</title>
+<link rel="stylesheet" href="../common/theme.css">
+<style>
+.field { position: relative; flex: 1; border-radius: var(--radius-large); background: var(--card); overflow: hidden; touch-action: none; }
+.falling { position: absolute; top: 0; font-size: 34px; transform: translateX(-50%); pointer-events: none; }
+.basket { position: absolute; bottom: 12px; width: 84px; height: 64px; border-radius: 18px; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; font-size: 30px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.target { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; }
+.target span { padding: 6px 12px; border-radius: 999px; color: #fff; }
+.popup { position: absolute; font-weight: 700; transform: translateX(-50%); animation: rise 0.6s forwards; pointer-events: none; }
+@keyframes rise { to { transform: translate(-50%, -40px); opacity: 0; } }
+.warning { color: var(--error); }
+</style>
+</head>
+<body>
+<div class="hud"><span id="score"></span><span id="time"></span></div>
+<div class="target" id="target"></div>
+<div class="field" id="field"><div class="basket" id="basket"></div></div>
+<p class="hint" id="hint"></p>
+<script src="../common/game.js"></script>
+<script>
+const TEXT = {
+  hint: { ru: 'Двигай бак пальцем и лови только нужные отходы', be: 'Рухай бак пальцам і лаві толькі патрэбныя адходы', en: 'Drag the bin and catch only the right waste' },
+  score: { ru: 'Очки: {0}', be: 'Ачкі: {0}', en: 'Score: {0}' },
+  time: { ru: 'Осталось: {0} с', be: 'Засталося: {0} с', en: 'Left: {0} s' },
+  target: { ru: 'Лови:', be: 'Лаві:', en: 'Catch:' },
+  finished: { ru: 'Игра окончена! Очки: {0}', be: 'Гульня скончана! Ачкі: {0}', en: 'Game over! Score: {0}' },
+};
+const TYPES = [
+  { id: 'glass', color: '#34C77B', icon: '🍾', title: { ru: 'Стекло', be: 'Шкло', en: 'Glass' }, items: ['🍾', '🫙', '🍷'] },
+  { id: 'metal', color: '#8E7CF0', icon: '🥫', title: { ru: 'Металл', be: 'Метал', en: 'Metal' }, items: ['🥫', '🔩', '🍫'] },
+  { id: 'paper', color: '#4DA3FF', icon: '📰', title: { ru: 'Бумага', be: 'Папера', en: 'Paper' }, items: ['📰', '📦', '📄'] },
+  { id: 'plastic', color: '#FF9F43', icon: '🧴', title: { ru: 'Пластик', be: 'Пластык', en: 'Plastic' }, items: ['🧴', '🛍️', '🥤'] },
+];
+const GAME_SECONDS = 45;
+const TARGET_CHANGE_SECONDS = 10;
+const SPAWN_INTERVAL_MS = 900;
+const FALL_SPEED_PER_SECOND = 0.32;
+const CATCH_POINTS = 10;
+const WRONG_PENALTY = 5;
+const CATCH_ZONE = 0.1;
+const WARNING_SECONDS = 5;
+
+const field = document.getElementById('field');
+const basket = document.getElementById('basket');
+document.getElementById('hint').textContent = GP.t(TEXT.hint);
+let score, secondsLeft, target, items, basketX, lastFrame, lastSpawn, running, timer;
+
+function start() {
+  score = 0;
+  secondsLeft = GAME_SECONDS;
+  items.forEach?.((item) => item.view.remove());
+  items = [];
+  basketX = 0.5;
+  lastFrame = performance.now();
+  lastSpawn = 0;
+  running = true;
+  setTarget();
+  renderHud();
+  clearInterval(timer);
+  timer = setInterval(tick, 1000);
+  requestAnimationFrame(frame);
+}
+
+function setTarget() {
+  target = GP.randomItem(TYPES);
+  basket.style.background = target.color;
+  basket.textContent = target.icon;
+  const label = document.getElementById('target');
+  const badge = GP.element('span', '', GP.t(target.title));
+  badge.style.background = target.color;
+  label.replaceChildren(GP.element('span', '', GP.t(TEXT.target)), badge);
+  label.firstChild.style.color = 'var(--text)';
+  label.firstChild.style.padding = '0';
+}
+
+function renderHud() {
+  document.getElementById('score').textContent = GP.t(TEXT.score, score);
+  const time = document.getElementById('time');
+  time.textContent = GP.t(TEXT.time, secondsLeft);
+  time.classList.toggle('warning', secondsLeft <= WARNING_SECONDS);
+}
+
+function spawn() {
+  const type = GP.randomItem(TYPES);
+  const view = GP.element('div', 'falling', GP.randomItem(type.items));
+  const x = 0.1 + Math.random() * 0.8;
+  view.style.left = x * 100 + '%';
+  field.append(view);
+  items.push({ type, view, x, y: 0 });
+}
+
+function popup(text, x, color) {
+  const view = GP.element('div', 'popup', text);
+  view.style.left = x * 100 + '%';
+  view.style.bottom = '84px';
+  view.style.color = color;
+  field.append(view);
+  setTimeout(() => view.remove(), 600);
+}
+
+function frame(now) {
+  if (!running) return;
+  const delta = (now - lastFrame) / 1000;
+  lastFrame = now;
+  if (now - lastSpawn > SPAWN_INTERVAL_MS) {
+    spawn();
+    lastSpawn = now;
+  }
+  const height = field.clientHeight;
+  const catchLine = (height - 76) / height;
+  items = items.filter((item) => {
+    item.y += FALL_SPEED_PER_SECOND * delta;
+    item.view.style.top = item.y * height + 'px';
+    if (item.y >= catchLine && Math.abs(item.x - basketX) < CATCH_ZONE + 0.04) {
+      const correct = item.type.id === target.id;
+      score = Math.max(0, score + (correct ? CATCH_POINTS : -WRONG_PENALTY));
+      popup(correct ? '+' + CATCH_POINTS : '−' + WRONG_PENALTY, item.x, correct ? 'var(--forest)' : 'var(--error)');
+      GP.vibrate(correct ? 15 : [30, 40, 30]);
+      item.view.remove();
+      renderHud();
+      return false;
+    }
+    if (item.y > 1) {
+      item.view.remove();
+      return false;
+    }
+    return true;
+  });
+  basket.style.left = basketX * 100 + '%';
+  requestAnimationFrame(frame);
+}
+
+function tick() {
+  secondsLeft -= 1;
+  if (secondsLeft > 0 && (GAME_SECONDS - secondsLeft) % TARGET_CHANGE_SECONDS === 0) setTarget();
+  renderHud();
+  if (secondsLeft > 0) return;
+  running = false;
+  clearInterval(timer);
+  items.forEach((item) => item.view.remove());
+  items = [];
+  GP.finish(score);
+  GP.showResult(GP.t(TEXT.finished, score), start);
+}
+
+function moveBasket(clientX) {
+  const rect = field.getBoundingClientRect();
+  basketX = Math.min(0.92, Math.max(0.08, (clientX - rect.left) / rect.width));
+}
+
+field.addEventListener('pointerdown', (event) => moveBasket(event.clientX));
+field.addEventListener('pointermove', (event) => {
+  if (event.buttons > 0 || event.pointerType === 'touch') moveBasket(event.clientX);
+});
+
+items = [];
+start();
+</script>
+</body>
+</html>

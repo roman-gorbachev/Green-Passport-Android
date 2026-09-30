@@ -7,7 +7,7 @@ import { award, readDailyCount, writeDailyCount } from './rewards';
 import { RewardWithStreak, withStreak } from './streak';
 
 const GAME_REWARDS_COUNTER = 'gameRewards';
-const KNOWN_GAMES = new Set(['eco_puzzle', 'waste_sorting', 'eco_maze', 'eco_quiz']);
+const LEGACY_GAMES = new Set(['eco_puzzle', 'waste_sorting', 'eco_maze', 'eco_quiz']);
 
 export const recordTipRead = onCall({ region: REGION }, async (request): Promise<RewardWithStreak> => {
   const uid = requireUser(request);
@@ -39,12 +39,15 @@ export const recordGameResult = onCall({ region: REGION }, async (request): Prom
   const uid = requireUser(request);
   const gameId = requireString(request.data, 'gameId');
   const score = Math.max(0, Math.floor(optionalNumber(request.data, 'score') ?? 0));
-  if (!KNOWN_GAMES.has(gameId)) throw new HttpsError('invalid-argument', 'Unknown game');
   const day = dayKey();
 
   const reward = await db.runTransaction(async (tx) => {
+    const game = await tx.get(db.doc(paths.game(gameId)));
+    const isKnown = game.exists ? game.get('isActive') !== false : LEGACY_GAMES.has(gameId);
+    if (!isKnown) throw new HttpsError('invalid-argument', 'Unknown game');
     const rewardedToday = await readDailyCount(tx, uid, day, GAME_REWARDS_COUNTER);
-    const points = Math.min(score, GAME_MAX_POINTS);
+    const maxPoints = Number(game.get('maxPoints') ?? GAME_MAX_POINTS);
+    const points = Math.min(score, maxPoints);
     if (rewardedToday >= GAME_REWARDS_PER_DAY || points === 0) return { points: 0, xp: 0 };
 
     writeDailyCount(tx, uid, day, GAME_REWARDS_COUNTER, rewardedToday + 1);

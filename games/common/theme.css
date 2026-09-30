@@ -1,0 +1,138 @@
+:root {
+  --forest: #1f6b47;
+  --on-forest: #ffffff;
+  --lime: #c3ee5a;
+  --on-lime: #17331f;
+  --mint-surface: #e6f5ec;
+  --mint-surface-high: #c9e6d3;
+  --background: #f2f2f7;
+  --card: #ffffff;
+  --text: #0b0f10;
+  --secondary-text: #6a7f75;
+  --error: #ff3b30;
+  --radius-large: 22px;
+  --radius-medium: 14px;
+  --spacing-small: 12px;
+  --spacing-medium: 16px;
+  --spacing-large: 24px;
+  --screen-padding: 20px;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --forest: #2e8c5e;
+  --lime: #b5e04c;
+  --mint-surface: #1e2a24;
+  --mint-surface-high: #32443a;
+  --background: #000000;
+  --card: #1c1c1e;
+  --text: #e4eee7;
+  --secondary-text: #8aa398;
+  --error: #ff453a;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--background);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, Roboto, sans-serif;
+  overscroll-behavior: none;
+}
+
+body {
+  padding: max(var(--spacing-small), env(safe-area-inset-top)) var(--screen-padding)
+    max(var(--spacing-medium), env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-medium);
+}
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  color: var(--secondary-text);
+  font-size: 15px;
+  text-align: center;
+  margin: 0;
+}
+
+.button {
+  appearance: none;
+  border: none;
+  border-radius: 999px;
+  padding: 14px 24px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 17px;
+  background: var(--forest);
+  color: var(--on-forest);
+  cursor: pointer;
+}
+
+.button.secondary {
+  background: var(--mint-surface-high);
+  color: var(--forest);
+}
+
+.button:active {
+  transform: scale(0.97);
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-medium);
+}
+
+.result {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-large);
+  padding: var(--screen-padding);
+  background: var(--background);
+  text-align: center;
+  animation: appear 0.25s ease-out;
+}
+
+.result img {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+}
+
+.result h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.result .button {
+  width: 100%;
+  max-width: 360px;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}

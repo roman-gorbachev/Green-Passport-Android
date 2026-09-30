@@ -56,6 +56,13 @@ Module graph: `:app` → `:core` + every `:feature:<name>`; each `:feature:<name
 - Moderators are documents in `apps/greenpassport/admins/{uid}`.
 - Tests: `cd functions && npm test` (word filter); with the emulators: `firebase emulators:exec --only firestore,storage "npm --prefix rules-tests test"` (security rules) and `firebase emulators:exec --only auth,firestore,functions,storage "npm --prefix functions run test:integration"` (callables).
 
+## Web games
+
+Mini-games are HTML5 pages in `games/` (plain HTML/CSS/JS, no build step), served by Firebase Hosting (`firebase deploy --only hosting`) and opened in a WebView by both apps.
+- Catalog: `apps/greenpassport/games/{gameId}` (`titles {ru,be,en}`, `path`, `sfSymbol`, `materialIcon`, `maxPoints`, `order`, `isActive`), seeded by `scripts/seed-firestore.js`. A new game is a new folder plus a catalog document, no app release needed.
+- `games/common/game.js` is the shared shell: `?lang=ru|be|en`, `?theme=light|dark`, `GP.t()`, `GP.showResult()`, and the bridge `GP.finish(score)` → iOS `webkit.messageHandlers.greenPassport`, Android `window.GreenPassportAndroid.finish(score)` (JavascriptInterface, still to be added to the Android app). `games/common/theme.css` mirrors the shared color tokens.
+- `recordGameResult` accepts active catalog games (plus the four legacy ids) and caps points at the game's `maxPoints`.
+
 ## Conventions
 
 - User profile (`core/model/profile`: `UserProfile`, `UserProfileRepository`) lives in the same `apps/greenpassport/users/{uid}` document as points; write it with `SetOptions.merge()` so points are never overwritten. Personalize screens from the profile, not from `AuthSession.displayName`.

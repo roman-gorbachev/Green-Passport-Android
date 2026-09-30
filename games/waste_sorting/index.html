@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Green Passport</title>
+<link rel="stylesheet" href="../common/theme.css">
+<style>
+.item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; }
+.item .emoji { font-size: 72px; }
+.item .name { font-size: 28px; font-weight: 700; }
+.bins { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.bin { border: none; border-radius: var(--radius-large); min-height: 104px; color: #fff; font: inherit; font-weight: 600; font-size: 17px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.bin span:first-child { font-size: 30px; }
+.bin:active { transform: scale(0.97); }
+.flash-good { animation: good 0.3s; }
+.flash-bad { animation: bad 0.3s; }
+@keyframes good { 50% { transform: scale(1.08); } }
+@keyframes bad { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+.warning { color: var(--error); }
+</style>
+</head>
+<body>
+<div class="hud"><span id="score"></span><span id="time"></span></div>
+<p class="hint" id="hint"></p>
+<div class="item" id="item"><span class="emoji" id="emoji"></span><span class="name" id="name"></span></div>
+<div class="bins" id="bins"></div>
+<script src="../common/game.js"></script>
+<script>
+const TEXT = {
+  hint: {"ru": "Выберите правильный контейнер для отхода", "be": "Выберыце правільны кантэйнер для адходу", "en": "Pick the right bin for the item"},
+  score: {"ru": "Очки: {0}", "be": "Ачкі: {0}", "en": "Score: {0}"},
+  time: {"ru": "Осталось: {0} с", "be": "Засталося: {0} с", "en": "Time left: {0}s"},
+  finished: {"ru": "Игра окончена! Очки: {0}", "be": "Гульня скончана! Ачкі: {0}", "en": "Game over! Score: {0}"},
+};
+const BINS = [
+  { id: 'glass', emoji: '🍾', color: '#34C77B', title: {"ru": "Стекло", "be": "Шкло", "en": "Glass"} },
+  { id: 'metal', emoji: '🥫', color: '#8E7CF0', title: {"ru": "Металл", "be": "Метал", "en": "Metal"} },
+  { id: 'paper', emoji: '📰', color: '#4DA3FF', title: {"ru": "Бумага", "be": "Папера", "en": "Paper"} },
+  { id: 'plastic', emoji: '🧴', color: '#FF9F43', title: {"ru": "Пластик", "be": "Пластык", "en": "Plastic"} },
+];
+const ITEMS = [
+  { bin: 'glass', emoji: '🍾', name: {"ru": "Стеклянная бутылка", "be": "Шкляная бутэлька", "en": "Glass bottle"} },
+  { bin: 'glass', emoji: '🫙', name: {"ru": "Стеклянная банка", "be": "Шкляны слоік", "en": "Glass jar"} },
+  { bin: 'metal', emoji: '🥫', name: {"ru": "Банка из-под газировки", "be": "Бляшанка з-пад газіроўкі", "en": "Soda can"} },
+  { bin: 'metal', emoji: '🍫', name: {"ru": "Алюминиевая фольга", "be": "Алюмініевая фальга", "en": "Aluminum foil"} },
+  { bin: 'paper', emoji: '📰', name: {"ru": "Газета", "be": "Газета", "en": "Newspaper"} },
+  { bin: 'paper', emoji: '📦', name: {"ru": "Картонная коробка", "be": "Кардонная скрынка", "en": "Cardboard box"} },
+  { bin: 'plastic', emoji: '🛍️', name: {"ru": "Пластиковый пакет", "be": "Пластыкавы пакет", "en": "Plastic bag"} },
+  { bin: 'plastic', emoji: '🧴', name: {"ru": "Пластиковая бутылка", "be": "Пластыкавая бутэлька", "en": "Plastic bottle"} },
+];
+const GAME_SECONDS = 30;
+const POINTS_PER_CORRECT_ANSWER = 10;
+const WARNING_SECONDS = 5;
+
+const itemView = document.getElementById('item');
+const scoreLabel = document.getElementById('score');
+const timeLabel = document.getElementById('time');
+document.getElementById('hint').textContent = GP.t(TEXT.hint);
+let score = 0;
+let secondsLeft = GAME_SECONDS;
+let current = null;
+let timer = null;
+
+document.getElementById('bins').append(...BINS.map((bin) => {
+  const button = GP.element('button', 'bin');
+  button.style.background = bin.color;
+  button.append(GP.element('span', '', bin.emoji), GP.element('span', '', GP.t(bin.title)));
+  button.addEventListener('click', () => answer(bin.id));
+  return button;
+}));
+
+function start() {
+  score = 0;
+  secondsLeft = GAME_SECONDS;
+  nextItem();
+  renderHud();
+  clearInterval(timer);
+  timer = setInterval(tick, 1000);
+}
+
+function nextItem() {
+  current = GP.randomItem(ITEMS);
+  document.getElementById('emoji').textContent = current.emoji;
+  document.getElementById('name').textContent = GP.t(current.name);
+}
+
+function renderHud() {
+  scoreLabel.textContent = GP.t(TEXT.score, score);
+  timeLabel.textContent = GP.t(TEXT.time, secondsLeft);
+  timeLabel.classList.toggle('warning', secondsLeft <= WARNING_SECONDS);
+}
+
+function answer(binId) {
+  if (secondsLeft <= 0) return;
+  const correct = current.bin === binId;
+  if (correct) score += POINTS_PER_CORRECT_ANSWER;
+  GP.vibrate(correct ? 15 : [30, 40, 30]);
+  itemView.classList.remove('flash-good', 'flash-bad');
+  void itemView.offsetWidth;
+  itemView.classList.add(correct ? 'flash-good' : 'flash-bad');
+  nextItem();
+  renderHud();
+}
+
+function tick() {
+  secondsLeft -= 1;
+  renderHud();
+  if (secondsLeft > 0) return;
+  clearInterval(timer);
+  GP.finish(score);
+  GP.showResult(GP.t(TEXT.finished, score), start);
+}
+
+start();
+</script>
+</body>
+</html>

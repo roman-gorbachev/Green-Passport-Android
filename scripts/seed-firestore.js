@@ -74,6 +74,17 @@ const surveys = [
   { question: 'Как вы обычно избавляетесь от старой одежды?', options: ['Выбрасываю', 'Отдаю на переработку', 'Отдаю нуждающимся', 'Продаю или меняю'], isActive: true },
 ];
 
+const games = [
+  { id: 'eco_puzzle', titles: { ru: 'Эко-головоломка', be: 'Эка-галаваломка', en: 'Eco puzzle' }, path: 'eco_puzzle/index.html', sfSymbol: 'puzzlepiece.extension.fill', materialIcon: 'Extension', maxPoints: 30, order: 1, isActive: true },
+  { id: 'waste_sorting', titles: { ru: 'Сортировка отходов', be: 'Сартаванне адходаў', en: 'Waste sorting' }, path: 'waste_sorting/index.html', sfSymbol: 'trash.fill', materialIcon: 'DeleteSweep', maxPoints: 30, order: 2, isActive: true },
+  { id: 'eco_maze', titles: { ru: 'Эко-лабиринт', be: 'Эка-лабірынт', en: 'Eco maze' }, path: 'eco_maze/index.html', sfSymbol: 'safari.fill', materialIcon: 'Explore', maxPoints: 30, order: 3, isActive: true },
+  { id: 'eco_quiz', titles: { ru: 'Эко-викторина', be: 'Эка-віктарына', en: 'Eco quiz' }, path: 'eco_quiz/index.html', sfSymbol: 'questionmark.bubble.fill', materialIcon: 'Quiz', maxPoints: 30, order: 4, isActive: true },
+  { id: 'waste_catcher', titles: { ru: 'Поймай отходы', be: 'Злаві адходы', en: 'Waste catcher' }, path: 'waste_catcher/index.html', sfSymbol: 'arrow.down.to.line.compact', materialIcon: 'MoveDown', maxPoints: 30, order: 5, isActive: true },
+  { id: 'myth_or_fact', titles: { ru: 'Правда или миф', be: 'Праўда ці міф', en: 'Myth or fact' }, path: 'myth_or_fact/index.html', sfSymbol: 'checkmark.circle.badge.questionmark.fill', materialIcon: 'FactCheck', maxPoints: 30, order: 6, isActive: true },
+  { id: 'eco_words', titles: { ru: 'Эко-слова', be: 'Эка-словы', en: 'Eco words' }, path: 'eco_words/index.html', sfSymbol: 'textformat.abc', materialIcon: 'Abc', maxPoints: 30, order: 7, isActive: true },
+  { id: 'water_saver', titles: { ru: 'Сбереги воду', be: 'Беражы ваду', en: 'Water saver' }, path: 'water_saver/index.html', sfSymbol: 'drop.fill', materialIcon: 'WaterDrop', maxPoints: 30, order: 8, isActive: true },
+];
+
 async function seedCollection(collectionName, documents) {
   if (onlyCollections && !onlyCollections.includes(collectionName)) {
     return [];
@@ -121,6 +132,18 @@ async function seedEventSecrets(writtenEvents) {
   }
 }
 
+async function seedGames() {
+  if (onlyCollections && !onlyCollections.includes('games')) {
+    return;
+  }
+  const batch = db.batch();
+  for (const { id, ...game } of games) {
+    batch.set(root.collection('games').doc(id), game);
+  }
+  await batch.commit();
+  console.log(`games: ${games.length} documents written`);
+}
+
 async function seedAdmin() {
   if (!adminUid) {
     return;
@@ -138,6 +161,7 @@ async function main() {
   await seedEventSecrets(writtenEvents);
   await seedCollection('ecoTips', ecoTips);
   await seedCollection('surveys', surveys);
+  await seedGames();
   await seedAdmin();
   console.log('Done.');
 }

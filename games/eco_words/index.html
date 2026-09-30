@@ -1,0 +1,160 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Green Passport</title>
+<link rel="stylesheet" href="../common/theme.css">
+<style>
+.grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; width: 100%; max-width: 420px; align-self: center; }
+.letter { aspect-ratio: 1; border: none; border-radius: 8px; background: var(--card); color: var(--text); font: inherit; font-weight: 700; font-size: 18px; }
+.letter.selected { background: var(--lime); color: var(--on-lime); }
+.letter.found { background: var(--mint-surface-high); color: var(--forest); }
+.words { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.word { padding: 6px 12px; border-radius: 999px; background: var(--card); font-weight: 600; font-size: 15px; }
+.word.found { background: var(--forest); color: var(--on-forest); text-decoration: line-through; }
+.warning { color: var(--error); }
+</style>
+</head>
+<body>
+<div class="hud"><span id="score"></span><span id="time"></span></div>
+<p class="hint" id="hint"></p>
+<div class="grid" id="grid"></div>
+<div class="words" id="words"></div>
+<script src="../common/game.js"></script>
+<script>
+const TEXT = {
+  hint: { ru: 'Нажми первую и последнюю букву слова', be: 'Націсні першую і апошнюю літару слова', en: 'Tap the first and the last letter of a word' },
+  score: { ru: 'Найдено: {0} из {1}', be: 'Знойдзена: {0} з {1}', en: 'Found: {0} of {1}' },
+  time: { ru: 'Осталось: {0} с', be: 'Засталося: {0} с', en: 'Left: {0} s' },
+  finished: { ru: 'Слов найдено: {0} из {1}. Очки: {2}', be: 'Слоў знойдзена: {0} з {1}. Ачкі: {2}', en: 'Words found: {0} of {1}. Score: {2}' },
+};
+const WORDS = {
+  ru: ['ВОДА', 'ЛЕС', 'СОЛНЦЕ', 'ВЕТЕР', 'ПЛАСТИК', 'БУМАГА'],
+  be: ['ВАДА', 'ЛЕС', 'СОНЦА', 'ВЕЦЕР', 'ПЛАСТЫК', 'ПАПЕРА'],
+  en: ['WATER', 'FOREST', 'SUN', 'WIND', 'PLASTIC', 'PAPER'],
+};
+const ALPHABETS = {
+  ru: 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯ',
+  be: 'АБВГДЕЖЗІЙКЛМНОПРСТУЎФХЦЧШЫЭЮЯ',
+  en: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+};
+const SIZE = 8;
+const GAME_SECONDS = 120;
+const POINTS_PER_WORD = 10;
+const TIME_BONUS_DIVIDER = 10;
+const PLACEMENT_ATTEMPTS = 200;
+const WARNING_SECONDS = 10;
+
+const gridView = document.getElementById('grid');
+document.getElementById('hint').textContent = GP.t(TEXT.hint);
+let grid, placements, found, selected, secondsLeft, timer;
+
+function place(words) {
+  for (let attempt = 0; attempt < PLACEMENT_ATTEMPTS; attempt += 1) {
+    const cells = Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
+    const result = [];
+    const ok = words.every((word) => {
+      for (let tries = 0; tries < PLACEMENT_ATTEMPTS; tries += 1) {
+        const horizontal = Math.random() < 0.5;
+        const row = Math.floor(Math.random() * (horizontal ? SIZE : SIZE - word.length + 1));
+        const column = Math.floor(Math.random() * (horizontal ? SIZE - word.length + 1 : SIZE));
+        const positions = [...word].map((_, index) => (horizontal ? [row, column + index] : [row + index, column]));
+        if (positions.every(([r, c], index) => cells[r][c] === null || cells[r][c] === word[index])) {
+          positions.forEach(([r, c], index) => { cells[r][c] = word[index]; });
+          result.push({ word, positions });
+          return true;
+        }
+      }
+      return false;
+    });
+    if (ok) {
+      const alphabet = ALPHABETS[GP.lang];
+      return {
+        grid: cells.map((row) => row.map((letter) => letter ?? alphabet[Math.floor(Math.random() * alphabet.length)])),
+        placements: result,
+      };
+    }
+  }
+  return null;
+}
+
+function start() {
+  const layout = place(GP.shuffle(WORDS[GP.lang]));
+  grid = layout.grid;
+  placements = layout.placements;
+  found = new Set();
+  selected = null;
+  secondsLeft = GAME_SECONDS;
+  render();
+  clearInterval(timer);
+  timer = setInterval(tick, 1000);
+}
+
+function isFoundCell(row, column) {
+  return placements.some((placement) => found.has(placement.word)
+    && placement.positions.some(([r, c]) => r === row && c === column));
+}
+
+function render() {
+  document.getElementById('score').textContent = GP.t(TEXT.score, found.size, placements.length);
+  const time = document.getElementById('time');
+  time.textContent = GP.t(TEXT.time, secondsLeft);
+  time.classList.toggle('warning', secondsLeft <= WARNING_SECONDS);
+  const views = [];
+  grid.forEach((row, rowIndex) => row.forEach((letter, columnIndex) => {
+    const isSelected = selected && selected[0] === rowIndex && selected[1] === columnIndex;
+    const view = GP.element('button', 'letter' + (isSelected ? ' selected' : isFoundCell(rowIndex, columnIndex) ? ' found' : ''), letter);
+    view.addEventListener('click', () => tap(rowIndex, columnIndex));
+    views.push(view);
+  }));
+  gridView.replaceChildren(...views);
+  document.getElementById('words').replaceChildren(...placements.map((placement) =>
+    GP.element('span', 'word' + (found.has(placement.word) ? ' found' : ''), placement.word)));
+}
+
+function tap(row, column) {
+  if (!selected) {
+    selected = [row, column];
+    render();
+    return;
+  }
+  const [startRow, startColumn] = selected;
+  selected = null;
+  const match = placements.find((placement) => {
+    const first = placement.positions[0];
+    const last = placement.positions[placement.positions.length - 1];
+    const forward = first[0] === startRow && first[1] === startColumn && last[0] === row && last[1] === column;
+    const backward = last[0] === startRow && last[1] === startColumn && first[0] === row && first[1] === column;
+    return !found.has(placement.word) && (forward || backward);
+  });
+  if (match) {
+    found.add(match.word);
+    GP.vibrate(20);
+  }
+  render();
+  if (found.size === placements.length) end();
+}
+
+function score() {
+  const timeBonus = found.size === placements.length ? Math.floor(secondsLeft / TIME_BONUS_DIVIDER) : 0;
+  return found.size * POINTS_PER_WORD + timeBonus;
+}
+
+function tick() {
+  secondsLeft -= 1;
+  render();
+  if (secondsLeft <= 0) end();
+}
+
+function end() {
+  clearInterval(timer);
+  const total = score();
+  GP.finish(total);
+  GP.showResult(GP.t(TEXT.finished, found.size, placements.length, total), start);
+}
+
+start();
+</script>
+</body>
+</html>

@@ -57,6 +57,8 @@ before(async () => {
   await db.doc(`${ROOT}/eventSecrets/soon`).set({ code: 'secret' });
   await db.doc(`${ROOT}/events/later`).set({ title: 'Later', startAtEpochMillis: Date.now() + 5 * 24 * 60 * 60 * 1000, rewardPoints: 40 });
   await db.doc(`${ROOT}/eventSecrets/later`).set({ code: 'secret' });
+  await db.doc(`${ROOT}/games/water_saver`).set({ path: 'water_saver/index.html', maxPoints: 20, isActive: true });
+  await db.doc(`${ROOT}/games/retired`).set({ path: 'retired/index.html', maxPoints: 30, isActive: false });
   await db.doc(`${ROOT}/surveys/s1`).set({ question: 'Q', options: ['A', 'B'], isActive: true });
   await db.doc(`${ROOT}/shopItems/coffee`).set({ pointsCost: 100, validityDays: 14 });
 });
@@ -184,4 +186,10 @@ test('profile: completing the profile awards the bonus exactly once', async () =
   await db.doc(`${ROOT}/users/${carol.uid}`).set({ city: 'Минск' }, { merge: true });
   await new Promise((resolve) => setTimeout(resolve, 3000));
   assert.equal(await points(carol.uid), 50);
+});
+
+test('games: catalog games use their own point cap, inactive and unknown games are rejected', async () => {
+  assert.equal((await call('recordGameResult', bob, { gameId: 'water_saver', score: 500 })).result.points, 20);
+  assert.equal((await call('recordGameResult', bob, { gameId: 'retired', score: 10 })).error, 'INVALID_ARGUMENT');
+  assert.equal((await call('recordGameResult', bob, { gameId: 'nope', score: 10 })).error, 'INVALID_ARGUMENT');
 });
