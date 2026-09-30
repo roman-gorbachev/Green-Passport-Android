@@ -70,6 +70,12 @@ Module graph: `:app` → `:core` + every `:feature:<name>`; each `:feature:<name
 - The Map tab uses Yandex MapKit (`:feature:map`, `MapKitInitializer`). The key is `YANDEX_MAPKIT_API_KEY` in `local.properties` (or an env var), exposed via the module's `BuildConfig`. Without it the tab falls back to a list. No route building.
 - Demo Firestore data is seeded with `scripts/seed-firestore.js` (see `scripts/README.md`; needs `scripts/service-account.json`, which is gitignored). Re-running it creates duplicate documents.
 
+## UX parity with iOS
+
+The Android app and the iOS app (`~/Personal/Green-Passport-iOS`, a SwiftUI port on the same Firebase backend) share one UX: the same tabs, entry points, step order, texts, colors, rules and loading/empty/error states. Controls stay native to each platform (Material 3 here, HIG on iOS). Parity is about flows, not pixels.
+
+`claude/ux-spec.ru.md` is the platform-neutral source of truth, and the same file lives in the iOS repo's `claude/`. **Any UX change goes into the spec first, then into code on both platforms.** A behaviour difference that is not recorded in the spec is a bug. The spec's "Android backlog" section lists iOS-first changes that Android still has to adopt. String keys and color token names (`Forest`, `Lime`, `SectionCommunity`, …) are shared with iOS, so never rename one without updating the other platform.
+
 ## Team Conventions
 
 ### Files
