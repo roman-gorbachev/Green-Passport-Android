@@ -106,6 +106,21 @@ async function seedQrSecrets(writtenTasks) {
   }
 }
 
+async function seedEventSecrets(writtenEvents) {
+  if (writtenEvents.length === 0) {
+    return;
+  }
+  fs.mkdirSync(QR_OUTPUT_DIR, { recursive: true });
+  for (const { id, doc } of writtenEvents) {
+    const secret = crypto.randomBytes(QR_SECRET_BYTES).toString('hex');
+    await root.collection('eventSecrets').doc(id).set({ code: secret });
+    const payload = `greenpassport:event:${id}:${secret}`;
+    const fileName = path.join(QR_OUTPUT_DIR, `event_${id}.png`);
+    await QRCode.toFile(fileName, payload, { width: 600, margin: 2 });
+    console.log(`Check-in QR for "${doc.title}" -> ${fileName}`);
+  }
+}
+
 async function seedAdmin() {
   if (!adminUid) {
     return;
@@ -119,7 +134,8 @@ async function main() {
   await seedQrSecrets(writtenTasks);
   await seedCollection('shopItems', shopItems);
   await seedCollection('mapPoints', mapPoints);
-  await seedCollection('events', events);
+  const writtenEvents = await seedCollection('events', events);
+  await seedEventSecrets(writtenEvents);
   await seedCollection('ecoTips', ecoTips);
   await seedCollection('surveys', surveys);
   await seedAdmin();

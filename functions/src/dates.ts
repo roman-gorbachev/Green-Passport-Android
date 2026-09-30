@@ -1,4 +1,4 @@
-import { TIME_ZONE } from './config';
+import { DAY_MILLIS, TIME_ZONE } from './config';
 
 const dayFormatter = new Intl.DateTimeFormat('en-CA', {
   timeZone: TIME_ZONE,
@@ -9,4 +9,8 @@ const dayFormatter = new Intl.DateTimeFormat('en-CA', {
 
 export function dayKey(date: Date = new Date()): string {
   return dayFormatter.format(date);
+}
+
+export function previousDayKey(date: Date = new Date()): string {
+  return dayFormatter.format(new Date(date.getTime() - DAY_MILLIS));
 }

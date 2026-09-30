@@ -10,10 +10,11 @@ import { dayKey } from './dates';
 import { db, paths, storage } from './db';
 import { requireAdmin, requireString, requireUser } from './guards';
 import { award, readDailyCount, RewardResult, taskReward, writeDailyCount } from './rewards';
+import { withStreak } from './streak';
 
 const SELF_TASKS_COUNTER = 'selfTasks';
 
-export const completeSelfTask = onCall({ region: REGION }, async (request): Promise<RewardResult & { taskId: string }> => {
+export const completeSelfTask = onCall({ region: REGION }, async (request): Promise<RewardResult & { taskId: string; streakBonus: number }> => {
   const uid = requireUser(request);
   const taskId = requireString(request.data, 'taskId');
   const day = dayKey();
@@ -38,10 +39,10 @@ export const completeSelfTask = onCall({ region: REGION }, async (request): Prom
     });
     return award(tx, uid, taskReward(task.data()), 'TASK_COMPLETED', taskId);
   });
-  return { ...reward, taskId };
+  return withStreak(uid, { ...reward, taskId });
 });
 
-export const redeemTaskCode = onCall({ region: REGION }, async (request): Promise<RewardResult & { taskId: string }> => {
+export const redeemTaskCode = onCall({ region: REGION }, async (request): Promise<RewardResult & { taskId: string; streakBonus: number }> => {
   const uid = requireUser(request);
   const code = requireString(request.data, 'code').trim();
   if (!code.startsWith(TASK_CODE_PREFIX)) throw new HttpsError('not-found', 'Unknown code');
@@ -66,7 +67,7 @@ export const redeemTaskCode = onCall({ region: REGION }, async (request): Promis
     });
     return award(tx, uid, taskReward(task.data()), 'TASK_COMPLETED', taskId);
   });
-  return { ...reward, taskId };
+  return withStreak(uid, { ...reward, taskId });
 });
 
 export const reviewSubmission = onCall({ region: REGION }, async (request): Promise<{ status: string }> => {

@@ -14,11 +14,13 @@ service cloud.firestore {
   }
 
   function keepsPoints() {
-    return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['availablePoints', 'lifetimeXp']);
+    return !request.resource.data.diff(resource.data).affectedKeys()
+      .hasAny(['availablePoints', 'lifetimeXp', 'streak', 'profileBonusAwarded']);
   }
 
   function hasNoPoints(data) {
-    return data.get('availablePoints', 0) == 0 && data.get('lifetimeXp', 0) == 0;
+    return data.get('availablePoints', 0) == 0 && data.get('lifetimeXp', 0) == 0 &&
+      !('streak' in data) && !('profileBonusAwarded' in data);
   }
 
   function hasBannedWords(text) {
@@ -79,6 +81,15 @@ service cloud.firestore {
 
     match /apps/greenpassport/taskSecrets/{taskId} {
       allow read, write: if false;
+    }
+
+    match /apps/greenpassport/eventSecrets/{eventId} {
+      allow read, write: if false;
+    }
+
+    match /apps/greenpassport/eventAttendance/{attendanceId} {
+      allow read: if isOwnerOrAdmin(resource.data);
+      allow write: if false;
     }
 
     match /apps/greenpassport/taskSubmissions/{submissionId} {
@@ -167,7 +178,7 @@ service cloud.firestore {
     match /apps/greenpassport/{collection}/{document=**} {
       allow read: if request.auth != null && !(collection in [
         'taskSecrets', 'admins', 'reports', 'taskSubmissions', 'pointsLedger',
-        'taskProgress', 'purchases', 'ecoTipReads',
+        'taskProgress', 'purchases', 'ecoTipReads', 'eventSecrets', 'eventAttendance',
       ]);
       allow write: if false;
     }
