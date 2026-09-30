@@ -35,12 +35,12 @@ const tasks = [
 ];
 
 const shopItems = [
-  { title: 'Скидка 10% на кофе', partnerName: 'Кофейня «Зелёный лист»', pointsCost: 100 },
-  { title: 'Скидка 15% на органические продукты', partnerName: 'Эко-маркет «Природа»', pointsCost: 200 },
-  { title: 'Бесплатная многоразовая бутылка', partnerName: 'Магазин «ЭкоДом»', pointsCost: 300 },
-  { title: 'Скидка 20% на велопрокат', partnerName: 'Велопрокат «КрутиПедали»', pointsCost: 250 },
-  { title: 'Купон на посадку дерева', partnerName: 'Фонд «Зелёный город»', pointsCost: 150 },
-  { title: 'Скидка 10% на химчистку с эко-средствами', partnerName: 'Химчистка «ЭкоКлин»', pointsCost: 120 },
+  { title: 'Скидка 10% на кофе', partnerName: 'Кофейня «Зелёный лист»', pointsCost: 100, validityDays: 14 },
+  { title: 'Скидка 15% на органические продукты', partnerName: 'Эко-маркет «Природа»', pointsCost: 200, validityDays: 30 },
+  { title: 'Бесплатная многоразовая бутылка', partnerName: 'Магазин «ЭкоДом»', pointsCost: 300, validityDays: 60 },
+  { title: 'Скидка 20% на велопрокат', partnerName: 'Велопрокат «КрутиПедали»', pointsCost: 250, validityDays: 30 },
+  { title: 'Купон на посадку дерева', partnerName: 'Фонд «Зелёный город»', pointsCost: 150, validityDays: 60 },
+  { title: 'Скидка 10% на химчистку с эко-средствами', partnerName: 'Химчистка «ЭкоКлин»', pointsCost: 120, validityDays: 21 },
 ];
 
 const mapPoints = [

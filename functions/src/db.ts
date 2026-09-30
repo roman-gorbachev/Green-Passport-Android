@@ -20,6 +20,7 @@ export const paths = {
   ecoTipRead: (uid: string, tipId: string) => `${APP_ROOT}/ecoTipReads/${uid}_${tipId}`,
   shopItem: (rewardId: string) => `${APP_ROOT}/shopItems/${rewardId}`,
   purchases: () => `${APP_ROOT}/purchases`,
+  purchase: (couponId: string) => `${APP_ROOT}/purchases/${couponId}`,
   pointsLedger: () => `${APP_ROOT}/pointsLedger`,
   post: (postId: string) => `${APP_ROOT}/posts/${postId}`,
 };

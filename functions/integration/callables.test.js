@@ -51,7 +51,7 @@ before(async () => {
   await db.doc(`${ROOT}/tasks/qr1`).set({ verification: 'QR', rewardPoints: 70, rewardXp: 70 });
   await db.doc(`${ROOT}/taskSecrets/qr1`).set({ code: 'secret' });
   await db.doc(`${ROOT}/ecoTips/tip1`).set({ rewardPoints: 15, rewardXp: 15 });
-  await db.doc(`${ROOT}/shopItems/coffee`).set({ pointsCost: 100 });
+  await db.doc(`${ROOT}/shopItems/coffee`).set({ pointsCost: 100, validityDays: 14 });
 });
 
 test('self tasks: awarded once each and at most three per day', async () => {
@@ -81,8 +81,29 @@ test('tips and games: tips once, game points capped', async () => {
 test('shop: spends points on the server and refuses when short', async () => {
   const purchase = await call('redeemReward', alice, { rewardId: 'coffee' });
   assert.ok(purchase.result.couponId);
+  assert.match(purchase.result.code, /^[A-HJKMNP-Z2-9]{8}$/);
+  const validityMillis = purchase.result.expiresAtEpochMillis - purchase.result.redeemedAtEpochMillis;
+  assert.equal(validityMillis, 14 * 24 * 60 * 60 * 1000);
   assert.equal(await points(alice.uid), 75);
   assert.equal((await call('redeemReward', alice, { rewardId: 'coffee' })).error, 'FAILED_PRECONDITION');
+
+  const couponId = purchase.result.couponId;
+  assert.equal((await call('markCouponUsed', moderator, { couponId })).error, 'NOT_FOUND');
+  assert.ok((await call('markCouponUsed', alice, { couponId })).result.usedAtEpochMillis);
+  assert.equal((await call('markCouponUsed', alice, { couponId })).error, 'ALREADY_EXISTS');
+  const coupon = await db.doc(`${ROOT}/purchases/${couponId}`).get();
+  assert.equal(coupon.get('status'), 'USED');
+});
+
+test('shop: expired coupons cannot be marked as used', async () => {
+  const expired = await db.collection(`${ROOT}/purchases`).add({
+    userId: alice.uid,
+    rewardId: 'coffee',
+    redeemedAtEpochMillis: 1,
+    expiresAtEpochMillis: 2,
+    status: 'ACTIVE',
+  });
+  assert.equal((await call('markCouponUsed', alice, { couponId: expired.id })).error, 'FAILED_PRECONDITION');
 });
 
 test('photo review: only moderators, approval awards points', async () => {
