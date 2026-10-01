@@ -21,4 +21,6 @@
     <string name="your_balance">Твой баланс</string>
     <string name="points_count">%1$d ач.</string>
     <string name="xp_left_to_level">Яшчэ %1$d ач. да ўзр. %2$d</string>
+    <string name="streak_days">%1$d дз. запар</string>
+    <string name="cancel">Скасаваць</string>
 </resources>

@@ -23,7 +23,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
-import com.smartcity.greenpassport.core.designsystem.component.GpFilterChip
+import com.smartcity.greenpassport.core.designsystem.component.ChoiceCapsule
 import com.smartcity.greenpassport.core.designsystem.component.GpTextField
 import com.smartcity.greenpassport.core.designsystem.component.ProfileAvatar
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
@@ -86,7 +86,7 @@ fun CityStep(
             modifier = Modifier.fillMaxWidth(),
         ) {
             SupportedCities.all.forEach { city ->
-                GpFilterChip(
+                ChoiceCapsule(
                     label = city,
                     selected = uiState.city == city,
                     onClick = { actions.onCitySelected(city) },
@@ -115,7 +115,7 @@ fun InterestsStep(
             modifier = Modifier.fillMaxWidth(),
         ) {
             TaskCategory.entries.forEach { category ->
-                GpFilterChip(
+                ChoiceCapsule(
                     label = stringResource(interestLabelRes(category)),
                     selected = category in uiState.interests,
                     onClick = { actions.onInterestToggled(category) },
@@ -149,7 +149,7 @@ fun AvatarStep(
                 val isSelected = style == uiState.avatar
                 ProfileAvatar(
                     style = style,
-                    size = Dimens.IconCircleSize,
+                    size = Dimens.TileSizeLarge,
                     modifier = Modifier
                         .clip(CircleShape)
                         .then(
@@ -157,7 +157,7 @@ fun AvatarStep(
                                 Modifier.border(
                                     border = BorderStroke(
                                         width = Dimens.SelectionBorderWidth,
-                                        color = MaterialTheme.colorScheme.onBackground,
+                                        color = MaterialTheme.colorScheme.primary,
                                     ),
                                     shape = CircleShape,
                                 )

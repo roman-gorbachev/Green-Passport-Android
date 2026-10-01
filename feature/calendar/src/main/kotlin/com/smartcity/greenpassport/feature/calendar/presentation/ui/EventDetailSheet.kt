@@ -23,7 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,7 +40,6 @@ import com.smartcity.greenpassport.core.model.EcoEvent
 import com.smartcity.greenpassport.feature.calendar.R
 import com.smartcity.greenpassport.feature.calendar.presentation.state.EventDetailUiState
 import com.smartcity.greenpassport.feature.calendar.presentation.viewmodels.EventDetailViewModel
-import java.util.Locale
 import com.smartcity.greenpassport.core.R as CoreR
 
 private const val EVENT_IMAGE_ASPECT_RATIO = 1.5f
@@ -89,7 +88,7 @@ private fun EventDetailContent(
     onSignUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
+    val locale = LocalLocale.current.platformLocale
 
     Column(modifier = modifier.fillMaxWidth()) {
         Column(

@@ -21,4 +21,6 @@
     <string name="your_balance">Your balance</string>
     <string name="points_count">%1$d pts</string>
     <string name="xp_left_to_level">%1$d pts to level %2$d</string>
+    <string name="streak_days">%1$d-day streak</string>
+    <string name="cancel">Cancel</string>
 </resources>

@@ -30,18 +30,18 @@ fun PointsChip(
         modifier = modifier
             .clip(RoundedCornerShape(Dimens.CornerRadiusPill))
             .background(MaterialTheme.colorScheme.secondary)
-            .padding(horizontal = Dimens.SpacingSmall + Dimens.SpacingExtraSmall, vertical = Dimens.SpacingExtraSmall),
+            .padding(horizontal = Dimens.SpacingSmall, vertical = Dimens.SpacingExtraSmall),
     ) {
-        Text(
-            text = stringResource(R.string.points_reward, points),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSecondary,
-        )
         Icon(
             imageVector = Icons.Filled.Bolt,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSecondary,
             modifier = Modifier.size(Dimens.IconSizeExtraSmall),
+        )
+        Text(
+            text = stringResource(R.string.points_reward, points),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSecondary,
         )
     }
 }

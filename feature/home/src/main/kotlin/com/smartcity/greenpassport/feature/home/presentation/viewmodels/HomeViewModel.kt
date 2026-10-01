@@ -66,7 +66,10 @@ class HomeViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .map { profile -> session to profile }
         }
-        return combine(sessionsWithProfile, refreshRequests) { sessionWithProfile, _ -> sessionWithProfile }
+        return combine(
+            sessionsWithProfile,
+            refreshRequests.onStart { emit(Unit) }
+        ) { sessionWithProfile, _ -> sessionWithProfile }
             .mapLatest { (session, profile) -> loadHomeUiState(session, profile) }
     }
 

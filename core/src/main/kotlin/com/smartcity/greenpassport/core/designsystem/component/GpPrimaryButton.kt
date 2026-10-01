@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,11 +27,6 @@ fun GpPrimaryButton(
         onClick = onClick,
         enabled = enabled && !isLoading,
         shape = RoundedCornerShape(Dimens.CornerRadiusPill),
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = Dimens.ButtonElevation,
-            pressedElevation = Dimens.SpacingNone,
-            disabledElevation = Dimens.SpacingNone,
-        ),
         contentPadding = PaddingValues(horizontal = Dimens.SpacingLarge),
         modifier = modifier
             .fillMaxWidth()
@@ -40,7 +34,7 @@ fun GpPrimaryButton(
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onPrimary,
                 strokeWidth = Dimens.ProgressStrokeWidth,
                 modifier = Modifier.size(Dimens.IconSizeMedium),
             )

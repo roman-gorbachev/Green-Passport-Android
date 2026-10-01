@@ -21,7 +21,7 @@ import com.smartcity.greenpassport.core.R
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 
 private const val SCRIM_TOP_ALPHA = 0f
-private const val SCRIM_BOTTOM_ALPHA = 0.45f
+private const val SCRIM_BOTTOM_ALPHA = 0.55f
 private const val TITLE_MAX_LINES = 2
 
 @Composable
@@ -63,18 +63,18 @@ fun HeroImageCard(
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(horizontal = Dimens.SpacingLarge, vertical = Dimens.SheetContentPadding),
+                    .padding(start = Dimens.CardPadding, end = Dimens.CardPadding, bottom = Dimens.SpacingLarge),
             ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.headlineLarge,
+                    style = MaterialTheme.typography.headlineSmall,
                     color = Color.White,
                     maxLines = TITLE_MAX_LINES,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = subtitle,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = Color.White,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

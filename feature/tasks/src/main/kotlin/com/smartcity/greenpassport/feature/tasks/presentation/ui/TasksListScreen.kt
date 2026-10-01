@@ -1,10 +1,12 @@
 package com.smartcity.greenpassport.feature.tasks.presentation.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -19,18 +21,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.designsystem.component.ChoiceCapsule
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
-import com.smartcity.greenpassport.core.designsystem.component.GpFilterChip
-import com.smartcity.greenpassport.core.designsystem.component.GpListRow
+import com.smartcity.greenpassport.core.designsystem.component.ListRowContent
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
 import com.smartcity.greenpassport.core.designsystem.component.PointsChip
+import com.smartcity.greenpassport.core.designsystem.component.listSectionItems
+import com.smartcity.greenpassport.core.designsystem.layout.plus
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
-import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.core.model.TaskCategory
 import com.smartcity.greenpassport.feature.tasks.R
@@ -43,6 +47,7 @@ import com.smartcity.greenpassport.core.R as CoreR
 fun TasksListScreen(
     onTaskSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     viewModel: TasksListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -58,6 +63,7 @@ fun TasksListScreen(
         onTaskSelected = onTaskSelected,
         onToggleFavorite = viewModel::onToggleFavorite,
         onRetry = viewModel::refresh,
+        contentPadding = contentPadding,
         modifier = modifier,
     )
 }
@@ -69,9 +75,15 @@ private fun TasksListContent(
     onTaskSelected: (String) -> Unit,
     onToggleFavorite: (String) -> Unit,
     onRetry: () -> Unit,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
+    val listPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding())
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(top = contentPadding.calculateTopPadding()),
+    ) {
         LazyRow(
             contentPadding = PaddingValues(
                 horizontal = Dimens.ScreenHorizontalPadding,
@@ -81,7 +93,7 @@ private fun TasksListContent(
         ) {
             if (uiState.profile != null) {
                 item {
-                    GpFilterChip(
+                    ChoiceCapsule(
                         label = stringResource(R.string.for_you),
                         selected = uiState.effectiveFilter == TaskFilter.ForYou,
                         onClick = { onFilterSelected(TaskFilter.ForYou) },
@@ -89,14 +101,14 @@ private fun TasksListContent(
                 }
             }
             item {
-                GpFilterChip(
+                ChoiceCapsule(
                     label = stringResource(R.string.tasks_filter_all),
                     selected = uiState.effectiveFilter == TaskFilter.All,
                     onClick = { onFilterSelected(TaskFilter.All) },
                 )
             }
             items(TaskCategory.entries) { category ->
-                GpFilterChip(
+                ChoiceCapsule(
                     label = stringResource(taskCategoryLabelRes(category)),
                     selected = uiState.effectiveFilter == TaskFilter.Category(category),
                     onClick = { onFilterSelected(TaskFilter.Category(category)) },
@@ -105,26 +117,25 @@ private fun TasksListContent(
         }
 
         when {
-            uiState.isLoading -> LoadingContent(modifier = Modifier.fillMaxSize())
+            uiState.isLoading -> LoadingContent(modifier = Modifier.padding(listPadding))
             uiState.hasError -> ErrorContent(
                 message = stringResource(CoreR.string.error_generic_message),
                 retryLabel = stringResource(CoreR.string.retry_button),
                 onRetry = onRetry,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.padding(listPadding),
             )
             uiState.visibleTasks.isEmpty() -> EmptyContent(
                 message = stringResource(R.string.tasks_empty),
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.padding(listPadding),
             )
 
             else -> LazyColumn(
-                contentPadding = PaddingValues(
+                contentPadding = listPadding + PaddingValues(
                     horizontal = Dimens.ScreenHorizontalPadding,
                     vertical = Dimens.SpacingSmall,
                 ),
-                verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
             ) {
-                items(uiState.visibleTasks, key = { it.id }) { task ->
+                listSectionItems(uiState.visibleTasks, key = { it.id }) { task ->
                     TaskRow(
                         task = task,
                         isCompleted = uiState.completedTaskIds.contains(task.id),
@@ -132,7 +143,6 @@ private fun TasksListContent(
                         isFavorite = uiState.favoriteTaskIds.contains(task.id),
                         onClick = { onTaskSelected(task.id) },
                         onToggleFavorite = { onToggleFavorite(task.id) },
-                        modifier = Modifier.animateItem(),
                     )
                 }
             }
@@ -150,12 +160,12 @@ private fun TaskRow(
     onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    GpListRow(
+    ListRowContent(
         title = task.title,
         subtitle = when {
             isCompleted -> stringResource(R.string.task_detail_completed_label)
             isPending -> stringResource(R.string.under_review)
-            else -> null
+            else -> stringResource(taskCategoryLabelRes(task.category))
         },
         leading = { MascotWidget(size = Dimens.ListRowMascotSize) },
         trailing = {
@@ -168,7 +178,7 @@ private fun TaskRow(
                         imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                         contentDescription = stringResource(CoreR.string.favorites),
                         tint = if (isFavorite) {
-                            GreenPassportTheme.sectionColors.feedback
+                            MaterialTheme.colorScheme.primary
                         } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
                         },
@@ -176,7 +186,6 @@ private fun TaskRow(
                 }
             }
         },
-        onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.clickable(role = Role.Button, onClick = onClick),
     )
 }

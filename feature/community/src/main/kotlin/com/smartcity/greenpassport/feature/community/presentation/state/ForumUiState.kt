@@ -8,6 +8,7 @@ data class ForumUiState(
     val isLoading: Boolean = true,
     val isPosting: Boolean = false,
     val isTextRejected: Boolean = false,
+    val isSendFailed: Boolean = false,
     val currentUserId: String? = null,
     val reportedPostIds: Set<String> = emptySet(),
 )

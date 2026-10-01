@@ -38,7 +38,7 @@ fun StepIndicator(
                 targetValue = if (index <= currentStep) {
                     MaterialTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colorScheme.surfaceContainerHigh
+                    MaterialTheme.colorScheme.surfaceVariant
                 },
                 label = "stepDotColor",
             )

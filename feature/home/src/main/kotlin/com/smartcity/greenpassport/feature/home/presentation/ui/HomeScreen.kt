@@ -15,9 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,14 +25,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.common.formatEventDate
 import com.smartcity.greenpassport.core.common.formatEventTime
@@ -44,6 +39,7 @@ import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.HeroImageCard
+import com.smartcity.greenpassport.core.designsystem.component.ListRowChevron
 import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
 import com.smartcity.greenpassport.core.designsystem.component.PointsChip
 import com.smartcity.greenpassport.core.designsystem.component.ProfileAvatar
@@ -52,7 +48,6 @@ import com.smartcity.greenpassport.core.designsystem.component.QuickActionButton
 import com.smartcity.greenpassport.core.designsystem.component.SectionHeader
 import com.smartcity.greenpassport.core.designsystem.component.avatarColor
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
-import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.model.EcoEvent
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import com.smartcity.greenpassport.core.navigation.Destination
@@ -73,9 +68,6 @@ private const val KEY_HERO_PLACEHOLDER = "heroPlaceholder"
 private const val KEY_QUICK_ACTIONS = "quickActions"
 private const val KEY_EVENT = "event"
 private const val KEY_TASKS_HEADER = "tasksHeader"
-private const val KEY_TASKS_ERROR = "tasksError"
-private const val KEY_TASKS_EMPTY = "tasksEmpty"
-private const val KEY_TASK_PLACEHOLDER = "taskPlaceholder"
 
 @Composable
 fun HomeScreen(
@@ -88,11 +80,6 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LifecycleResumeEffect(viewModel) {
-        viewModel.refresh()
-        onPauseOrDispose {}
-    }
 
     HomeContent(
         uiState = uiState,
@@ -123,10 +110,10 @@ private fun HomeContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(
-            top = systemBars.calculateTopPadding() + Dimens.SpacingLarge,
-            bottom = systemBars.calculateBottomPadding() + Dimens.BottomBarReservedHeight + Dimens.SpacingMedium,
+            top = systemBars.calculateTopPadding() + Dimens.SpacingSmall,
+            bottom = systemBars.calculateBottomPadding() + Dimens.BottomBarReservedHeight + Dimens.SpacingLarge,
         ),
-        verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
+        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingLarge),
     ) {
         item(key = KEY_HEADER) {
             HomeHeader(
@@ -138,21 +125,22 @@ private fun HomeContent(
         }
         if (uiState.isLoading) {
             item(key = KEY_HERO_PLACEHOLDER) {
-                ProgressHeroPlaceholder(modifier = Modifier.animateItem().screenPadding())
+                ProgressHeroPlaceholder(modifier = Modifier.screenPadding())
             }
         } else {
             item(key = KEY_HERO) {
                 ProgressHeroCard(
                     points = uiState.points,
                     level = uiState.level,
-                    modifier = Modifier.animateItem().screenPadding(),
+                    streakDays = uiState.streakDays,
+                    modifier = Modifier.screenPadding(),
                 )
             }
         }
         item(key = KEY_QUICK_ACTIONS) {
             QuickActionsRow(
                 onDestinationSelected = onDestinationSelected,
-                modifier = Modifier.animateItem(),
+                modifier = Modifier.screenPadding(),
             )
         }
         uiState.upcomingEvent?.let { event ->
@@ -162,56 +150,57 @@ private fun HomeContent(
                     title = event.title,
                     subtitle = eventSubtitle(event),
                     onClick = { onEventSelected(event.id) },
-                    modifier = Modifier.animateItem().screenPadding(),
+                    modifier = Modifier.screenPadding(),
                 )
             }
         }
         item(key = KEY_TASKS_HEADER) {
-            SectionHeader(
-                title = stringResource(R.string.your_tasks),
-                actionLabel = stringResource(R.string.all),
-                onAction = onAllTasksClick,
-                modifier = Modifier.animateItem().screenPadding(),
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingCompact),
+                modifier = Modifier.screenPadding(),
+            ) {
+                SectionHeader(
+                    title = stringResource(R.string.your_tasks),
+                    actionLabel = stringResource(R.string.all),
+                    onAction = onAllTasksClick,
+                )
+                HomeTasks(uiState = uiState, onTaskSelected = onTaskSelected, onRetry = onRetry)
+            }
         }
-        homeTasks(uiState = uiState, onTaskSelected = onTaskSelected, onRetry = onRetry)
     }
 }
 
-private fun LazyListScope.homeTasks(
+@Composable
+private fun HomeTasks(
     uiState: HomeUiState,
     onTaskSelected: (String) -> Unit,
     onRetry: () -> Unit,
 ) {
     when {
-        uiState.isLoading -> items(TASK_PLACEHOLDER_COUNT, key = { index -> KEY_TASK_PLACEHOLDER + index }) {
-            ListRowPlaceholder(modifier = Modifier.animateItem().screenPadding())
+        uiState.isLoading -> repeat(TASK_PLACEHOLDER_COUNT) {
+            ListRowPlaceholder()
         }
 
-        uiState.hasTasksError -> item(key = KEY_TASKS_ERROR) {
-            ErrorContent(
-                message = stringResource(CoreR.string.error_generic_message),
-                retryLabel = stringResource(CoreR.string.retry_button),
-                onRetry = onRetry,
-                modifier = Modifier.animateItem().screenPadding(),
-            )
-        }
+        uiState.hasTasksError -> ErrorContent(
+            message = stringResource(CoreR.string.error_generic_message),
+            retryLabel = stringResource(CoreR.string.retry_button),
+            onRetry = onRetry,
+        )
 
-        uiState.tasks.isEmpty() -> item(key = KEY_TASKS_EMPTY) {
-            EmptyContent(
-                message = stringResource(R.string.all_tasks_completed),
-                modifier = Modifier.animateItem().screenPadding(),
-            )
-        }
+        uiState.tasks.isEmpty() -> EmptyContent(message = stringResource(R.string.all_tasks_completed))
 
-        else -> items(uiState.tasks, key = { it.id }) { task ->
+        else -> uiState.tasks.forEach { task ->
             GpListRow(
                 title = task.title,
                 subtitle = task.city.takeIf { it.isNotBlank() },
                 leading = { MascotWidget(size = Dimens.ListRowMascotSize) },
-                trailing = { PointsChip(points = task.rewardPoints) },
+                trailing = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        PointsChip(points = task.rewardPoints)
+                        ListRowChevron(modifier = Modifier.padding(start = Dimens.SpacingSmall))
+                    }
+                },
                 onClick = { onTaskSelected(task.id) },
-                modifier = Modifier.animateItem().screenPadding(),
             )
         }
     }
@@ -238,8 +227,8 @@ private fun HomeHeader(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = today,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.outline,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = if (displayName != null) {
@@ -247,7 +236,7 @@ private fun HomeHeader(
                 } else {
                     stringResource(R.string.hello)
                 },
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.displayLarge,
                 color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -272,17 +261,13 @@ private fun QuickActionsRow(
     onDestinationSelected: (Destination) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyRow(
-        modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = Dimens.ScreenHorizontalPadding - Dimens.SpacingExtraSmall),
-        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
-    ) {
-        items(HomeQuickAction.entries) { action ->
+    Row(modifier = modifier.fillMaxWidth()) {
+        HomeQuickAction.entries.forEach { action ->
             QuickActionButton(
                 label = stringResource(action.labelRes),
                 icon = action.icon,
-                color = action.color(),
                 onClick = { onDestinationSelected(action.destination) },
+                modifier = Modifier.weight(1f),
             )
         }
     }
@@ -296,8 +281,8 @@ private fun ProgressHeroPlaceholder(modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .height(Dimens.ProgressHeroHeight)
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                shape = RoundedCornerShape(Dimens.CornerRadiusExtraLarge),
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(Dimens.CornerRadiusLarge),
             ),
     ) {
         CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
@@ -311,22 +296,10 @@ private fun ListRowPlaceholder(modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .height(Dimens.ListRowHeight)
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.surface,
+                shape = MaterialTheme.shapes.large,
             ),
     )
-}
-
-@Composable
-private fun HomeQuickAction.color(): Color {
-    val sectionColors = GreenPassportTheme.sectionColors
-    return when (this) {
-        HomeQuickAction.COMMUNITY -> sectionColors.community
-        HomeQuickAction.GAMES -> sectionColors.games
-        HomeQuickAction.ECO_TIPS -> sectionColors.tips
-        HomeQuickAction.CALENDAR -> sectionColors.calendar
-        HomeQuickAction.FEEDBACK -> sectionColors.feedback
-    }
 }
 
 private fun Modifier.screenPadding(): Modifier = padding(horizontal = Dimens.ScreenHorizontalPadding)
@@ -343,4 +316,4 @@ private fun eventSubtitle(event: EcoEvent): String {
 }
 
 @Composable
-private fun currentLocale(): Locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
+private fun currentLocale(): Locale = LocalLocale.current.platformLocale

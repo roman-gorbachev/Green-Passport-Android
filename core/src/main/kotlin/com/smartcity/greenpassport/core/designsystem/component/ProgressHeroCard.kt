@@ -1,7 +1,10 @@
 package com.smartcity.greenpassport.core.designsystem.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -36,11 +40,11 @@ fun ProgressHeroCard(
     points: Int,
     modifier: Modifier = Modifier,
     level: Level? = null,
+    streakDays: Int = 0,
 ) {
     val onPrimary = MaterialTheme.colorScheme.onPrimary
 
     GpSurfaceCard(
-        shape = RoundedCornerShape(Dimens.CornerRadiusExtraLarge),
         color = MaterialTheme.colorScheme.primary,
         modifier = modifier
             .fillMaxWidth()
@@ -55,56 +59,15 @@ fun ProgressHeroCard(
                 bottom = Dimens.CardPadding,
             ),
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = if (level != null) {
-                        stringResource(R.string.level, level.number)
-                    } else {
-                        stringResource(R.string.your_balance)
-                    },
-                    style = MaterialTheme.typography.labelMedium,
-                    color = onPrimary.copy(alpha = CAPTION_ALPHA),
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(top = Dimens.SpacingExtraSmall),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(Dimens.IconSizeMedium),
-                    )
-                    Text(
-                        text = stringResource(R.string.points_count, points),
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = onPrimary,
-                        modifier = Modifier.padding(start = Dimens.SpacingExtraSmall),
-                    )
-                }
-                if (level != null) {
-                    LinearProgressIndicator(
-                        progress = { level.progressFraction() },
-                        color = MaterialTheme.colorScheme.secondary,
-                        trackColor = onPrimary.copy(alpha = TRACK_ALPHA),
-                        strokeCap = StrokeCap.Round,
-                        gapSize = Dimens.SpacingNone,
-                        drawStopIndicator = {},
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = Dimens.SpacingMedium)
-                            .height(Dimens.ProgressBarHeight),
-                    )
-                    Text(
-                        text = stringResource(R.string.xp_progress, level.currentXp, level.xpForNextLevel),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = onPrimary.copy(alpha = CAPTION_ALPHA),
-                        modifier = Modifier.padding(top = Dimens.SpacingExtraSmall),
-                    )
-                }
-            }
+            ProgressSummary(
+                points = points,
+                level = level,
+                streakDays = streakDays,
+                modifier = Modifier.weight(1f),
+            )
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
                 modifier = Modifier.padding(start = Dimens.SpacingSmall),
             ) {
                 if (level != null) {
@@ -122,8 +85,103 @@ fun ProgressHeroCard(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ProgressSummary(
+    points: Int,
+    level: Level?,
+    streakDays: Int,
+    modifier: Modifier = Modifier,
+) {
+    val onPrimary = MaterialTheme.colorScheme.onPrimary
+    Column(
+        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
+        modifier = modifier,
+    ) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+            verticalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
+            itemVerticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = if (level != null) {
+                    stringResource(R.string.level, level.number)
+                } else {
+                    stringResource(R.string.your_balance)
+                },
+                style = MaterialTheme.typography.titleSmall,
+                color = onPrimary.copy(alpha = CAPTION_ALPHA),
+            )
+            if (streakDays > 0) {
+                StreakCapsule(days = streakDays)
+            }
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.size(Dimens.IconSizeMedium),
+            )
+            Text(
+                text = stringResource(R.string.points_count, points),
+                style = MaterialTheme.typography.headlineLarge,
+                color = onPrimary,
+            )
+        }
+        if (level != null) {
+            LinearProgressIndicator(
+                progress = { level.progressFraction() },
+                color = MaterialTheme.colorScheme.secondary,
+                trackColor = onPrimary.copy(alpha = TRACK_ALPHA),
+                strokeCap = StrokeCap.Round,
+                gapSize = Dimens.SpacingNone,
+                drawStopIndicator = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = Dimens.SpacingSmall)
+                    .height(Dimens.ProgressBarHeight),
+            )
+            Text(
+                text = stringResource(R.string.xp_progress, level.currentXp, level.xpForNextLevel),
+                style = MaterialTheme.typography.labelSmall,
+                color = onPrimary.copy(alpha = CAPTION_ALPHA),
+            )
+        }
+    }
+}
+
 private fun Level.progressFraction(): Float =
     if (xpForNextLevel > 0) currentXp.toFloat() / xpForNextLevel else 0f
+
+@Composable
+private fun StreakCapsule(
+    days: Int,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(Dimens.CornerRadiusPill))
+            .padding(horizontal = Dimens.SpacingSmall, vertical = Dimens.SpacingHairline),
+    ) {
+        Icon(
+            imageVector = Icons.Filled.LocalFireDepartment,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSecondary,
+            modifier = Modifier.size(Dimens.IconSizeExtraSmall),
+        )
+        Text(
+            text = stringResource(R.string.streak_days, days),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSecondary,
+        )
+    }
+}
 
 @Composable
 private fun SpeechBubble(
@@ -133,12 +191,12 @@ private fun SpeechBubble(
     Text(
         text = text,
         style = MaterialTheme.typography.labelSmall,
-        color = MaterialTheme.colorScheme.onBackground,
+        color = MaterialTheme.colorScheme.onSurface,
         textAlign = TextAlign.Center,
         modifier = modifier
             .widthIn(max = Dimens.SpeechBubbleMaxWidth)
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(Dimens.CornerRadiusSmall),
             )
             .padding(horizontal = Dimens.SpacingSmall, vertical = Dimens.SpacingExtraSmall),
@@ -149,6 +207,10 @@ private fun SpeechBubble(
 @Composable
 private fun ProgressHeroCardPreview() {
     GreenPassportTheme {
-        ProgressHeroCard(points = 500, level = Level(number = 3, currentXp = 800, xpForNextLevel = 1000))
+        ProgressHeroCard(
+            points = 500,
+            level = Level(number = 3, currentXp = 800, xpForNextLevel = 1000),
+            streakDays = 5,
+        )
     }
 }

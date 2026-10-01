@@ -18,7 +18,7 @@ class PostToForumUseCase @Inject constructor(
         val profile = userProfileRepository.observeProfile(authorId).catch { emit(null) }.first()
         communityRepository.postToForum(
             authorId = authorId,
-            authorName = profile?.let { "${it.firstName} ${it.lastName}".trim() },
+            authorName = profile?.let { "${it.firstName} ${it.lastName}".trim() }?.ifBlank { null },
             authorAvatar = profile?.avatar,
             text = text,
         )

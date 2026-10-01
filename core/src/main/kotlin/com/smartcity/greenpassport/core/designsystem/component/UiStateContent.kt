@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -71,7 +72,9 @@ fun ErrorContent(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(vertical = Dimens.SpacingMedium),
         )
-        GpPrimaryButton(text = retryLabel, onClick = onRetry)
+        FilledTonalButton(onClick = onRetry) {
+            Text(text = retryLabel, style = MaterialTheme.typography.titleSmall)
+        }
     }
 }
 

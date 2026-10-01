@@ -15,9 +15,9 @@ import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 fun GpSurfaceCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    shape: Shape = MaterialTheme.shapes.medium,
+    shape: Shape = MaterialTheme.shapes.large,
     color: Color = MaterialTheme.colorScheme.surfaceContainer,
-    shadowElevation: Dp = Dimens.CardElevation,
+    shadowElevation: Dp = Dimens.SpacingNone,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     if (onClick == null) {

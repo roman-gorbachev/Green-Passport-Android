@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -27,6 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
+import com.smartcity.greenpassport.core.designsystem.layout.plus
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.Achievement
 import com.smartcity.greenpassport.feature.profile.R
@@ -39,6 +41,7 @@ private const val CARDS_GRID_COLUMNS = 2
 @Composable
 fun CardsScreen(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     viewModel: AchievementsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -48,24 +51,24 @@ fun CardsScreen(
             message = stringResource(CoreR.string.error_generic_message),
             retryLabel = stringResource(CoreR.string.retry_button),
             onRetry = viewModel::retry,
-            modifier = modifier,
+            modifier = modifier.padding(contentPadding),
         )
         return
     }
 
     if (uiState.isLoading) {
-        LoadingContent(modifier = modifier)
+        LoadingContent(modifier = modifier.padding(contentPadding))
         return
     }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(CARDS_GRID_COLUMNS),
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
+        contentPadding = contentPadding + PaddingValues(
             horizontal = Dimens.ScreenHorizontalPadding,
-            vertical = Dimens.SpacingSmall,
+            vertical = Dimens.SpacingMedium,
         ),
-        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium),
+        horizontalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
         verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
     ) {
         items(uiState.achievements) { achievement -> CardTile(achievement) }
@@ -79,9 +82,9 @@ private fun CardTile(achievement: Achievement) {
             .fillMaxWidth()
             .aspectRatio(1f),
         color = if (achievement.isUnlocked) {
-            MaterialTheme.colorScheme.primaryContainer
+            MaterialTheme.colorScheme.surfaceContainerHigh
         } else {
-            MaterialTheme.colorScheme.surfaceVariant
+            MaterialTheme.colorScheme.surface
         },
     ) {
         Column(
@@ -97,8 +100,9 @@ private fun CardTile(achievement: Achievement) {
                 tint = if (achievement.isUnlocked) {
                     MaterialTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colorScheme.outline
+                    MaterialTheme.colorScheme.onSurfaceVariant
                 },
+                modifier = Modifier.size(Dimens.TileSizeMedium),
             )
             Text(
                 text = if (achievement.isUnlocked) {
@@ -106,7 +110,7 @@ private fun CardTile(achievement: Achievement) {
                 } else {
                     stringResource(R.string.cards_locked_label)
                 },
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = Dimens.SpacingSmall),
             )

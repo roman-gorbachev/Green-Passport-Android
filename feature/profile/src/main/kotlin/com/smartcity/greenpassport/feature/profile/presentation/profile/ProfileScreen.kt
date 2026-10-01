@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Bookmark
@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.SwapHoriz
@@ -28,7 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,11 +42,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
-import com.smartcity.greenpassport.core.designsystem.component.GpListRow
-import com.smartcity.greenpassport.core.designsystem.component.IconCircle
+import com.smartcity.greenpassport.core.designsystem.component.ListSection
+import com.smartcity.greenpassport.core.designsystem.component.ListSectionRow
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.ProfileAvatar
 import com.smartcity.greenpassport.core.designsystem.component.ProgressHeroCard
+import com.smartcity.greenpassport.core.designsystem.component.SymbolTile
+import com.smartcity.greenpassport.core.designsystem.component.SymbolTileStyle
+import com.smartcity.greenpassport.core.designsystem.layout.plus
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.designsystem.theme.SectionColors
@@ -60,6 +63,7 @@ import com.smartcity.greenpassport.core.R as CoreR
 fun ProfileScreen(
     onMenuEntrySelected: (Destination) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -69,13 +73,13 @@ fun ProfileScreen(
             message = stringResource(CoreR.string.error_generic_message),
             retryLabel = stringResource(CoreR.string.retry_button),
             onRetry = viewModel::refresh,
-            modifier = modifier,
+            modifier = modifier.padding(contentPadding),
         )
         return
     }
 
     if (uiState.isLoading) {
-        LoadingContent(modifier = modifier)
+        LoadingContent(modifier = modifier.padding(contentPadding))
         return
     }
 
@@ -84,6 +88,7 @@ fun ProfileScreen(
         onNotificationsToggle = viewModel::onNotificationsToggle,
         onSignOut = viewModel::onSignOut,
         onMenuEntrySelected = onMenuEntrySelected,
+        contentPadding = contentPadding,
         modifier = modifier,
     )
 }
@@ -115,88 +120,118 @@ private fun ProfileContent(
     onNotificationsToggle: (Boolean) -> Unit,
     onSignOut: () -> Unit,
     onMenuEntrySelected: (Destination) -> Unit,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
+    val sectionColors = GreenPassportTheme.sectionColors
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
+        contentPadding = contentPadding + PaddingValues(
             horizontal = Dimens.ScreenHorizontalPadding,
             vertical = Dimens.SpacingMedium,
         ),
-        verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
+        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingLarge),
     ) {
         item {
-            ProfileHeader(uiState = uiState)
+            Column(verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMedium)) {
+                ProfileHeader(uiState = uiState)
+                ProgressHeroCard(points = uiState.points, level = uiState.level)
+            }
         }
 
         item {
-            ProgressHeroCard(points = uiState.points, level = uiState.level)
+            SettingsSection(
+                uiState = uiState,
+                onNotificationsToggle = onNotificationsToggle,
+                onMenuEntrySelected = onMenuEntrySelected,
+            )
         }
 
+        item {
+            ListSection {
+                profileMenuEntries.forEachIndexed { index, entry ->
+                    ListSectionRow(
+                        title = stringResource(entry.labelRes),
+                        leading = { ProfileMenuIcon(icon = entry.icon, color = entry.color(sectionColors)) },
+                        onClick = { entry.destination?.let(onMenuEntrySelected) },
+                        showDivider = index < profileMenuEntries.lastIndex,
+                    )
+                }
+            }
+        }
+
+        item {
+            ListSection {
+                ListSectionRow(
+                    title = stringResource(R.string.profile_sign_out),
+                    leading = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(Dimens.TileSizeSmall),
+                        )
+                    },
+                    trailing = {},
+                    onClick = onSignOut,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingsSection(
+    uiState: ProfileUiState,
+    onNotificationsToggle: (Boolean) -> Unit,
+    onMenuEntrySelected: (Destination) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ListSection(modifier = modifier) {
         if (uiState.isModerator) {
-            item {
-                GpListRow(
-                    title = stringResource(R.string.moderation),
-                    leading = { ProfileMenuIcon(icon = Icons.Filled.Shield, color = MaterialTheme.colorScheme.error) },
-                    onClick = { onMenuEntrySelected(Destination.Moderation) },
-                )
-            }
-        }
-
-        if (!uiState.isAnonymous) {
-            item {
-                GpListRow(
-                    title = stringResource(R.string.edit_profile),
-                    leading = { ProfileMenuIcon(icon = Icons.Filled.Edit, color = MaterialTheme.colorScheme.primary) },
-                    onClick = { onMenuEntrySelected(Destination.EditProfile) },
-                )
-            }
-        }
-
-        item {
-            GpListRow(
-                title = stringResource(R.string.profile_notifications_label),
+            ListSectionRow(
+                title = stringResource(R.string.moderation),
                 leading = {
-                    ProfileMenuIcon(icon = Icons.Filled.Notifications, color = MaterialTheme.colorScheme.primary)
-                },
-                trailing = {
-                    Switch(
-                        checked = uiState.notificationsEnabled,
-                        onCheckedChange = onNotificationsToggle,
+                    ProfileMenuIcon(
+                        icon = Icons.Filled.Shield,
+                        color = MaterialTheme.colorScheme.error
                     )
                 },
-                onClick = { onNotificationsToggle(!uiState.notificationsEnabled) },
+                onClick = { onMenuEntrySelected(Destination.Moderation) },
+                showDivider = true,
             )
         }
-
-        item {
-            LanguageRow()
-        }
-
-        items(profileMenuEntries) { entry ->
-            GpListRow(
-                title = stringResource(entry.labelRes),
-                leading = { ProfileMenuIcon(icon = entry.icon, color = entry.color(GreenPassportTheme.sectionColors)) },
-                onClick = { entry.destination?.let(onMenuEntrySelected) },
+        if (!uiState.isAnonymous) {
+            ListSectionRow(
+                title = stringResource(R.string.edit_profile),
+                leading = {
+                    ProfileMenuIcon(
+                        icon = Icons.Filled.Edit,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                },
+                onClick = { onMenuEntrySelected(Destination.EditProfile) },
+                showDivider = true,
             )
         }
-
-        item {
-            TextButton(
-                onClick = onSignOut,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Logout,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = Dimens.SpacingSmall),
+        ListSectionRow(
+            title = stringResource(R.string.profile_notifications_label),
+            leading = {
+                ProfileMenuIcon(
+                    icon = Icons.Filled.NotificationsActive,
+                    color = MaterialTheme.colorScheme.primary
                 )
-                Text(
-                    text = stringResource(R.string.profile_sign_out),
-                    style = MaterialTheme.typography.labelLarge,
+            },
+            trailing = {
+                Switch(
+                    checked = uiState.notificationsEnabled,
+                    onCheckedChange = onNotificationsToggle,
                 )
-            }
-        }
+            },
+            onClick = { onNotificationsToggle(!uiState.notificationsEnabled) },
+            showDivider = true,
+        )
+        LanguageRow()
     }
 }
 
@@ -218,7 +253,7 @@ private fun ProfileHeader(
                     uiState.isAnonymous -> stringResource(R.string.profile_anonymous_label)
                     else -> uiState.email.orEmpty()
                 },
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground,
             )
             Text(
@@ -227,8 +262,8 @@ private fun ProfileHeader(
                 } else {
                     stringResource(R.string.points_balance, uiState.points)
                 },
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.outline,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -240,10 +275,10 @@ private fun ProfileMenuIcon(
     color: Color,
     modifier: Modifier = Modifier,
 ) {
-    IconCircle(
+    SymbolTile(
         icon = icon,
-        color = color,
-        size = Dimens.IconCircleSmallSize,
+        style = SymbolTileStyle.Tinted(color),
+        size = Dimens.TileSizeSmall,
         modifier = modifier,
     )
 }
@@ -255,7 +290,7 @@ private fun LanguageRow(
 ) {
     val selected by viewModel.language.collectAsStateWithLifecycle()
     var isMenuOpen by remember { mutableStateOf(false) }
-    GpListRow(
+    ListSectionRow(
         title = stringResource(R.string.language),
         leading = {
             ProfileMenuIcon(icon = Icons.Filled.Translate, color = GreenPassportTheme.sectionColors.calendar)
@@ -264,8 +299,8 @@ private fun LanguageRow(
             Box {
                 Text(
                     text = stringResource(appLanguageLabelRes(selected)),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 DropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }) {
                     AppLanguage.entries.forEach { language ->

@@ -18,4 +18,5 @@
     <string name="spam">Спам</string>
     <string name="inappropriate_content">Неприемлемый контент</string>
     <string name="other">Другое</string>
+    <string name="message_not_sent_msg">Не удалось отправить. Проверьте интернет и попробуйте ещё раз</string>
 </resources>

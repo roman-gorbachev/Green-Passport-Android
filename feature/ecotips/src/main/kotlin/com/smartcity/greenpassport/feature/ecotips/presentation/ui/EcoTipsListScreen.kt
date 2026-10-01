@@ -12,9 +12,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Eco
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,12 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.designsystem.component.ChoiceCapsule
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
-import com.smartcity.greenpassport.core.designsystem.component.GpFilterChip
 import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
+import com.smartcity.greenpassport.core.designsystem.component.SymbolTile
+import com.smartcity.greenpassport.core.designsystem.layout.plus
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.EcoTip
 import com.smartcity.greenpassport.core.model.EcoTipCategory
@@ -44,6 +45,7 @@ import com.smartcity.greenpassport.core.R as CoreR
 fun EcoTipsListScreen(
     onTipSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     viewModel: EcoTipsListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -56,11 +58,11 @@ fun EcoTipsListScreen(
         onTipSelected = onTipSelected,
         onToggleBookmark = viewModel::onToggleBookmark,
         onRetry = viewModel::refresh,
+        contentPadding = contentPadding,
         modifier = modifier,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EcoTipsListContent(
     uiState: EcoTipsListUiState,
@@ -68,95 +70,108 @@ private fun EcoTipsListContent(
     onTipSelected: (String) -> Unit,
     onToggleBookmark: (String) -> Unit,
     onRetry: () -> Unit,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
-        val dailyTip = uiState.dailyTip
-        if (dailyTip != null) {
-            DailyTipCard(tip = dailyTip, onClick = { onTipSelected(dailyTip.id) })
-        }
+    val listPadding = contentPadding + PaddingValues(vertical = Dimens.SpacingSmall)
+    when {
+        uiState.isLoading -> LoadingContent(modifier = modifier.padding(contentPadding))
+        uiState.hasError -> ErrorContent(
+            message = stringResource(CoreR.string.error_generic_message),
+            retryLabel = stringResource(CoreR.string.retry_button),
+            onRetry = onRetry,
+            modifier = modifier.padding(contentPadding),
+        )
 
-        LazyRow(
-            contentPadding = PaddingValues(
-                horizontal = Dimens.ScreenHorizontalPadding,
-                vertical = Dimens.SpacingSmall,
-            ),
-            horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+        else -> LazyColumn(
+            contentPadding = listPadding,
+            verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
+            modifier = modifier.fillMaxSize(),
         ) {
-            item {
-                GpFilterChip(
-                    label = stringResource(R.string.ecotips_filter_all),
-                    selected = uiState.selectedCategory == null,
-                    onClick = { onCategorySelected(null) },
-                )
-            }
-            items(EcoTipCategory.entries) { category ->
-                GpFilterChip(
-                    label = stringResource(ecoTipCategoryLabelRes(category)),
-                    selected = uiState.selectedCategory == category,
-                    onClick = { onCategorySelected(category) },
-                )
-            }
-        }
-
-        when {
-            uiState.isLoading -> LoadingContent(modifier = Modifier.fillMaxSize())
-            uiState.hasError -> ErrorContent(
-                message = stringResource(CoreR.string.error_generic_message),
-                retryLabel = stringResource(CoreR.string.retry_button),
-                onRetry = onRetry,
-                modifier = Modifier.fillMaxSize(),
-            )
-            uiState.visibleTips.isEmpty() -> EmptyContent(
-                message = stringResource(R.string.ecotips_empty),
-                modifier = Modifier.fillMaxSize(),
-            )
-
-            else -> LazyColumn(
-                contentPadding = PaddingValues(
-                    horizontal = Dimens.ScreenHorizontalPadding,
-                    vertical = Dimens.SpacingSmall,
-                ),
-                verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
-            ) {
-                items(uiState.visibleTips, key = { it.id }) { tip ->
-                    val isBookmarked = uiState.bookmarkedTipIds.contains(tip.id)
-                    GpListRow(
-                        title = tip.title,
-                        leading = {
-                            Icon(
-                                imageVector = if (uiState.readTipIds.contains(tip.id)) {
-                                    Icons.Filled.CheckCircle
-                                } else {
-                                    Icons.Filled.Eco
-                                },
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        },
-                        trailing = {
-                            IconButton(onClick = { onToggleBookmark(tip.id) }) {
-                                Icon(
-                                    imageVector = if (isBookmarked) {
-                                        Icons.Filled.Bookmark
-                                    } else {
-                                        Icons.Filled.BookmarkBorder
-                                    },
-                                    contentDescription = null,
-                                    tint = if (isBookmarked) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                    },
-                                )
-                            }
-                        },
-                        onClick = { onTipSelected(tip.id) },
-                    )
+            val dailyTip = uiState.dailyTip
+            if (dailyTip != null) {
+                item {
+                    DailyTipCard(tip = dailyTip, onClick = { onTipSelected(dailyTip.id) })
                 }
+            }
+            item {
+                CategoryFilters(selectedCategory = uiState.selectedCategory, onCategorySelected = onCategorySelected)
+            }
+            if (uiState.visibleTips.isEmpty()) {
+                item {
+                    EmptyContent(message = stringResource(R.string.ecotips_empty))
+                }
+            }
+            items(uiState.visibleTips, key = { it.id }) { tip ->
+                TipRow(
+                    tip = tip,
+                    isRead = uiState.readTipIds.contains(tip.id),
+                    isBookmarked = uiState.bookmarkedTipIds.contains(tip.id),
+                    onClick = { onTipSelected(tip.id) },
+                    onToggleBookmark = { onToggleBookmark(tip.id) },
+                )
             }
         }
     }
+}
+
+@Composable
+private fun CategoryFilters(
+    selectedCategory: EcoTipCategory?,
+    onCategorySelected: (EcoTipCategory?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = Dimens.ScreenHorizontalPadding),
+        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+        modifier = modifier,
+    ) {
+        item {
+            ChoiceCapsule(
+                label = stringResource(R.string.ecotips_filter_all),
+                selected = selectedCategory == null,
+                onClick = { onCategorySelected(null) },
+            )
+        }
+        items(EcoTipCategory.entries) { category ->
+            ChoiceCapsule(
+                label = stringResource(ecoTipCategoryLabelRes(category)),
+                selected = selectedCategory == category,
+                onClick = { onCategorySelected(category) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun TipRow(
+    tip: EcoTip,
+    isRead: Boolean,
+    isBookmarked: Boolean,
+    onClick: () -> Unit,
+    onToggleBookmark: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    GpListRow(
+        title = tip.title,
+        subtitle = stringResource(ecoTipCategoryLabelRes(tip.category)),
+        leading = { SymbolTile(icon = if (isRead) Icons.Filled.Check else Icons.Filled.Eco) },
+        trailing = {
+            IconButton(onClick = onToggleBookmark) {
+                Icon(
+                    imageVector = if (isBookmarked) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                    contentDescription = null,
+                    tint = if (isBookmarked) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                )
+            }
+        },
+        onClick = onClick,
+        modifier = modifier.padding(horizontal = Dimens.ScreenHorizontalPadding),
+    )
 }
 
 @Composable
@@ -168,14 +183,13 @@ private fun DailyTipCard(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = Dimens.ScreenHorizontalPadding, vertical = Dimens.SpacingSmall),
-        shape = MaterialTheme.shapes.large,
+            .padding(horizontal = Dimens.ScreenHorizontalPadding),
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Column(modifier = Modifier.padding(Dimens.CardPadding)) {
             Text(
                 text = stringResource(R.string.ecotips_daily_tip_label),
-                style = MaterialTheme.typography.labelLarge,
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(

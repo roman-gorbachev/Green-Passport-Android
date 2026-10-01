@@ -1,11 +1,13 @@
 package com.smartcity.greenpassport.feature.feedback.presentation
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -21,13 +23,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.GpTextField
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
+import com.smartcity.greenpassport.core.designsystem.layout.plus
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.SurveyQuestion
 import com.smartcity.greenpassport.feature.feedback.R
@@ -40,6 +45,7 @@ private const val SUPPORT_PHONE = "+375 (33) 555-01-01"
 @Composable
 fun FeedbackScreen(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     viewModel: FeedbackViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -49,21 +55,23 @@ fun FeedbackScreen(
             message = stringResource(CoreR.string.error_generic_message),
             retryLabel = stringResource(CoreR.string.retry_button),
             onRetry = viewModel::retry,
-            modifier = modifier,
+            modifier = modifier.padding(contentPadding),
         )
         return
     }
 
     if (uiState.isLoading) {
-        LoadingContent(modifier = modifier)
+        LoadingContent(modifier = modifier.padding(contentPadding))
         return
     }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
+        modifier = modifier
+            .fillMaxSize()
+            .imePadding(),
+        contentPadding = contentPadding + PaddingValues(
             horizontal = Dimens.ScreenHorizontalPadding,
-            vertical = Dimens.SpacingSmall,
+            vertical = Dimens.SpacingMedium,
         ),
         verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
     ) {
@@ -252,18 +260,27 @@ private fun SurveySection(
 
 @Composable
 private fun SupportSection() {
+    val uriHandler = LocalUriHandler.current
     GpSurfaceCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Dimens.SpacingMedium)) {
             Text(text = stringResource(R.string.feedback_support_title), style = MaterialTheme.typography.titleMedium)
             Text(
                 text = stringResource(R.string.feedback_support_email_format, SUPPORT_EMAIL),
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = Dimens.SpacingSmall),
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .padding(top = Dimens.SpacingSmall)
+                    .clickable(role = Role.Button) { runCatching { uriHandler.openUri("mailto:$SUPPORT_EMAIL") } },
             )
             Text(
                 text = stringResource(R.string.feedback_support_phone_format, SUPPORT_PHONE),
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = Dimens.SpacingExtraSmall),
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .padding(top = Dimens.SpacingExtraSmall)
+                    .clickable(role = Role.Button) {
+                        runCatching { uriHandler.openUri("tel:${SUPPORT_PHONE.filter { it.isDigit() || it == '+' }}") }
+                    },
             )
         }
     }

@@ -1,17 +1,19 @@
 package com.smartcity.greenpassport.feature.community.presentation.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,9 +24,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
-import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.GpTextField
+import com.smartcity.greenpassport.core.designsystem.component.ListRowContent
+import com.smartcity.greenpassport.core.designsystem.component.ListSection
+import com.smartcity.greenpassport.core.designsystem.component.ListSectionDivider
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
+import com.smartcity.greenpassport.core.designsystem.component.SymbolTile
+import com.smartcity.greenpassport.core.designsystem.layout.plus
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.CommunityGroup
 import com.smartcity.greenpassport.feature.community.R
@@ -33,68 +39,98 @@ import com.smartcity.greenpassport.feature.community.presentation.viewmodels.Gro
 @Composable
 fun GroupsScreen(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     viewModel: GroupsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Column(modifier = modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(Dimens.SpacingMedium),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            GpTextField(
-                value = uiState.draftName,
-                onValueChange = viewModel::onDraftNameChanged,
-                label = { Text(stringResource(R.string.groups_draft_label)) },
-                isError = uiState.isNameRejected,
-                supportingText = if (uiState.isNameRejected) {
-                    { Text(stringResource(R.string.text_contains_banned_words)) }
-                } else {
-                    null
-                },
-                modifier = Modifier.weight(1f),
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .imePadding(),
+        contentPadding = contentPadding + PaddingValues(
+            horizontal = Dimens.ScreenHorizontalPadding,
+            vertical = Dimens.SpacingMedium,
+        ),
+        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingLarge),
+    ) {
+        item {
+            CreateGroupSection(
+                draftName = uiState.draftName,
+                isCreating = uiState.isCreating,
+                isNameRejected = uiState.isNameRejected,
+                onDraftNameChange = viewModel::onDraftNameChanged,
+                onCreate = viewModel::onCreateGroup,
             )
-            if (uiState.isCreating) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .padding(start = Dimens.SpacingSmall)
-                        .size(Dimens.IconSizeMedium),
-                )
-            } else {
-                Button(
-                    onClick = viewModel::onCreateGroup,
-                    modifier = Modifier.padding(start = Dimens.SpacingSmall),
-                ) {
-                    Text(stringResource(R.string.groups_create_button))
+        }
+        when {
+            uiState.isLoading -> item { LoadingContent() }
+            uiState.groups.isEmpty() -> item { EmptyContent(message = stringResource(R.string.groups_empty)) }
+            else -> item {
+                ListSection {
+                    uiState.groups.forEachIndexed { index, group ->
+                        GroupRow(
+                            group = group,
+                            isMember = uiState.currentUserId != null && group.memberIds.contains(uiState.currentUserId),
+                            isJoining = uiState.joiningGroupId == group.id,
+                            onJoin = { viewModel.onJoinGroup(group) },
+                        )
+                        if (index < uiState.groups.lastIndex) {
+                            ListSectionDivider()
+                        }
+                    }
                 }
             }
         }
+    }
+}
 
-        when {
-            uiState.isLoading -> LoadingContent(modifier = Modifier.weight(1f))
-            uiState.groups.isEmpty() -> EmptyContent(
-                message = stringResource(R.string.groups_empty),
+@Composable
+private fun CreateGroupSection(
+    draftName: String,
+    isCreating: Boolean,
+    isNameRejected: Boolean,
+    onDraftNameChange: (String) -> Unit,
+    onCreate: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ListSection(
+        modifier = modifier,
+        footer = if (isNameRejected) {
+            {
+                Text(
+                    text = stringResource(R.string.text_contains_banned_words),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        } else {
+            null
+        },
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(end = Dimens.CardPadding),
+        ) {
+            GpTextField(
+                value = draftName,
+                onValueChange = onDraftNameChange,
+                label = { Text(stringResource(R.string.groups_draft_label)) },
+                isError = isNameRejected,
+                singleLine = true,
                 modifier = Modifier.weight(1f),
             )
-
-            else -> LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                contentPadding = PaddingValues(
-                    horizontal = Dimens.ScreenHorizontalPadding,
-                    vertical = Dimens.SpacingSmall,
-                ),
-                verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
-            ) {
-                items(uiState.groups) { group ->
-                    GroupCard(
-                        group = group,
-                        isMember = uiState.currentUserId != null && group.memberIds.contains(uiState.currentUserId),
-                        isJoining = uiState.joiningGroupId == group.id,
-                        onJoin = { viewModel.onJoinGroup(group) },
+            if (isCreating) {
+                CircularProgressIndicator(modifier = Modifier.size(Dimens.IconSizeMedium))
+            } else {
+                Button(
+                    onClick = onCreate,
+                    enabled = draftName.isNotBlank(),
+                    shape = RoundedCornerShape(Dimens.CornerRadiusPill),
+                ) {
+                    Text(
+                        text = stringResource(R.string.groups_create_button),
+                        style = MaterialTheme.typography.titleSmall
                     )
                 }
             }
@@ -103,40 +139,33 @@ fun GroupsScreen(
 }
 
 @Composable
-private fun GroupCard(
+private fun GroupRow(
     group: CommunityGroup,
     isMember: Boolean,
     isJoining: Boolean,
     onJoin: () -> Unit,
 ) {
-    GpSurfaceCard(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(Dimens.SpacingMedium),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = group.name, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    text = stringResource(R.string.groups_member_count_format, group.memberIds.size),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-
+    ListRowContent(
+        title = group.name,
+        subtitle = stringResource(R.string.groups_member_count_format, group.memberIds.size),
+        leading = { SymbolTile(icon = Icons.Filled.Groups) },
+        trailing = {
             when {
                 isMember -> Text(
                     text = stringResource(R.string.groups_joined_label),
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
 
                 isJoining -> CircularProgressIndicator(modifier = Modifier.size(Dimens.IconSizeMedium))
 
-                else -> Button(onClick = onJoin) {
-                    Text(stringResource(R.string.groups_join_button))
+                else -> FilledTonalButton(onClick = onJoin, shape = RoundedCornerShape(Dimens.CornerRadiusPill)) {
+                    Text(
+                        text = stringResource(R.string.groups_join_button),
+                        style = MaterialTheme.typography.titleSmall
+                    )
                 }
             }
-        }
-    }
+        },
+    )
 }

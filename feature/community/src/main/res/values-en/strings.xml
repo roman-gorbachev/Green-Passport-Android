@@ -18,4 +18,5 @@
     <string name="spam">Spam</string>
     <string name="inappropriate_content">Inappropriate content</string>
     <string name="other">Other</string>
+    <string name="message_not_sent_msg">Couldn\'t send. Check your connection and try again</string>
 </resources>

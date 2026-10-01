@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello_name">Hello, %1$s 👋</string>
-    <string name="hello">Hello! 👋</string>
+    <string name="hello_name">Hello, %1$s</string>
+    <string name="hello">Hello!</string>
     <string name="your_tasks">Your tasks</string>
     <string name="all_tasks_completed">All tasks completed — check back later</string>
     <string name="community">Community</string>

@@ -29,17 +29,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.designsystem.component.ChoiceCapsule
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
-import com.smartcity.greenpassport.core.designsystem.component.GpFilterChip
 import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSearchField
 import com.smartcity.greenpassport.core.designsystem.component.GpSheetScaffold
-import com.smartcity.greenpassport.core.designsystem.component.IconCircle
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.ScreenHeader
 import com.smartcity.greenpassport.core.designsystem.component.SheetDialogProperties
+import com.smartcity.greenpassport.core.designsystem.component.SymbolTile
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.MapPoint
 import com.smartcity.greenpassport.core.model.MapPointType
@@ -171,11 +171,7 @@ private fun MapPointsListContent(
                         title = point.name,
                         subtitle = point.address,
                         leading = {
-                            IconCircle(
-                                icon = mapPointTypeIcon(point.type),
-                                color = mapPointTypeColor(point.type),
-                                size = Dimens.IconCircleSmallSize,
-                            )
+                            SymbolTile(icon = mapPointTypeIcon(point.type))
                         },
                         onClick = { onPointSelected(point.id) },
                     )
@@ -214,14 +210,14 @@ private fun MapFiltersOverlay(
             modifier = Modifier.padding(top = Dimens.SpacingSmall),
         ) {
             item {
-                GpFilterChip(
+                ChoiceCapsule(
                     label = stringResource(R.string.map_filter_all),
                     selected = uiState.selectedType == null,
                     onClick = { onTypeSelected(null) },
                 )
             }
             items(MapPointType.entries) { type ->
-                GpFilterChip(
+                ChoiceCapsule(
                     label = stringResource(mapPointTypeLabelRes(type)),
                     selected = uiState.selectedType == type,
                     onClick = { onTypeSelected(type) },

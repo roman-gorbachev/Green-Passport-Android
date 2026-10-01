@@ -47,7 +47,7 @@ class ForumViewModel @Inject constructor(
     }
 
     fun onDraftChanged(text: String) {
-        _uiState.update { it.copy(draft = text, isTextRejected = false) }
+        _uiState.update { it.copy(draft = text, isTextRejected = false, isSendFailed = false) }
     }
 
     fun onPost() {
@@ -56,12 +56,13 @@ class ForumViewModel @Inject constructor(
         if (text.isEmpty() || _uiState.value.isPosting) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isPosting = true) }
+            _uiState.update { it.copy(isPosting = true, isSendFailed = false) }
             runCatching {
                 postToForum(authorId, text)
                 _uiState.update { it.copy(isPosting = false, draft = "") }
             }.onFailure { error ->
-                _uiState.update { it.copy(isPosting = false, isTextRejected = error is ContentRejectedException) }
+                val isRejected = error is ContentRejectedException
+                _uiState.update { it.copy(isPosting = false, isTextRejected = isRejected, isSendFailed = !isRejected) }
             }
         }
     }

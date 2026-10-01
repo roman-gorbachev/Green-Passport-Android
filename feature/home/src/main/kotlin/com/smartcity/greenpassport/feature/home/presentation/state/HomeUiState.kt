@@ -14,4 +14,5 @@ data class HomeUiState(
     val level: Level? = null,
     val upcomingEvent: EcoEvent? = null,
     val tasks: List<Task> = emptyList(),
+    val streakDays: Int = 0,
 )

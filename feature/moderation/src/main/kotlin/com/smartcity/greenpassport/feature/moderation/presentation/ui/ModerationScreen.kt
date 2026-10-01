@@ -11,11 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryTabRow
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -29,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
@@ -36,6 +36,8 @@ import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.NetworkImage
+import com.smartcity.greenpassport.core.designsystem.component.SegmentedControl
+import com.smartcity.greenpassport.core.designsystem.layout.plus
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.ForumPost
 import com.smartcity.greenpassport.core.model.moderation.ModerationAction
@@ -48,28 +50,35 @@ import com.smartcity.greenpassport.core.R as CoreR
 @Composable
 fun ModerationScreen(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     viewModel: ModerationViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var selectedTab by rememberSaveable { mutableStateOf(ModerationTab.PHOTOS) }
 
     when {
-        uiState.isLoading -> LoadingContent(modifier = modifier)
+        uiState.isLoading -> LoadingContent(modifier = modifier.padding(contentPadding))
         !uiState.isModerator -> EmptyContent(
             message = stringResource(R.string.moderators_only_msg),
-            modifier = modifier,
+            modifier = modifier.padding(contentPadding),
         )
-        else -> Column(modifier = modifier.fillMaxSize()) {
-            PrimaryTabRow(selectedTabIndex = selectedTab.ordinal) {
-                ModerationTab.entries.forEach { tab ->
+        else -> Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(top = contentPadding.calculateTopPadding()),
+        ) {
+            SegmentedControl(
+                options = ModerationTab.entries.map { tab ->
                     val count = if (tab == ModerationTab.PHOTOS) uiState.submissions.size else uiState.flaggedPosts.size
-                    Tab(
-                        selected = tab == selectedTab,
-                        onClick = { selectedTab = tab },
-                        text = { Text(stringResource(tabLabelRes(tab), count)) },
-                    )
-                }
-            }
+                    stringResource(tabLabelRes(tab), count)
+                },
+                selectedIndex = selectedTab.ordinal,
+                onSelect = { index -> selectedTab = ModerationTab.entries[index] },
+                modifier = Modifier.padding(
+                    horizontal = Dimens.ScreenHorizontalPadding,
+                    vertical = Dimens.SpacingSmall
+                ),
+            )
             if (uiState.hasActionError) {
                 Text(
                     text = stringResource(R.string.action_failed_msg),
@@ -84,12 +93,14 @@ fun ModerationScreen(
                     processingIds = uiState.processingIds,
                     onApprove = viewModel::onApprove,
                     onReject = viewModel::onReject,
+                    bottomPadding = contentPadding.calculateBottomPadding(),
                 )
 
                 ModerationTab.REPORTS -> FlaggedPostsList(
                     posts = uiState.flaggedPosts,
                     processingIds = uiState.processingIds,
                     onAction = viewModel::onModeratePost,
+                    bottomPadding = contentPadding.calculateBottomPadding(),
                 )
             }
         }
@@ -102,13 +113,19 @@ private fun SubmissionsList(
     processingIds: Set<String>,
     onApprove: (String) -> Unit,
     onReject: (String, String) -> Unit,
+    bottomPadding: Dp,
 ) {
     if (submissions.isEmpty()) {
         EmptyContent(message = stringResource(R.string.no_photos_to_review))
         return
     }
     LazyColumn(
-        contentPadding = PaddingValues(Dimens.ScreenHorizontalPadding),
+        contentPadding = PaddingValues(
+            start = Dimens.ScreenHorizontalPadding,
+            end = Dimens.ScreenHorizontalPadding,
+            top = Dimens.SpacingSmall,
+            bottom = Dimens.ScreenHorizontalPadding + bottomPadding,
+        ),
         verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
     ) {
         items(submissions, key = { it.submission.id }) { item ->
@@ -200,20 +217,50 @@ private fun FlaggedPostsList(
     posts: List<ForumPost>,
     processingIds: Set<String>,
     onAction: (String, ModerationAction) -> Unit,
+    bottomPadding: Dp,
 ) {
+    var postPendingDeletion by remember { mutableStateOf<String?>(null) }
+    postPendingDeletion?.let { postId ->
+        AlertDialog(
+            onDismissRequest = { postPendingDeletion = null },
+            title = { Text(stringResource(R.string.delete)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        postPendingDeletion = null
+                        onAction(postId, ModerationAction.DELETE)
+                    },
+                ) {
+                    Text(text = stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { postPendingDeletion = null }) {
+                    Text(stringResource(CoreR.string.cancel))
+                }
+            },
+        )
+    }
     if (posts.isEmpty()) {
         EmptyContent(message = stringResource(R.string.no_reports))
         return
     }
     LazyColumn(
-        contentPadding = PaddingValues(Dimens.ScreenHorizontalPadding),
+        contentPadding = PaddingValues(
+            start = Dimens.ScreenHorizontalPadding,
+            end = Dimens.ScreenHorizontalPadding,
+            top = Dimens.SpacingSmall,
+            bottom = Dimens.ScreenHorizontalPadding + bottomPadding,
+        ),
         verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
     ) {
         items(posts, key = { it.id }) { post ->
             FlaggedPostCard(
                 post = post,
                 isProcessing = post.id in processingIds,
-                onAction = { action -> onAction(post.id, action) },
+                onAction = { action ->
+                    if (action == ModerationAction.DELETE) postPendingDeletion = post.id else onAction(post.id, action)
+                },
             )
         }
     }
