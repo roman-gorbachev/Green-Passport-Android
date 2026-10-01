@@ -5,7 +5,8 @@
     <string name="map_type_eco_event">Эко-события</string>
     <string name="map_search_placeholder">Поиск</string>
     <string name="map_empty">Ничего не найдено</string>
-    <string name="map_route_unavailable">Построение маршрута пока недоступно</string>
     <string name="save">Сохранить</string>
     <string name="saved">Сохранено</string>
+    <string name="build_route">Маршрут</string>
+    <string name="my_location">Моё местоположение</string>
 </resources>

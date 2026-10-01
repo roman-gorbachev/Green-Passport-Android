@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.model.MapPoint
 import com.smartcity.greenpassport.core.model.MapPointType
+import com.smartcity.greenpassport.core.model.map.MapFocus
 import com.smartcity.greenpassport.feature.map.domain.GetMapPointsUseCase
 import com.smartcity.greenpassport.feature.map.domain.ObserveSavedMapPointIdsUseCase
+import com.smartcity.greenpassport.feature.map.domain.ResolveMapFocusUseCase
 import com.smartcity.greenpassport.feature.map.domain.ToggleSavedMapPointUseCase
 import com.smartcity.greenpassport.feature.map.presentation.state.MapUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,10 +20,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,6 +36,7 @@ import javax.inject.Inject
 class MapViewModel @Inject constructor(
     private val getMapPoints: GetMapPointsUseCase,
     private val toggleSavedMapPoint: ToggleSavedMapPointUseCase,
+    private val resolveMapFocus: ResolveMapFocusUseCase,
     observeSavedMapPointIds: ObserveSavedMapPointIdsUseCase,
 ) : ViewModel() {
 
@@ -41,6 +47,14 @@ class MapViewModel @Inject constructor(
 
     private val filters = MutableStateFlow(MapFilters())
 
+    private val isLocationPermissionResolved = MutableStateFlow(false)
+
+    private val focus = isLocationPermissionResolved
+        .filter { it }
+        .take(1)
+        .map<Boolean, MapFocus?> { resolveMapFocus() }
+        .onStart { emit(null) }
+
     val uiState = observeMapUiState(observeSavedMapPointIds()).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
@@ -49,6 +63,12 @@ class MapViewModel @Inject constructor(
 
     fun refresh() {
         refreshRequests.tryEmit(Unit)
+    }
+
+    fun shouldRequestLocationPermission(): Boolean = !isLocationPermissionResolved.value
+
+    fun onLocationPermissionResolved() {
+        isLocationPermissionResolved.value = true
     }
 
     fun onTypeSelected(type: MapPointType?) {
@@ -76,7 +96,8 @@ class MapViewModel @Inject constructor(
             observePoints(),
             savedIds.catch { emit(emptySet()) }.onStart { emit(emptySet()) },
             filters,
-        ) { points, saved, currentFilters ->
+            focus,
+        ) { points, saved, currentFilters, currentFocus ->
             MapUiState(
                 points = points.points.orEmpty(),
                 savedPointIds = saved,
@@ -85,6 +106,7 @@ class MapViewModel @Inject constructor(
                 selectedPointId = currentFilters.selectedPointId,
                 isLoading = points.isLoading,
                 hasError = points.hasError,
+                focus = currentFocus,
             )
         }
     }

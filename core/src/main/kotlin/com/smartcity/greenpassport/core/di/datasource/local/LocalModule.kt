@@ -5,10 +5,12 @@ import androidx.room.Room
 import com.smartcity.greenpassport.core.datasource.local.GreenPassportDatabase
 import com.smartcity.greenpassport.core.datasource.local.dao.GameProgressDao
 import com.smartcity.greenpassport.core.datasource.local.dao.NotificationLogDao
+import com.smartcity.greenpassport.core.datasource.local.location.FusedLocationRepository
 import com.smartcity.greenpassport.core.datasource.local.repository.GameProgressRepository
 import com.smartcity.greenpassport.core.datasource.local.repository.NotificationLogRepository
 import com.smartcity.greenpassport.core.datasource.local.repository.RoomGameProgressRepository
 import com.smartcity.greenpassport.core.datasource.local.repository.RoomNotificationLogRepository
+import com.smartcity.greenpassport.core.model.map.LocationRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -28,6 +30,9 @@ abstract class LocalModule {
 
     @Binds
     abstract fun bindNotificationLogRepository(impl: RoomNotificationLogRepository): NotificationLogRepository
+
+    @Binds
+    abstract fun bindLocationRepository(impl: FusedLocationRepository): LocationRepository
 
     companion object {
         @Provides

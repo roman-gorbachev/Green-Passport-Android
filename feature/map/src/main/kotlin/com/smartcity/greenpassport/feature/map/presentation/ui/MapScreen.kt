@@ -1,14 +1,23 @@
 package com.smartcity.greenpassport.feature.map.presentation.ui
 
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -16,17 +25,25 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ChoiceCapsule
@@ -55,6 +72,21 @@ fun MapScreen(
     viewModel: MapViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+    ) { viewModel.onLocationPermissionResolved() }
+
+    LaunchedEffect(Unit) {
+        val isGranted = LOCATION_PERMISSIONS.any { permission ->
+            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        }
+        if (isGranted || !viewModel.shouldRequestLocationPermission()) {
+            viewModel.onLocationPermissionResolved()
+        } else {
+            permissionLauncher.launch(LOCATION_PERMISSIONS)
+        }
+    }
 
     if (MapKitInitializer.isAvailable) {
         MapContent(
@@ -103,7 +135,9 @@ private fun MapContent(
     Box(modifier = modifier.fillMaxSize()) {
         YandexMap(
             points = uiState.visiblePoints,
+            focus = uiState.focus,
             onPointClick = onPointSelected,
+            bottomPadding = bottomInset + Dimens.BottomBarReservedHeight,
             logoBottomPaddingPx = logoBottomPaddingPx,
             modifier = Modifier.fillMaxSize(),
         )
@@ -253,11 +287,45 @@ private fun MapPointSheet(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = Dimens.SpacingSmall),
             )
-            GpPrimaryButton(
-                text = stringResource(if (isSaved) R.string.saved else R.string.save),
-                onClick = onToggleSaved,
+            val context = LocalContext.current
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingCompact),
                 modifier = Modifier.padding(top = Dimens.SpacingLarge),
-            )
+            ) {
+                GpPrimaryButton(
+                    text = stringResource(R.string.build_route),
+                    onClick = { openRoute(context, point) },
+                    modifier = Modifier.weight(1f),
+                )
+                FilledTonalButton(
+                    onClick = onToggleSaved,
+                    shape = RoundedCornerShape(Dimens.CornerRadiusPill),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(Dimens.PrimaryButtonHeight),
+                ) {
+                    Icon(
+                        imageVector = if (isSaved) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = Dimens.SpacingSmall),
+                    )
+                    Text(
+                        text = stringResource(if (isSaved) R.string.saved else R.string.save),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+            }
         }
     }
+}
+
+private val LOCATION_PERMISSIONS = arrayOf(
+    Manifest.permission.ACCESS_FINE_LOCATION,
+    Manifest.permission.ACCESS_COARSE_LOCATION,
+)
+
+private fun openRoute(context: Context, point: MapPoint) {
+    val coordinates = "${point.latitude},${point.longitude}"
+    val uri = Uri.parse("geo:$coordinates?q=$coordinates(${Uri.encode(point.name)})")
+    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, uri)) }
 }

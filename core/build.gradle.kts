@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.functions)
     implementation(libs.play.services.code.scanner)
+    implementation(libs.play.services.location)
 
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services)
