@@ -20,4 +20,15 @@
     <string name="inappropriate_content">Недапушчальны кантэнт</string>
     <string name="other">Іншае</string>
     <string name="message_not_sent_msg">Не ўдалося адправіць. Праверце інтэрнэт і паспрабуйце яшчэ раз</string>
+    <string name="group_members">Удзельнікі</string>
+    <string name="invite">Запрасіць</string>
+    <string name="leave_group">Пакінуць групу</string>
+    <string name="leave_group_confirm_msg">Чат групы стане недаступны. Вярнуцца можна па кодзе запрашэння.</string>
+    <string name="join_by_code">Далучыцца па кодзе</string>
+    <string name="invite_code">Код запрашэння</string>
+    <string name="group_not_found_msg">Група з такім кодам не знойдзена</string>
+    <string name="group_invite_share_msg">Далучайся да групы «%1$s» у Зялёным пашпарце. Код: %2$s</string>
+    <string name="group_chat_empty_msg">Паведамленняў пакуль няма. Напішыце першым!</string>
+    <string name="join_group_to_chat_msg">Далучыцеся да групы, каб чытаць і пісаць у чат</string>
+    <string name="more">Яшчэ</string>
 </resources>

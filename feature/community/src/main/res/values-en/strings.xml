@@ -19,4 +19,15 @@
     <string name="inappropriate_content">Inappropriate content</string>
     <string name="other">Other</string>
     <string name="message_not_sent_msg">Couldn\'t send. Check your connection and try again</string>
+    <string name="group_members">Members</string>
+    <string name="invite">Invite</string>
+    <string name="leave_group">Leave group</string>
+    <string name="leave_group_confirm_msg">You will lose access to the group chat. You can come back with the invite code.</string>
+    <string name="join_by_code">Join by code</string>
+    <string name="invite_code">Invite code</string>
+    <string name="group_not_found_msg">No group found with this code</string>
+    <string name="group_invite_share_msg">Join the “%1$s” group in Green Passport. Code: %2$s</string>
+    <string name="group_chat_empty_msg">No messages yet. Be the first to write!</string>
+    <string name="join_group_to_chat_msg">Join the group to read and write in the chat</string>
+    <string name="more">More</string>
 </resources>

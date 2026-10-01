@@ -19,4 +19,15 @@
     <string name="inappropriate_content">Неприемлемый контент</string>
     <string name="other">Другое</string>
     <string name="message_not_sent_msg">Не удалось отправить. Проверьте интернет и попробуйте ещё раз</string>
+    <string name="group_members">Участники</string>
+    <string name="invite">Пригласить</string>
+    <string name="leave_group">Покинуть группу</string>
+    <string name="leave_group_confirm_msg">Чат группы станет недоступен. Вернуться можно по коду приглашения.</string>
+    <string name="join_by_code">Вступить по коду</string>
+    <string name="invite_code">Код приглашения</string>
+    <string name="group_not_found_msg">Группа с таким кодом не найдена</string>
+    <string name="group_invite_share_msg">Присоединяйся к группе «%1$s» в Зелёном паспорте. Код: %2$s</string>
+    <string name="group_chat_empty_msg">Сообщений пока нет. Напишите первым!</string>
+    <string name="join_group_to_chat_msg">Вступите в группу, чтобы читать и писать в чат</string>
+    <string name="more">Ещё</string>
 </resources>

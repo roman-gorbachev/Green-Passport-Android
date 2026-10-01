@@ -19,7 +19,12 @@ import com.smartcity.greenpassport.feature.calendar.presentation.ui.CalendarScre
 import com.smartcity.greenpassport.feature.calendar.presentation.ui.EventDetailSheet
 import com.smartcity.greenpassport.feature.community.presentation.ui.CommunityHubScreen
 import com.smartcity.greenpassport.feature.community.presentation.ui.ForumScreen
+import com.smartcity.greenpassport.feature.community.presentation.ui.GroupDetailScreen
+import com.smartcity.greenpassport.feature.community.presentation.ui.GroupMenuButton
 import com.smartcity.greenpassport.feature.community.presentation.ui.GroupsScreen
+import com.smartcity.greenpassport.feature.community.presentation.ui.JoinByCodeButton
+import com.smartcity.greenpassport.feature.community.presentation.viewmodels.GroupDetailViewModel
+import com.smartcity.greenpassport.feature.community.presentation.viewmodels.GroupsViewModel
 import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipDetailScreen
 import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipsListScreen
 import com.smartcity.greenpassport.feature.feedback.presentation.FeedbackScreen
@@ -239,11 +244,37 @@ private fun NavGraphBuilder.communityRoutes(navController: NavHostController) {
         }
     }
     composable<Destination.CommunityGroups> {
+        val viewModel: GroupsViewModel = hiltViewModel()
         FeatureScaffold(
             title = stringResource(CommunityR.string.community_groups_title),
             onNavigateBack = navController::popBackStack,
+            actions = { JoinByCodeButton(onClick = { viewModel.onCodeDialogVisibilityChanged(true) }) },
         ) { innerPadding ->
-            GroupsScreen(contentPadding = innerPadding)
+            GroupsScreen(
+                onGroupSelected = { groupId -> navController.navigate(Destination.CommunityGroup(groupId)) },
+                contentPadding = innerPadding,
+                viewModel = viewModel,
+            )
+        }
+    }
+    composable<Destination.CommunityGroup> {
+        val viewModel: GroupDetailViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val group = uiState.group
+        FeatureScaffold(
+            title = group?.name.orEmpty(),
+            onNavigateBack = navController::popBackStack,
+            actions = {
+                if (group != null && uiState.isMember) {
+                    GroupMenuButton(
+                        group = group,
+                        onShowMembers = { viewModel.onMembersVisibilityChanged(true) },
+                        onLeave = { viewModel.onLeaveConfirmationVisibilityChanged(true) },
+                    )
+                }
+            },
+        ) { innerPadding ->
+            GroupDetailScreen(contentPadding = innerPadding, viewModel = viewModel)
         }
     }
     composable<Destination.Feedback> {

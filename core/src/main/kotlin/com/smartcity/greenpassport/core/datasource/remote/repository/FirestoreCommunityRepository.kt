@@ -1,19 +1,24 @@
 package com.smartcity.greenpassport.core.datasource.remote.repository
 
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
 import com.smartcity.greenpassport.core.datasource.remote.InviteCodeGenerator
-import com.smartcity.greenpassport.core.model.ChatMessage
+import com.smartcity.greenpassport.core.datasource.remote.cacheFirstSnapshots
 import com.smartcity.greenpassport.core.model.CommunityGroup
 import com.smartcity.greenpassport.core.model.CommunityRepository
 import com.smartcity.greenpassport.core.model.ForumPost
+import com.smartcity.greenpassport.core.model.GroupMember
+import com.smartcity.greenpassport.core.model.GroupMessage
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -31,6 +36,13 @@ private const val FIELD_OWNER_ID = "ownerId"
 private const val FIELD_INVITE_CODE = "inviteCode"
 
 private const val FIELD_SENDER_ID = "senderId"
+private const val FIELD_SENDER_NAME = "senderName"
+private const val FIELD_SENDER_AVATAR = "senderAvatar"
+private const val FIELD_FIRST_NAME = "firstName"
+private const val FIELD_LAST_NAME = "lastName"
+private const val FIELD_AVATAR = "avatar"
+private const val MESSAGES_LIMIT = 200L
+private const val MEMBERS_QUERY_CHUNK_SIZE = 30
 
 class FirestoreCommunityRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
@@ -84,22 +96,62 @@ class FirestoreCommunityRepository @Inject constructor(
             .await()
     }
 
-    override fun observeChatMessages(chatId: String): Flow<List<ChatMessage>> = callbackFlow {
-        val query = FirestoreCollections.chatMessages(firestore, chatId)
-            .orderBy(FIELD_CREATED_AT, Query.Direction.ASCENDING)
-        val registration = query.addSnapshotListener { snapshot, _ ->
-            trySend(snapshot?.documents.orEmpty().mapNotNull { it.toChatMessage() })
-        }
-        awaitClose { registration.remove() }
+    override fun observeGroup(groupId: String): Flow<CommunityGroup?> =
+        FirestoreCollections.groups(firestore).document(groupId).cacheFirstSnapshots()
+            .map { snapshot -> snapshot.toCommunityGroup() }
+            .distinctUntilChanged()
+
+    override suspend fun leaveGroup(groupId: String, userId: String) {
+        FirestoreCollections.groups(firestore).document(groupId)
+            .update(FIELD_MEMBER_IDS, FieldValue.arrayRemove(userId))
+            .await()
     }
 
-    override suspend fun sendChatMessage(chatId: String, senderId: String, text: String) {
+    override suspend fun findGroup(inviteCode: String): CommunityGroup? =
+        FirestoreCollections.groups(firestore)
+            .whereEqualTo(FIELD_INVITE_CODE, inviteCode)
+            .limit(1)
+            .get()
+            .await()
+            .documents
+            .firstOrNull()
+            ?.toCommunityGroup()
+
+    override fun observeMessages(groupId: String): Flow<List<GroupMessage>> =
+        FirestoreCollections.chatMessages(firestore, groupId)
+            .orderBy(FIELD_CREATED_AT, Query.Direction.ASCENDING)
+            .limitToLast(MESSAGES_LIMIT)
+            .cacheFirstSnapshots()
+            .map { snapshot -> snapshot.documents.mapNotNull { it.toGroupMessage() } }
+            .distinctUntilChanged()
+
+    override suspend fun sendMessage(
+        groupId: String,
+        senderId: String,
+        senderName: String?,
+        senderAvatar: AvatarStyle?,
+        text: String,
+    ) {
         val data = mapOf(
             FIELD_SENDER_ID to senderId,
+            FIELD_SENDER_NAME to senderName,
+            FIELD_SENDER_AVATAR to senderAvatar?.name,
             FIELD_TEXT to text,
             FIELD_CREATED_AT to System.currentTimeMillis(),
         )
-        FirestoreCollections.chatMessages(firestore, chatId).add(data).await()
+        FirestoreCollections.chatMessages(firestore, groupId).add(data).await()
+    }
+
+    override suspend fun fetchMembers(ids: List<String>): List<GroupMember> {
+        val membersById = ids.chunked(MEMBERS_QUERY_CHUNK_SIZE).flatMap { chunk ->
+            FirestoreCollections.users(firestore)
+                .whereIn(FieldPath.documentId(), chunk)
+                .get()
+                .await()
+                .documents
+                .map { it.toGroupMember() }
+        }.associateBy { it.id }
+        return ids.map { id -> membersById[id] ?: GroupMember(id = id, name = null, avatar = AvatarStyle.LIME) }
     }
 }
 
@@ -123,15 +175,35 @@ internal fun DocumentSnapshot.toForumPost(): ForumPost? {
 
 private fun DocumentSnapshot.toCommunityGroup(): CommunityGroup? {
     val name = getString(FIELD_NAME) ?: return null
-
-    @Suppress("UNCHECKED_CAST")
-    val memberIds = get(FIELD_MEMBER_IDS) as? List<String> ?: emptyList()
-    return CommunityGroup(id = id, name = name, memberIds = memberIds)
+    val memberIds = (get(FIELD_MEMBER_IDS) as? List<*>)?.filterIsInstance<String>().orEmpty()
+    return CommunityGroup(
+        id = id,
+        name = name,
+        memberIds = memberIds,
+        ownerId = getString(FIELD_OWNER_ID),
+        inviteCode = getString(FIELD_INVITE_CODE),
+    )
 }
 
-private fun DocumentSnapshot.toChatMessage(): ChatMessage? {
+private fun DocumentSnapshot.toGroupMessage(): GroupMessage? {
     val senderId = getString(FIELD_SENDER_ID) ?: return null
     val text = getString(FIELD_TEXT) ?: return null
     val sentAt = getLong(FIELD_CREATED_AT) ?: return null
-    return ChatMessage(id = id, senderId = senderId, text = text, sentAtEpochMillis = sentAt)
+    return GroupMessage(
+        id = id,
+        senderId = senderId,
+        senderName = getString(FIELD_SENDER_NAME),
+        senderAvatar = AvatarStyle.entries.firstOrNull { it.name == getString(FIELD_SENDER_AVATAR) },
+        text = text,
+        sentAtEpochMillis = sentAt,
+    )
+}
+
+private fun DocumentSnapshot.toGroupMember(): GroupMember {
+    val name = listOfNotNull(getString(FIELD_FIRST_NAME), getString(FIELD_LAST_NAME)).joinToString(" ").trim()
+    return GroupMember(
+        id = id,
+        name = name.ifBlank { null },
+        avatar = AvatarStyle.entries.firstOrNull { it.name == getString(FIELD_AVATAR) } ?: AvatarStyle.LIME,
+    )
 }

@@ -18,13 +18,8 @@ data class CommunityGroup(
     val id: String,
     val name: String,
     val memberIds: List<String>,
-)
-
-data class ChatMessage(
-    val id: String,
-    val senderId: String,
-    val text: String,
-    val sentAtEpochMillis: Long,
+    val ownerId: String? = null,
+    val inviteCode: String? = null,
 )
 
 interface CommunityRepository {
@@ -35,6 +30,16 @@ interface CommunityRepository {
     suspend fun createGroup(name: String, creatorId: String)
     suspend fun joinGroup(groupId: String, userId: String)
 
-    fun observeChatMessages(chatId: String): Flow<List<ChatMessage>>
-    suspend fun sendChatMessage(chatId: String, senderId: String, text: String)
+    fun observeGroup(groupId: String): Flow<CommunityGroup?>
+    suspend fun leaveGroup(groupId: String, userId: String)
+    suspend fun findGroup(inviteCode: String): CommunityGroup?
+    fun observeMessages(groupId: String): Flow<List<GroupMessage>>
+    suspend fun sendMessage(
+        groupId: String,
+        senderId: String,
+        senderName: String?,
+        senderAvatar: AvatarStyle?,
+        text: String,
+    )
+    suspend fun fetchMembers(ids: List<String>): List<GroupMember>
 }

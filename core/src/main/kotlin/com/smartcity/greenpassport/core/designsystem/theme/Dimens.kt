@@ -38,6 +38,8 @@ object Dimens {
     val TileSizeLarge = 56.dp
     val HistoryTileSize = 36.dp
     val CouponTileSize = 40.dp
+    val MessageAvatarSize = 28.dp
+    val MessageBubbleMaxWidth = 280.dp
     val CouponQrSize = 200.dp
     val InputFieldHeight = 50.dp
     val ProgressHeroHeight = 140.dp

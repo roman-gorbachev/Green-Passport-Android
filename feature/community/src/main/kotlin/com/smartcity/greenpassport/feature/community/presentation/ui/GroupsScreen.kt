@@ -1,5 +1,6 @@
 package com.smartcity.greenpassport.feature.community.presentation.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -9,18 +10,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
@@ -35,14 +42,34 @@ import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.CommunityGroup
 import com.smartcity.greenpassport.feature.community.R
 import com.smartcity.greenpassport.feature.community.presentation.viewmodels.GroupsViewModel
+import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun GroupsScreen(
+    onGroupSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     viewModel: GroupsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.openedGroupId) {
+        uiState.openedGroupId?.let { groupId ->
+            viewModel.onOpenedGroupShown()
+            onGroupSelected(groupId)
+        }
+    }
+
+    if (uiState.isCodeDialogVisible) {
+        JoinByCodeDialog(
+            code = uiState.inviteCodeDraft,
+            isJoining = uiState.isJoiningByCode,
+            isNotFound = uiState.isInviteCodeNotFound,
+            onCodeChange = viewModel::onInviteCodeChanged,
+            onJoin = viewModel::onJoinByCode,
+            onDismiss = { viewModel.onCodeDialogVisibilityChanged(false) },
+        )
+    }
 
     LazyColumn(
         modifier = modifier
@@ -74,6 +101,7 @@ fun GroupsScreen(
                             isMember = uiState.currentUserId != null && group.memberIds.contains(uiState.currentUserId),
                             isJoining = uiState.joiningGroupId == group.id,
                             onJoin = { viewModel.onJoinGroup(group) },
+                            onClick = { onGroupSelected(group.id) },
                         )
                         if (index < uiState.groups.lastIndex) {
                             ListSectionDivider()
@@ -144,8 +172,10 @@ private fun GroupRow(
     isMember: Boolean,
     isJoining: Boolean,
     onJoin: () -> Unit,
+    onClick: () -> Unit,
 ) {
     ListRowContent(
+        modifier = Modifier.clickable(role = Role.Button, onClick = onClick),
         title = group.name,
         subtitle = stringResource(R.string.groups_member_count_format, group.memberIds.size),
         leading = { SymbolTile(icon = Icons.Filled.Groups) },
@@ -165,6 +195,46 @@ private fun GroupRow(
                         style = MaterialTheme.typography.titleSmall
                     )
                 }
+            }
+        },
+    )
+}
+
+@Composable
+private fun JoinByCodeDialog(
+    code: String,
+    isJoining: Boolean,
+    isNotFound: Boolean,
+    onCodeChange: (String) -> Unit,
+    onJoin: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.join_by_code)) },
+        text = {
+            GpTextField(
+                value = code,
+                onValueChange = onCodeChange,
+                label = { Text(stringResource(R.string.invite_code)) },
+                isError = isNotFound,
+                supportingText = if (isNotFound) {
+                    { Text(stringResource(R.string.group_not_found_msg)) }
+                } else {
+                    null
+                },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onJoin, enabled = code.isNotBlank() && !isJoining) {
+                Text(stringResource(R.string.groups_join_button))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(CoreR.string.cancel))
             }
         },
     )

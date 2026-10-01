@@ -61,6 +61,9 @@ sealed interface Destination {
     data object CommunityGroups : Destination
 
     @Serializable
+    data class CommunityGroup(val groupId: String) : Destination
+
+    @Serializable
     data object EcoTips : Destination
 
     @Serializable

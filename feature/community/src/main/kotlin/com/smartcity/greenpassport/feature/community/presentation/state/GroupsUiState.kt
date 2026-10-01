@@ -10,4 +10,9 @@ data class GroupsUiState(
     val isNameRejected: Boolean = false,
     val joiningGroupId: String? = null,
     val currentUserId: String? = null,
+    val isCodeDialogVisible: Boolean = false,
+    val inviteCodeDraft: String = "",
+    val isJoiningByCode: Boolean = false,
+    val isInviteCodeNotFound: Boolean = false,
+    val openedGroupId: String? = null,
 )
