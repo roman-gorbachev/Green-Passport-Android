@@ -1,8 +1,5 @@
 package com.smartcity.greenpassport.feature.map.presentation.ui
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,6 +29,7 @@ import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.logo.Padding
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
@@ -53,7 +51,7 @@ fun YandexMap(
 ) {
     val context = LocalContext.current
     val mapView = remember { MapView(context) }
-    val pinIcon = remember { ImageProvider.fromBitmap(pinBitmap(context)) }
+    val pinRenderer = remember { MapPinRenderer(context) }
     val userLocationLayer = remember { MapKitFactory.getInstance().createUserLocationLayer(mapView.mapWindow) }
     val state = remember { YandexMapState() }
     val currentOnPointClick by rememberUpdatedState(onPointClick)
@@ -86,10 +84,10 @@ fun YandexMap(
                             true
                         }
                         state.tapListeners += listener
+                        val pin = pinRenderer.render(point.name)
                         map.mapObjects.addPlacemark().apply {
                             geometry = Point(point.latitude, point.longitude)
-                            setIcon(pinIcon)
-                            setText(point.name)
+                            setIcon(ImageProvider.fromBitmap(pin.bitmap), IconStyle().setAnchor(pin.anchor))
                             addTapListener(WeakReference(listener))
                         }
                     }
@@ -133,11 +131,3 @@ private class YandexMapState {
 
 private fun cameraPosition(point: GeoPoint, zoom: Float): CameraPosition =
     CameraPosition(Point(point.latitude, point.longitude), zoom, DEFAULT_AZIMUTH, DEFAULT_TILT)
-
-private fun pinBitmap(context: Context): Bitmap {
-    val drawable = checkNotNull(context.getDrawable(R.drawable.ic_map_pin))
-    val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
-    drawable.setBounds(0, 0, bitmap.width, bitmap.height)
-    drawable.draw(Canvas(bitmap))
-    return bitmap
-}
