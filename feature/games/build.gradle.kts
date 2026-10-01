@@ -15,6 +15,7 @@ android {
 
     defaultConfig {
         minSdk = 26
+        buildConfigField("String", "GAMES_BASE_URL", "\"https://chatroom-85fb8.web.app\"")
     }
 
     compileOptions {
@@ -24,11 +25,13 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
 dependencies {
     implementation(project(":core"))
+    implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)

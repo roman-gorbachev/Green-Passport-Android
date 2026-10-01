@@ -28,6 +28,7 @@ private const val BOOKMARKED_TIPS_COLLECTION = "bookmarkedTips"
 private const val TASK_SUBMISSIONS_COLLECTION = "taskSubmissions"
 private const val REPORTS_COLLECTION = "reports"
 private const val ADMINS_COLLECTION = "admins"
+private const val GAMES_COLLECTION = "games"
 
 object FirestoreCollections {
     fun appRoot(firestore: FirebaseFirestore): DocumentReference =
@@ -95,4 +96,7 @@ object FirestoreCollections {
 
     fun admins(firestore: FirebaseFirestore): CollectionReference =
         appRoot(firestore).collection(ADMINS_COLLECTION)
+
+    fun games(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(GAMES_COLLECTION)
 }

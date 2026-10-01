@@ -1,75 +1,7 @@
 <resources>
-    <string name="game_eco_puzzle_title">Eco Puzzle</string>
-    <string name="game_waste_sorting_title">Waste Sorting</string>
-    <string name="game_eco_maze_title">Eco Maze</string>
-    <string name="game_eco_quiz_title">Eco Quiz</string>
     <string name="games_best_score_format">Best: %1$d</string>
-
-    <string name="puzzle_instructions">Find matching pairs of cards</string>
-    <string name="puzzle_finished_format">Done! Moves: %1$d, score: %2$d</string>
-
-    <string name="sorting_instructions">Pick the right bin for the item</string>
-    <string name="sorting_score_format">Score: %1$d</string>
-    <string name="sorting_time_format">Time left: %1$ds</string>
-    <string name="sorting_bin_glass">Glass</string>
-    <string name="sorting_bin_metal">Metal</string>
-    <string name="sorting_bin_paper">Paper</string>
-    <string name="sorting_bin_plastic">Plastic</string>
-    <string name="sorting_finished_format">Game over! Score: %1$d</string>
-    <string name="game_play_again">Play again</string>
-
-    <string name="sorting_item_glass_bottle">Glass bottle</string>
-    <string name="sorting_item_glass_jar">Glass jar</string>
-    <string name="sorting_item_soda_can">Soda can</string>
-    <string name="sorting_item_foil">Aluminum foil</string>
-    <string name="sorting_item_newspaper">Newspaper</string>
-    <string name="sorting_item_cardboard_box">Cardboard box</string>
-    <string name="sorting_item_plastic_bag">Plastic bag</string>
-    <string name="sorting_item_plastic_bottle">Plastic bottle</string>
-
-    <string name="maze_score_format">Score: %1$d</string>
-    <string name="maze_finished_format">You made it through the maze! Score: %1$d</string>
-
-    <string name="quiz_score_format">Question %1$d of %2$d · Score: %3$d</string>
-    <string name="quiz_finished_format">Quiz complete! Correct answers: %1$d of %2$d</string>
-
-    <string name="quiz_question_1">Which of these is NOT recyclable?</string>
-    <string-array name="quiz_options_1">
-        <item>Glass bottle</item>
-        <item>Aluminum can</item>
-        <item>Used chewing gum</item>
-        <item>Cardboard</item>
-    </string-array>
-
-    <string name="quiz_question_2">What helps reduce the amount of waste?</string>
-    <string-array name="quiz_options_2">
-        <item>Disposable tableware</item>
-        <item>Reusable shopping bags</item>
-        <item>Frequently replacing devices</item>
-        <item>Excess product packaging</item>
-    </string-array>
-
-    <string name="quiz_question_3">Which gas do trees absorb, helping fight climate change?</string>
-    <string-array name="quiz_options_3">
-        <item>Oxygen</item>
-        <item>Carbon dioxide</item>
-        <item>Nitrogen</item>
-        <item>Hydrogen</item>
-    </string-array>
-
-    <string name="quiz_question_4">Which of these is an example of a renewable energy source?</string>
-    <string-array name="quiz_options_4">
-        <item>Coal</item>
-        <item>Oil</item>
-        <item>Solar energy</item>
-        <item>Natural gas</item>
-    </string-array>
-
-    <string name="quiz_question_5">Why does waste sorting matter?</string>
-    <string-array name="quiz_options_5">
-        <item>To create more waste</item>
-        <item>To make recycling easier</item>
-        <item>To make collection harder</item>
-        <item>It doesn\'t matter</item>
-    </string-array>
+    <string name="no_internet_for_points_msg">You need an internet connection to get points</string>
+    <string name="streak_bonus_msg">+%1$d pts for your streak</string>
+    <string name="close">Close</string>
+    <string name="something_went_wrong_msg">Something went wrong. Please try again</string>
 </resources>

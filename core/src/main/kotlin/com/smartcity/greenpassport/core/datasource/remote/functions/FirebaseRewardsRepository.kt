@@ -22,6 +22,7 @@ private const val PARAM_SCORE = "score"
 private const val PARAM_REWARD_ID = "rewardId"
 private const val RESULT_POINTS = "points"
 private const val RESULT_XP = "xp"
+private const val RESULT_STREAK_BONUS = "streakBonus"
 private const val RESULT_COUPON_ID = "couponId"
 private const val RESULT_REDEEMED_AT = "redeemedAtEpochMillis"
 
@@ -65,6 +66,7 @@ class FirebaseRewardsRepository @Inject constructor(
         val reward = RewardResult(
             points = (result[RESULT_POINTS] as? Number)?.toInt() ?: 0,
             xp = (result[RESULT_XP] as? Number)?.toInt() ?: 0,
+            streakBonus = (result[RESULT_STREAK_BONUS] as? Number)?.toInt() ?: 0,
         )
         if (reward.points > 0 || reward.xp > 0) {
             rewardNotifier.notifyReward(reason = reason, points = reward.points, xp = reward.xp)

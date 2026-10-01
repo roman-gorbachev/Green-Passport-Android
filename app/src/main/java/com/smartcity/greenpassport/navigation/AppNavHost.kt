@@ -1,6 +1,5 @@
 package com.smartcity.greenpassport.navigation
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -24,13 +23,8 @@ import com.smartcity.greenpassport.feature.community.presentation.ui.GroupsScree
 import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipDetailScreen
 import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipsListScreen
 import com.smartcity.greenpassport.feature.feedback.presentation.FeedbackScreen
-import com.smartcity.greenpassport.feature.games.domain.GameId
-import com.smartcity.greenpassport.feature.games.presentation.GamesHubScreen
-import com.smartcity.greenpassport.feature.games.presentation.gameTitleRes
-import com.smartcity.greenpassport.feature.games.presentation.maze.MazeScreen
-import com.smartcity.greenpassport.feature.games.presentation.puzzle.PuzzleScreen
-import com.smartcity.greenpassport.feature.games.presentation.quiz.QuizScreen
-import com.smartcity.greenpassport.feature.games.presentation.sorting.WasteSortingScreen
+import com.smartcity.greenpassport.feature.games.presentation.hub.ui.GamesHubScreen
+import com.smartcity.greenpassport.feature.games.presentation.web.ui.GameWebScreen
 import com.smartcity.greenpassport.feature.home.presentation.ui.HomeScreen
 import com.smartcity.greenpassport.feature.map.presentation.ui.MapScreen
 import com.smartcity.greenpassport.feature.moderation.presentation.ui.ModerationScreen
@@ -294,49 +288,12 @@ private fun NavGraphBuilder.gameRoutes(navController: NavHostController) {
             onNavigateBack = navController::popBackStack,
         ) { innerPadding ->
             GamesHubScreen(
-                onGameSelected = { gameId ->
-                    val destination = when (gameId) {
-                        GameId.ECO_PUZZLE -> Destination.EcoPuzzleGame
-                        GameId.WASTE_SORTING -> Destination.WasteSortingGame
-                        GameId.ECO_MAZE -> Destination.EcoMazeGame
-                        GameId.ECO_QUIZ -> Destination.EcoQuizGame
-                    }
-                    navController.navigate(destination)
-                },
+                onGameSelected = { gameId -> navController.navigate(Destination.GameWeb(gameId)) },
                 contentPadding = innerPadding,
             )
         }
     }
-    composable<Destination.EcoPuzzleGame> {
-        FeatureScaffold(
-            title = stringResource(gameTitleRes(GameId.ECO_PUZZLE)),
-            onNavigateBack = navController::popBackStack,
-        ) { innerPadding ->
-            PuzzleScreen(modifier = Modifier.padding(innerPadding))
-        }
-    }
-    composable<Destination.WasteSortingGame> {
-        FeatureScaffold(
-            title = stringResource(gameTitleRes(GameId.WASTE_SORTING)),
-            onNavigateBack = navController::popBackStack,
-        ) { innerPadding ->
-            WasteSortingScreen(modifier = Modifier.padding(innerPadding))
-        }
-    }
-    composable<Destination.EcoMazeGame> {
-        FeatureScaffold(
-            title = stringResource(gameTitleRes(GameId.ECO_MAZE)),
-            onNavigateBack = navController::popBackStack,
-        ) { innerPadding ->
-            MazeScreen(modifier = Modifier.padding(innerPadding))
-        }
-    }
-    composable<Destination.EcoQuizGame> {
-        FeatureScaffold(
-            title = stringResource(gameTitleRes(GameId.ECO_QUIZ)),
-            onNavigateBack = navController::popBackStack,
-        ) { innerPadding ->
-            QuizScreen(modifier = Modifier.padding(innerPadding))
-        }
+    composable<Destination.GameWeb> {
+        GameWebScreen(onClose = navController::popBackStack)
     }
 }

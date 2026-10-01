@@ -70,16 +70,7 @@ sealed interface Destination {
     data object Games : Destination
 
     @Serializable
-    data object EcoPuzzleGame : Destination
-
-    @Serializable
-    data object WasteSortingGame : Destination
-
-    @Serializable
-    data object EcoMazeGame : Destination
-
-    @Serializable
-    data object EcoQuizGame : Destination
+    data class GameWeb(val gameId: String) : Destination
 
     @Serializable
     data object Shop : Destination
