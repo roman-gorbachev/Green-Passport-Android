@@ -34,7 +34,11 @@ class FirestoreGamesRepository @Inject constructor(
 private fun DocumentSnapshot.toGame(): Game? {
     val path = getString(FIELD_PATH) ?: return null
     val titles = (get(FIELD_TITLES) as? Map<*, *>)
-        ?.mapNotNull { (key, value) -> (key as? String)?.let { language -> (value as? String)?.let { language to it } } }
+        ?.mapNotNull { (key, value) ->
+            val language = key as? String
+            val title = value as? String
+            if (language != null && title != null) language to title else null
+        }
         ?.toMap()
         .orEmpty()
     return Game(

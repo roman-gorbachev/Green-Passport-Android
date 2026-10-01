@@ -140,7 +140,11 @@ private fun RewardBanner(
         if (failure != null) {
             Text(
                 text = stringResource(
-                    if (failure == RewardFailure.NETWORK) R.string.no_internet_for_points_msg else R.string.something_went_wrong_msg,
+                    if (failure == RewardFailure.NETWORK) {
+                        R.string.no_internet_for_points_msg
+                    } else {
+                        R.string.something_went_wrong_msg
+                    },
                 ),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.error,
