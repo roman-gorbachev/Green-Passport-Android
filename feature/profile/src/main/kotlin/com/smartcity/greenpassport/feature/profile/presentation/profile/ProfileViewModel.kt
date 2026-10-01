@@ -4,14 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.auth.AuthSession
-import com.smartcity.greenpassport.core.model.Level
-import com.smartcity.greenpassport.core.model.LevelProgression
 import com.smartcity.greenpassport.core.model.settings.AppTheme
 import com.smartcity.greenpassport.feature.profile.domain.ObserveAppThemeUseCase
-import com.smartcity.greenpassport.feature.profile.domain.ObserveExperienceUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveIsModeratorUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveNotificationsEnabledUseCase
-import com.smartcity.greenpassport.feature.profile.domain.ObservePointsBalanceUseCase
+import com.smartcity.greenpassport.feature.profile.domain.ObserveProfileProgressUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveProfileSessionUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveUserProfileUseCase
 import com.smartcity.greenpassport.feature.profile.domain.SetAppThemeUseCase
@@ -27,7 +24,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -37,8 +33,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     observeSession: ObserveProfileSessionUseCase,
-    private val observePointsBalance: ObservePointsBalanceUseCase,
-    private val observeExperience: ObserveExperienceUseCase,
+    private val observeProfileProgress: ObserveProfileProgressUseCase,
     private val observeUserProfile: ObserveUserProfileUseCase,
     private val observeIsModerator: ObserveIsModeratorUseCase,
     private val observeNotificationsEnabled: ObserveNotificationsEnabledUseCase,
@@ -87,9 +82,15 @@ class ProfileViewModel @Inject constructor(
     private fun observeProfileUiState(sessions: Flow<AuthSession?>): Flow<ProfileUiState> {
         val settings = combine(observeNotificationsEnabled(), observeAppTheme()) { enabled, theme -> enabled to theme }
         val account = combine(sessions, retryRequests.onStart { emit(Unit) }) { session, _ -> session }
-            .flatMapLatest { session -> if (session == null) flowOf(
-                ProfileUiState(isLoading = false)
-            ) else observeAccount(session) }
+            .flatMapLatest { session ->
+                if (session == null) {
+                    flowOf(
+                        ProfileUiState(isLoading = false)
+                    )
+                } else {
+                    observeAccount(session)
+                }
+            }
         return combine(account, settings) { state, (enabled, theme) ->
             state.copy(notificationsEnabled = enabled, theme = theme)
         }
@@ -98,17 +99,16 @@ class ProfileViewModel @Inject constructor(
     private fun observeAccount(session: AuthSession): Flow<ProfileUiState> {
         val profile = observeUserProfile(session.userId).onStart { emit(null) }.catch { emit(null) }
         val isModerator = observeIsModerator(session.userId).onStart { emit(false) }.catch { emit(false) }
-        val points = observePointsBalance(session.userId).map { it.availablePoints }
-        val level = observeExperience(session.userId).map<_, Level> { LevelProgression.levelFor(it) }
-        return combine(profile, isModerator, points, level) { currentProfile, moderator, currentPoints, currentLevel ->
+        val progress = observeProfileProgress(session.userId)
+        return combine(profile, isModerator, progress) { currentProfile, moderator, currentProgress ->
             ProfileUiState(
                 userId = session.userId,
                 email = session.email,
                 isAnonymous = session.isAnonymous,
                 profile = currentProfile,
                 isModerator = moderator,
-                level = currentLevel,
-                points = currentPoints,
+                level = currentProgress.level,
+                points = currentProgress.points,
                 isLoading = false,
             )
         }.catch { error ->

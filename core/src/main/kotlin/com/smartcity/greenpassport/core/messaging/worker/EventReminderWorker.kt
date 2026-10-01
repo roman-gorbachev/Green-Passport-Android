@@ -30,14 +30,12 @@ class EventReminderWorker(
         )
         entryPoint.notificationLogRepository().log(title = eventTitle, body = reminderBody)
 
-        if (!entryPoint.appSettingsRepository().observeNotificationsEnabled().first()) return Result.success()
-        if (ContextCompat.checkSelfPermission(
-                applicationContext,
-                Manifest.permission.POST_NOTIFICATIONS,
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return Result.success()
-        }
+        val isEnabled = entryPoint.appSettingsRepository().observeNotificationsEnabled().first()
+        val isPermitted = ContextCompat.checkSelfPermission(
+            applicationContext,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
+        if (!isEnabled || !isPermitted) return Result.success()
 
         val notification = NotificationCompat.Builder(applicationContext, NotificationChannels.REWARDS_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)

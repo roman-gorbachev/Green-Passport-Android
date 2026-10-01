@@ -135,7 +135,11 @@ private fun LazyListScope.filterSections(
                     icon = verificationIcon(verification),
                     isOn = isOn,
                     onClick = {
-                        val updated = if (isOn) draft.verifications - verification else draft.verifications + verification
+                        val updated = if (isOn) {
+                            draft.verifications - verification
+                        } else {
+                            draft.verifications + verification
+                        }
                         onChange(draft.copy(verifications = updated))
                     },
                     showDivider = index < TaskVerification.entries.lastIndex,
