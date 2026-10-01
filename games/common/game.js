@@ -9,6 +9,9 @@ const GP = (() => {
   document.documentElement.dataset.theme = theme;
   document.documentElement.lang = lang;
 
+  const MAX_LIVES = 3;
+  const LOST_LIFE_VIBRATION_MS = 80;
+
   const COMMON = {
     playAgain: { ru: 'Играть снова', be: 'Гуляць зноў', en: 'Play again' },
   };
@@ -66,6 +69,25 @@ const GP = (() => {
     document.body.append(overlay);
   }
 
+  function lives(container, onGameOver) {
+    const hearts = Array.from({ length: MAX_LIVES }, () => element('span', 'heart', '♥'));
+    container.classList.add('lives');
+    container.replaceChildren(...hearts);
+    let left = MAX_LIVES;
+    return {
+      lose() {
+        if (left === 0) return;
+        left -= 1;
+        hearts[left].classList.add('lost');
+        vibrate(LOST_LIFE_VIBRATION_MS);
+        if (left === 0) onGameOver();
+      },
+      get isOver() {
+        return left === 0;
+      },
+    };
+  }
+
   function shuffle(items) {
     const copy = [...items];
     for (let index = copy.length - 1; index > 0; index -= 1) {
@@ -86,5 +108,5 @@ const GP = (() => {
     return node;
   }
 
-  return { lang, t, finish, close, vibrate, showResult, shuffle, randomItem, element };
+  return { lang, t, finish, close, vibrate, showResult, lives, shuffle, randomItem, element };
 })();

@@ -18,7 +18,7 @@
 </style>
 </head>
 <body>
-<div class="hud"><span id="score"></span><span id="time"></span></div>
+<div class="hud"><span id="score"></span><span id="lives"></span><span id="time"></span></div>
 <div class="tank"><div id="tank"></div></div>
 <p class="hint" id="hint"></p>
 <div class="taps" id="taps"></div>
@@ -30,6 +30,7 @@ const TEXT = {
   time: { ru: 'Осталось: {0} с', be: 'Засталося: {0} с', en: 'Left: {0} s' },
   finished: { ru: 'Сэкономлено воды! Очки: {0}', be: 'Зэканомлена вады! Ачкі: {0}', en: 'Water saved! Score: {0}' },
   empty: { ru: 'Вода закончилась! Очки: {0}', be: 'Вада скончылася! Ачкі: {0}', en: 'Out of water! Score: {0}' },
+  leaked: { ru: 'Краны протекли слишком долго! Очки: {0}', be: 'Краны цяклі занадта доўга! Ачкі: {0}', en: 'The taps leaked for too long! Score: {0}' },
 };
 const TAP_COUNT = 9;
 const GAME_SECONDS = 30;
@@ -41,10 +42,11 @@ const WATER_LOSS_PER_SECOND = 4;
 const FULL_TANK = 100;
 const TICK_MS = 100;
 const WARNING_SECONDS = 5;
+const MAX_LEAK_MS = 4000;
 
 const tapsView = document.getElementById('taps');
 document.getElementById('hint').textContent = GP.t(TEXT.hint);
-let leaking, closed, water, secondsLeft, leakInterval, sinceLeak, timer, elapsed;
+let leaking, closed, water, secondsLeft, leakInterval, sinceLeak, timer, elapsed, lives, running;
 
 const taps = Array.from({ length: TAP_COUNT }, (_, index) => {
   const view = GP.element('button', 'tap', '🚰');
@@ -54,7 +56,9 @@ const taps = Array.from({ length: TAP_COUNT }, (_, index) => {
 tapsView.replaceChildren(...taps);
 
 function start() {
-  leaking = new Set();
+  leaking = new Map();
+  running = true;
+  lives = GP.lives(document.getElementById('lives'), end);
   closed = 0;
   water = FULL_TANK;
   secondsLeft = GAME_SECONDS;
@@ -76,7 +80,7 @@ function render() {
 }
 
 function close(index) {
-  if (!leaking.has(index)) return;
+  if (!running || !leaking.has(index)) return;
   leaking.delete(index);
   closed += 1;
   GP.vibrate(15);
@@ -90,17 +94,31 @@ function step() {
     sinceLeak = 0;
     leakInterval = Math.max(MIN_LEAK_INTERVAL_MS, leakInterval - LEAK_SPEEDUP_MS);
     const dry = [...Array(TAP_COUNT).keys()].filter((index) => !leaking.has(index));
-    if (dry.length > 0) leaking.add(GP.randomItem(dry));
+    if (dry.length > 0) leaking.set(GP.randomItem(dry), 0);
+  }
+  for (const [index, leakingMs] of leaking) {
+    if (leakingMs + TICK_MS < MAX_LEAK_MS) {
+      leaking.set(index, leakingMs + TICK_MS);
+      continue;
+    }
+    leaking.delete(index);
+    lives.lose();
+    if (!running) return;
   }
   water -= (leaking.size * WATER_LOSS_PER_SECOND * TICK_MS) / 1000;
   if (elapsed % 1000 === 0) secondsLeft -= 1;
   render();
-  if (water <= 0 || secondsLeft <= 0) {
-    clearInterval(timer);
-    const score = closed * POINTS_PER_TAP;
-    GP.finish(score);
-    GP.showResult(GP.t(water <= 0 ? TEXT.empty : TEXT.finished, score), start);
-  }
+  if (water <= 0 || secondsLeft <= 0) end();
+}
+
+function end() {
+  if (!running) return;
+  running = false;
+  clearInterval(timer);
+  const score = closed * POINTS_PER_TAP;
+  GP.finish(score);
+  const message = water <= 0 ? TEXT.empty : lives.isOver ? TEXT.leaked : TEXT.finished;
+  GP.showResult(GP.t(message, score), start);
 }
 
 start();

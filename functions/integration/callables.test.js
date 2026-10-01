@@ -117,6 +117,32 @@ test('shop: expired coupons cannot be marked as used', async () => {
   assert.equal((await call('markCouponUsed', alice, { couponId: expired.id })).error, 'FAILED_PRECONDITION');
 });
 
+test('shop: partner scan redeems a coupon once and reports expired coupons', async () => {
+  const active = await db.collection(`${ROOT}/purchases`).add({
+    userId: alice.uid,
+    rewardId: 'coffee',
+    redeemedAtEpochMillis: 1,
+    expiresAtEpochMillis: Date.now() + 60 * 60 * 1000,
+    code: 'SCAN2345',
+    status: 'ACTIVE',
+  });
+  const scan = (id, code) => fetch(`${FUNCTIONS_URL}/scanCoupon?id=${id}&code=${code}`);
+  assert.equal((await scan(active.id, 'WRONG234')).status, 404);
+  assert.equal((await scan(active.id, 'SCAN2345')).status, 200);
+  assert.equal((await db.doc(`${ROOT}/purchases/${active.id}`).get()).get('status'), 'USED');
+  assert.equal((await scan(active.id, 'SCAN2345')).status, 409);
+  const expired = await db.collection(`${ROOT}/purchases`).add({
+    userId: alice.uid,
+    rewardId: 'coffee',
+    redeemedAtEpochMillis: 1,
+    expiresAtEpochMillis: 2,
+    code: 'OLD23456',
+    status: 'ACTIVE',
+  });
+  assert.equal((await scan(expired.id, 'OLD23456')).status, 410);
+  assert.equal((await db.doc(`${ROOT}/purchases/${expired.id}`).get()).get('status'), 'EXPIRED');
+});
+
 test('photo review: only moderators, approval awards points', async () => {
   const submissionId = `${alice.uid}_photo1`;
   await db.doc(`${ROOT}/taskSubmissions/${submissionId}`).set({

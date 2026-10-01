@@ -21,7 +21,7 @@
 </style>
 </head>
 <body>
-<div class="hud"><span id="score"></span><span id="time"></span></div>
+<div class="hud"><span id="score"></span><span id="lives"></span><span id="time"></span></div>
 <p class="hint" id="hint"></p>
 <div class="item" id="item"><span class="emoji" id="emoji"></span><span class="name" id="name"></span></div>
 <div class="bins" id="bins"></div>
@@ -52,6 +52,7 @@ const ITEMS = [
 const GAME_SECONDS = 30;
 const POINTS_PER_CORRECT_ANSWER = 10;
 const WARNING_SECONDS = 5;
+const ITEM_SECONDS = 5;
 
 const itemView = document.getElementById('item');
 const scoreLabel = document.getElementById('score');
@@ -59,8 +60,11 @@ const timeLabel = document.getElementById('time');
 document.getElementById('hint').textContent = GP.t(TEXT.hint);
 let score = 0;
 let secondsLeft = GAME_SECONDS;
+let itemSecondsLeft = ITEM_SECONDS;
 let current = null;
 let timer = null;
+let running = false;
+let lives = null;
 
 document.getElementById('bins').append(...BINS.map((bin) => {
   const button = GP.element('button', 'bin');
@@ -73,6 +77,8 @@ document.getElementById('bins').append(...BINS.map((bin) => {
 function start() {
   score = 0;
   secondsLeft = GAME_SECONDS;
+  running = true;
+  lives = GP.lives(document.getElementById('lives'), end);
   nextItem();
   renderHud();
   clearInterval(timer);
@@ -81,6 +87,7 @@ function start() {
 
 function nextItem() {
   current = GP.randomItem(ITEMS);
+  itemSecondsLeft = ITEM_SECONDS;
   document.getElementById('emoji').textContent = current.emoji;
   document.getElementById('name').textContent = GP.t(current.name);
 }
@@ -92,21 +99,42 @@ function renderHud() {
 }
 
 function answer(binId) {
-  if (secondsLeft <= 0) return;
+  if (!running) return;
   const correct = current.bin === binId;
-  if (correct) score += POINTS_PER_CORRECT_ANSWER;
-  GP.vibrate(correct ? 15 : [30, 40, 30]);
+  if (correct) {
+    score += POINTS_PER_CORRECT_ANSWER;
+    GP.vibrate(15);
+  }
+  flash(correct);
+  nextItem();
+  renderHud();
+  if (!correct) lives.lose();
+}
+
+function flash(correct) {
   itemView.classList.remove('flash-good', 'flash-bad');
   void itemView.offsetWidth;
   itemView.classList.add(correct ? 'flash-good' : 'flash-bad');
-  nextItem();
-  renderHud();
 }
 
 function tick() {
+  if (!running) return;
   secondsLeft -= 1;
+  itemSecondsLeft -= 1;
   renderHud();
-  if (secondsLeft > 0) return;
+  if (secondsLeft <= 0) {
+    end();
+    return;
+  }
+  if (itemSecondsLeft > 0) return;
+  flash(false);
+  nextItem();
+  lives.lose();
+}
+
+function end() {
+  if (!running) return;
+  running = false;
   clearInterval(timer);
   GP.finish(score);
   GP.showResult(GP.t(TEXT.finished, score), start);

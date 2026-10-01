@@ -16,7 +16,7 @@
 </style>
 </head>
 <body>
-<p class="hint" id="status" style="text-align:left"></p>
+<div class="hud"><p class="hint" id="status" style="text-align:left"></p><span id="lives"></span></div>
 <div class="progress"><div id="bar"></div></div>
 <p class="question" id="question"></p>
 <div class="options" id="options"></div>
@@ -39,11 +39,13 @@ const FEEDBACK_DELAY_MS = 600;
 let index;
 let correctAnswers;
 let answered;
+let lives;
 
 function start() {
   index = 0;
   correctAnswers = 0;
   answered = false;
+  lives = GP.lives(document.getElementById('lives'), () => {});
   render();
 }
 
@@ -72,7 +74,7 @@ function choose(optionIndex, button) {
   } else {
     button.classList.add('wrong');
     button.append(GP.element('span', '', '✕'));
-    GP.vibrate([30, 40, 30]);
+    lives.lose();
   }
   setTimeout(advance, FEEDBACK_DELAY_MS);
 }
@@ -80,7 +82,7 @@ function choose(optionIndex, button) {
 function advance() {
   answered = false;
   index += 1;
-  if (index < QUESTIONS.length) {
+  if (index < QUESTIONS.length && !lives.isOver) {
     render();
     return;
   }

@@ -1,6 +1,7 @@
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { HttpsError, onCall, onRequest } from 'firebase-functions/v2/https';
 import { DAY_MILLIS, DEFAULT_COUPON_VALIDITY_DAYS, REGION } from './config';
 import { generateCouponCode } from './couponCode';
+import { COUPON_STATUS_EXPIRED, couponScanOutcome, renderScanPage, scanLanguage, STATUS_CODES } from './couponScan';
 import { db, paths } from './db';
 import { requireString, requireUser } from './guards';
 
@@ -76,3 +77,30 @@ export const markCouponUsed = onCall(
     });
   },
 );
+
+export const scanCoupon = onRequest({ region: REGION }, async (request, response) => {
+  const couponId = typeof request.query.id === 'string' ? request.query.id : '';
+  const code = typeof request.query.code === 'string' ? request.query.code : '';
+  const language = scanLanguage(request.get('accept-language'));
+  if (!couponId || couponId.includes('/')) {
+    response.status(STATUS_CODES.notFound).send(renderScanPage('notFound', undefined, language));
+    return;
+  }
+  const couponRef = db.doc(paths.purchase(couponId));
+  const { outcome, rewardId } = await db.runTransaction(async (tx) => {
+    const coupon = await tx.get(couponRef);
+    const now = Date.now();
+    const result = couponScanOutcome(coupon.exists ? coupon.data() : undefined, code, now);
+    if (result === 'redeemed') {
+      tx.update(couponRef, { status: COUPON_STATUS_USED, usedAtEpochMillis: now });
+    } else if (result === 'expired' && coupon.get('status') !== COUPON_STATUS_EXPIRED) {
+      tx.update(couponRef, { status: COUPON_STATUS_EXPIRED });
+    }
+    return { outcome: result, rewardId: coupon.get('rewardId') as string | undefined };
+  });
+  const reward = rewardId && outcome === 'redeemed' ? await db.doc(paths.shopItem(rewardId)).get() : undefined;
+  response
+    .status(STATUS_CODES[outcome])
+    .set('Cache-Control', 'no-store')
+    .send(renderScanPage(outcome, reward?.get('title') as string | undefined, language));
+});

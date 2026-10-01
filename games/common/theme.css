@@ -47,6 +47,7 @@ body {
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, Roboto, sans-serif;
   overscroll-behavior: none;
+  touch-action: none;
 }
 
 body {
@@ -63,6 +64,23 @@ body {
   align-items: center;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+.lives {
+  display: flex;
+  gap: 4px;
+  color: var(--error);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.lives .heart {
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.lives .heart.lost {
+  opacity: 0.2;
+  transform: scale(0.8);
 }
 
 .hint {

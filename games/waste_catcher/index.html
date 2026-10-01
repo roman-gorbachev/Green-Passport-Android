@@ -17,7 +17,7 @@
 </style>
 </head>
 <body>
-<div class="hud"><span id="score"></span><span id="time"></span></div>
+<div class="hud"><span id="score"></span><span id="lives"></span><span id="time"></span></div>
 <div class="target" id="target"></div>
 <div class="field" id="field"><div class="basket" id="basket"></div></div>
 <p class="hint" id="hint"></p>
@@ -48,7 +48,7 @@ const WARNING_SECONDS = 5;
 const field = document.getElementById('field');
 const basket = document.getElementById('basket');
 document.getElementById('hint').textContent = GP.t(TEXT.hint);
-let score, secondsLeft, target, items, basketX, lastFrame, lastSpawn, running, timer;
+let score, secondsLeft, target, items, basketX, lastFrame, lastSpawn, running, timer, lives;
 
 function start() {
   score = 0;
@@ -59,6 +59,7 @@ function start() {
   lastFrame = performance.now();
   lastSpawn = 0;
   running = true;
+  lives = GP.lives(document.getElementById('lives'), end);
   setTarget();
   renderHud();
   clearInterval(timer);
@@ -120,19 +121,21 @@ function frame(now) {
       const correct = item.type.id === target.id;
       score = Math.max(0, score + (correct ? CATCH_POINTS : -WRONG_PENALTY));
       popup(correct ? '+' + CATCH_POINTS : '−' + WRONG_PENALTY, item.x, correct ? 'var(--forest)' : 'var(--error)');
-      GP.vibrate(correct ? 15 : [30, 40, 30]);
+      if (correct) GP.vibrate(15);
       item.view.remove();
       renderHud();
+      if (!correct) lives.lose();
       return false;
     }
     if (item.y > 1) {
       item.view.remove();
+      if (item.type.id === target.id) lives.lose();
       return false;
     }
     return true;
   });
   basket.style.left = basketX * 100 + '%';
-  requestAnimationFrame(frame);
+  if (running) requestAnimationFrame(frame);
 }
 
 function tick() {
@@ -140,6 +143,11 @@ function tick() {
   if (secondsLeft > 0 && (GAME_SECONDS - secondsLeft) % TARGET_CHANGE_SECONDS === 0) setTarget();
   renderHud();
   if (secondsLeft > 0) return;
+  end();
+}
+
+function end() {
+  if (!running) return;
   running = false;
   clearInterval(timer);
   items.forEach((item) => item.view.remove());
@@ -153,8 +161,12 @@ function moveBasket(clientX) {
   basketX = Math.min(0.92, Math.max(0.08, (clientX - rect.left) / rect.width));
 }
 
-field.addEventListener('pointerdown', (event) => moveBasket(event.clientX));
+field.addEventListener('pointerdown', (event) => {
+  event.preventDefault();
+  moveBasket(event.clientX);
+});
 field.addEventListener('pointermove', (event) => {
+  event.preventDefault();
   if (event.buttons > 0 || event.pointerType === 'touch') moveBasket(event.clientX);
 });
 
