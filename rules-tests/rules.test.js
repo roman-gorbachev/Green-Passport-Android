@@ -2,13 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const { after, before, beforeEach, test } = require('node:test');
 const { assertFails, assertSucceeds, initializeTestEnvironment } = require('@firebase/rules-unit-testing');
-const { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } = require('firebase/firestore');
+const { arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } = require('firebase/firestore');
 const { ref, uploadBytes, getBytes } = require('firebase/storage');
 
 const ROOT = 'apps/greenpassport';
 const ALICE = 'alice';
 const BOB = 'bob';
 const ADMIN = 'moderator';
+const CAROL = 'carol';
 
 let env;
 
@@ -38,7 +39,14 @@ beforeEach(async () => {
     await setDoc(doc(db, `${ROOT}/tasks/selfTask`), { title: 'Сумка', verification: 'SELF', rewardPoints: 20 });
     await setDoc(doc(db, `${ROOT}/taskSecrets/qrTask`), { code: 'secret' });
     await setDoc(doc(db, `${ROOT}/posts/post1`), { authorId: BOB, text: 'Привет', createdAtEpochMillis: 1 });
-    await setDoc(doc(db, `${ROOT}/groups/group1`), { name: 'Эко', memberIds: [BOB] });
+    await setDoc(doc(db, `${ROOT}/groups/group1`), {
+      name: 'Эко',
+      memberIds: [BOB, CAROL],
+      ownerId: BOB,
+      createdAtEpochMillis: 1,
+      inviteCode: 'ABC234',
+    });
+    await setDoc(doc(db, `${ROOT}/chats/group1/messages/m1`), { senderId: BOB, text: 'Привет', createdAtEpochMillis: 1 });
     await setDoc(doc(db, `${ROOT}/taskProgress/${ALICE}_selfTask`), { userId: ALICE, taskId: 'selfTask' });
   });
 });
@@ -105,13 +113,58 @@ test('forum posts and group names with obscene words are rejected', async () => 
   const post = { authorId: ALICE, text: 'Всем привет, идём на субботник', createdAtEpochMillis: 1 };
   await assertSucceeds(setDoc(doc(db, `${ROOT}/posts/clean`), post));
   await assertFails(setDoc(doc(db, `${ROOT}/posts/dirty`), { ...post, text: 'ну ты и пиздюк' }));
-  await assertFails(setDoc(doc(db, `${ROOT}/groups/dirty`), { name: 'Бляди', memberIds: [ALICE] }));
+  await assertFails(setDoc(doc(db, `${ROOT}/groups/dirty`), newGroup(ALICE, { name: 'Бляди' })));
 });
 
-test('group update may only change members', async () => {
+const newGroup = (ownerId, overrides = {}) => ({
+  name: 'Велосипедисты',
+  memberIds: [ownerId],
+  ownerId,
+  createdAtEpochMillis: 1,
+  inviteCode: 'XYZ789',
+  ...overrides,
+});
+
+test('group creator must be its owner and only member and give an invite code', async () => {
   const db = firestoreOf(ALICE);
-  await assertSucceeds(updateDoc(doc(db, `${ROOT}/groups/group1`), { memberIds: [BOB, ALICE] }));
-  await assertFails(updateDoc(doc(db, `${ROOT}/groups/group1`), { name: 'Захвачено' }));
+  await assertSucceeds(setDoc(doc(db, `${ROOT}/groups/clean`), newGroup(ALICE)));
+  await assertFails(setDoc(doc(db, `${ROOT}/groups/foreignOwner`), newGroup(ALICE, { ownerId: BOB })));
+  await assertFails(setDoc(doc(db, `${ROOT}/groups/extraMember`), newGroup(ALICE, { memberIds: [ALICE, BOB] })));
+  await assertFails(setDoc(doc(db, `${ROOT}/groups/noCode`), newGroup(ALICE, { inviteCode: null })));
+  await assertFails(setDoc(doc(db, `${ROOT}/groups/badCode`), newGroup(ALICE, { inviteCode: 'abc' })));
+  await assertFails(setDoc(doc(db, `${ROOT}/groups/legacy`), { name: 'Старая', memberIds: [ALICE] }));
+});
+
+test('group members may only add or remove themselves', async () => {
+  const group = (uid) => doc(firestoreOf(uid), `${ROOT}/groups/group1`);
+  await assertSucceeds(updateDoc(group(ALICE), { memberIds: arrayUnion(ALICE) }));
+  await assertSucceeds(updateDoc(group(ALICE), { memberIds: arrayRemove(ALICE) }));
+  await assertFails(updateDoc(group(ALICE), { memberIds: [] }));
+  await assertFails(updateDoc(group(ALICE), { memberIds: arrayRemove(BOB) }));
+  await assertFails(updateDoc(group(ALICE), { memberIds: [BOB, CAROL, ALICE, 'mallory'] }));
+  await assertFails(updateDoc(group(CAROL), { memberIds: [CAROL] }));
+  await assertFails(updateDoc(group(ALICE), { name: 'Захвачено' }));
+  await assertFails(updateDoc(group(ALICE), { inviteCode: 'AAAAAA' }));
+});
+
+test('only group members read and write the group chat', async () => {
+  const messages = (uid) => collection(firestoreOf(uid), `${ROOT}/chats/group1/messages`);
+  const message = (senderId) => ({ senderId, senderName: 'Кэрол', senderAvatar: 'SKY', text: 'Привет', createdAtEpochMillis: 2 });
+  await assertSucceeds(getDocs(messages(CAROL)));
+  await assertSucceeds(setDoc(doc(messages(CAROL), 'm2'), message(CAROL)));
+  await assertFails(setDoc(doc(messages(CAROL), 'm3'), message(BOB)));
+  await assertFails(setDoc(doc(messages(CAROL), 'm4'), { ...message(CAROL), text: 'ну ты и пиздюк' }));
+  await assertFails(getDocs(messages(ALICE)));
+  await assertFails(setDoc(doc(messages(ALICE), 'm5'), message(ALICE)));
+  await assertFails(updateDoc(doc(messages(BOB), 'm1'), { text: 'Изменено' }));
+});
+
+test('forum post with author name and avatar is accepted', async () => {
+  const db = firestoreOf(ALICE);
+  const post = { authorId: ALICE, authorName: 'Алиса Иванова', authorAvatar: 'LIME', text: 'Привет', createdAtEpochMillis: 1 };
+  await assertSucceeds(setDoc(doc(db, `${ROOT}/posts/withAvatar`), post));
+  await assertSucceeds(setDoc(doc(db, `${ROOT}/posts/anonymous`), { ...post, authorName: null, authorAvatar: null }));
+  await assertFails(setDoc(doc(db, `${ROOT}/posts/emptyName`), { ...post, authorName: '' }));
 });
 
 test('moderator role document is readable only by its owner', async () => {

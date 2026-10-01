@@ -52,3 +52,15 @@ node seed-firestore.js --only=events
 
 `--only` takes a comma-separated list of collection names and skips the rest, so the other
 collections are not duplicated.
+
+## Backfill groups
+
+Groups created before invite codes existed have no `inviteCode`, `ownerId` or
+`createdAtEpochMillis`. Fill them in once (the first member becomes the owner):
+
+```
+node backfill-groups.js --dry-run
+node backfill-groups.js
+```
+
+Running it again is safe: groups that already have the fields are skipped.

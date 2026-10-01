@@ -44,6 +44,21 @@ service cloud.firestore {
       isCleanOptionalText(data, 'userName', 61);
   }
 
+  function isJoining() {
+    return request.resource.data.memberIds.toSet().difference(resource.data.memberIds.toSet()) == [request.auth.uid].toSet() &&
+      resource.data.memberIds.toSet().difference(request.resource.data.memberIds.toSet()).size() == 0;
+  }
+
+  function isLeaving() {
+    return resource.data.memberIds.toSet().difference(request.resource.data.memberIds.toSet()) == [request.auth.uid].toSet() &&
+      request.resource.data.memberIds.toSet().difference(resource.data.memberIds.toSet()).size() == 0;
+  }
+
+  function isGroupMember(database, groupId) {
+    return request.auth.uid in
+      get(/databases/$(database)/documents/apps/greenpassport/groups/$(groupId)).data.memberIds;
+  }
+
   function hasCleanProfileNames(data) {
     return isCleanOptionalText(data, 'firstName', 30) && isCleanOptionalText(data, 'lastName', 30);
   }
@@ -162,23 +177,31 @@ service cloud.firestore {
 
     match /apps/greenpassport/groups/{groupId} {
       allow read: if request.auth != null;
-      allow create: if request.auth != null && isCleanText(request.resource.data.name, 60);
+      allow create: if request.auth != null && isCleanText(request.resource.data.name, 60) &&
+        request.resource.data.ownerId == request.auth.uid &&
+        request.resource.data.memberIds == [request.auth.uid] &&
+        request.resource.data.createdAtEpochMillis is int &&
+        request.resource.data.inviteCode is string && request.resource.data.inviteCode.matches('[A-Z2-9]{6}');
       allow update: if request.auth != null &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds']);
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds']) &&
+        (isJoining() || isLeaving());
       allow delete: if false;
     }
 
-    match /apps/greenpassport/chats/{chatId}/messages/{messageId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.senderId == request.auth.uid &&
-        isCleanText(request.resource.data.text, 2000);
+    match /apps/greenpassport/chats/{groupId}/messages/{messageId} {
+      allow read: if request.auth != null && isGroupMember(database, groupId);
+      allow create: if request.auth != null && isGroupMember(database, groupId) &&
+        request.resource.data.senderId == request.auth.uid &&
+        isCleanText(request.resource.data.text, 2000) &&
+        isCleanOptionalText(request.resource.data, 'senderName', 61) &&
+        request.resource.data.createdAtEpochMillis is int;
       allow update, delete: if false;
     }
 
     match /apps/greenpassport/{collection}/{document=**} {
       allow read: if request.auth != null && !(collection in [
         'taskSecrets', 'admins', 'reports', 'taskSubmissions', 'pointsLedger',
-        'taskProgress', 'purchases', 'ecoTipReads', 'eventSecrets', 'eventAttendance',
+        'taskProgress', 'purchases', 'ecoTipReads', 'eventSecrets', 'eventAttendance', 'chats',
       ]);
       allow write: if false;
     }
