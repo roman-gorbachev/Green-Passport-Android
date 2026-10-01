@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BrightnessMedium
+import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EmojiEvents
@@ -108,6 +109,7 @@ private data class ProfileMenuEntry(
 private val profileMenuEntries = listOf(
     ProfileMenuEntry(R.string.profile_achievements, Icons.Filled.EmojiEvents, Destination.Achievements) { it.tips },
     ProfileMenuEntry(R.string.profile_cards, Icons.Filled.Style, Destination.Cards) { it.games },
+    ProfileMenuEntry(R.string.my_coupons, Icons.Filled.ConfirmationNumber, Destination.Coupons) { it.community },
     ProfileMenuEntry(R.string.profile_history, Icons.Filled.History, Destination.History) { it.calendar },
     ProfileMenuEntry(
         R.string.profile_notifications_label,

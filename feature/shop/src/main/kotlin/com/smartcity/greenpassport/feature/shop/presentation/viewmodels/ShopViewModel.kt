@@ -67,12 +67,17 @@ class ShopViewModel @Inject constructor(
         viewModelScope.launch {
             actions.update { it.copy(purchasingRewardId = reward.id, hasInsufficientPoints = false) }
             runCatching { purchaseReward(reward) }
+                .onSuccess { coupon -> actions.update { it.copy(purchasedCouponId = coupon.id) } }
                 .onFailure { error ->
                     Log.w(TAG, "Failed to purchase reward", error)
                     actions.update { it.copy(hasInsufficientPoints = true) }
                 }
             actions.update { it.copy(purchasingRewardId = null) }
         }
+    }
+
+    fun onPurchasedCouponShown() {
+        actions.update { it.copy(purchasedCouponId = null) }
     }
 
     private fun observeShopUiState(sessions: Flow<AuthSession?>): Flow<ShopUiState> {
@@ -85,6 +90,7 @@ class ShopViewModel @Inject constructor(
             shopData.copy(
                 purchasingRewardId = currentActions.purchasingRewardId,
                 hasInsufficientPoints = currentActions.hasInsufficientPoints,
+                purchasedCouponId = currentActions.purchasedCouponId,
             )
         }
     }
@@ -107,6 +113,7 @@ class ShopViewModel @Inject constructor(
     private data class ShopActions(
         val purchasingRewardId: String? = null,
         val hasInsufficientPoints: Boolean = false,
+        val purchasedCouponId: String? = null,
     )
 
     companion object {

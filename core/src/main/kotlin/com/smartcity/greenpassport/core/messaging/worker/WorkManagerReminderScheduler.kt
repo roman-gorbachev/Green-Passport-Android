@@ -36,6 +36,26 @@ class WorkManagerReminderScheduler @Inject constructor(
     override fun cancelEventReminder(eventId: String) {
         WorkManager.getInstance(context).cancelUniqueWork(uniqueWorkName(eventId))
     }
+
+    override fun scheduleCouponReminder(couponId: String, title: String, expiresAtEpochMillis: Long) {
+        val triggerAt = expiresAtEpochMillis - COUPON_REMINDER_LEAD_MILLIS
+        val delayMillis = triggerAt - System.currentTimeMillis()
+        if (delayMillis <= 0) return
+        val request = OneTimeWorkRequestBuilder<CouponReminderWorker>()
+            .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
+            .setInputData(workDataOf(CouponReminderWorker.KEY_COUPON_TITLE to title))
+            .build()
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            COUPON_WORK_PREFIX + couponId,
+            ExistingWorkPolicy.REPLACE,
+            request,
+        )
+    }
+
+    companion object {
+        private const val COUPON_REMINDER_LEAD_MILLIS = 24 * 60 * 60 * 1000L
+        private const val COUPON_WORK_PREFIX = "coupon_expiring_"
+    }
 }
 
 private fun uniqueWorkName(eventId: String): String = "event_reminder_$eventId"

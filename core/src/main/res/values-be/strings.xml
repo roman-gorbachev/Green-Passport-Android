@@ -23,4 +23,6 @@
     <string name="xp_left_to_level">Яшчэ %1$d ач. да ўзр. %2$d</string>
     <string name="streak_days">%1$d дз. запар</string>
     <string name="cancel">Скасаваць</string>
+    <string name="coupon_expires_soon">Купон хутка скончыцца</string>
+    <string name="coupon_valid_until_tomorrow_msg">«%1$s» дзейнічае да заўтра</string>
 </resources>

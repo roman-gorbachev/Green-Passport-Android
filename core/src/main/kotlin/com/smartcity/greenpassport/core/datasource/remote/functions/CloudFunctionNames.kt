@@ -7,6 +7,7 @@ object CloudFunctionNames {
     const val RECORD_TIP_READ = "recordTipRead"
     const val RECORD_GAME_RESULT = "recordGameResult"
     const val REDEEM_REWARD = "redeemReward"
+    const val MARK_COUPON_USED = "markCouponUsed"
     const val REVIEW_SUBMISSION = "reviewSubmission"
     const val MODERATE_CONTENT = "moderateContent"
 }

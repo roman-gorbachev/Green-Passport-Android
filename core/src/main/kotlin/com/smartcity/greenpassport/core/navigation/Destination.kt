@@ -76,6 +76,12 @@ sealed interface Destination {
     data object Shop : Destination
 
     @Serializable
+    data object Coupons : Destination
+
+    @Serializable
+    data class CouponDetail(val couponId: String) : Destination
+
+    @Serializable
     data object Feedback : Destination
 
     @Serializable

@@ -36,6 +36,8 @@ import com.smartcity.greenpassport.feature.profile.presentation.favorites.Favori
 import com.smartcity.greenpassport.feature.profile.presentation.history.HistoryScreen
 import com.smartcity.greenpassport.feature.profile.presentation.notifications.NotificationsScreen
 import com.smartcity.greenpassport.feature.profile.presentation.profile.ProfileScreen
+import com.smartcity.greenpassport.feature.shop.presentation.ui.CouponDetailSheet
+import com.smartcity.greenpassport.feature.shop.presentation.ui.CouponsScreen
 import com.smartcity.greenpassport.feature.shop.presentation.ui.ShopScreen
 import com.smartcity.greenpassport.feature.tasks.presentation.ui.TaskDetailSheet
 import com.smartcity.greenpassport.feature.tasks.presentation.ui.TasksFilterButton
@@ -44,6 +46,7 @@ import com.smartcity.greenpassport.feature.tasks.presentation.viewmodels.TasksLi
 import com.smartcity.greenpassport.feature.community.R as CommunityR
 import com.smartcity.greenpassport.feature.moderation.R as ModerationR
 import com.smartcity.greenpassport.feature.profile.R as ProfileR
+import com.smartcity.greenpassport.feature.shop.R as ShopR
 
 @Composable
 fun AppNavHost(
@@ -60,6 +63,7 @@ fun AppNavHost(
         communityRoutes(navController)
         contentRoutes(navController)
         gameRoutes(navController)
+        couponRoutes(navController)
     }
 }
 
@@ -119,7 +123,11 @@ private fun NavGraphBuilder.mainRoutes(navController: NavHostController) {
             title = stringResource(destinationTitleRes(Destination.Shop)),
             onNavigateBack = null,
         ) { innerPadding ->
-            ShopScreen(contentPadding = innerPadding)
+            ShopScreen(
+                onCouponsClick = { navController.navigate(Destination.Coupons) },
+                onCouponSelected = { couponId -> navController.navigate(Destination.CouponDetail(couponId)) },
+                contentPadding = innerPadding,
+            )
         }
     }
 }
@@ -295,5 +303,22 @@ private fun NavGraphBuilder.gameRoutes(navController: NavHostController) {
     }
     composable<Destination.GameWeb> {
         GameWebScreen(onClose = navController::popBackStack)
+    }
+}
+
+private fun NavGraphBuilder.couponRoutes(navController: NavHostController) {
+    composable<Destination.Coupons> {
+        FeatureScaffold(
+            title = stringResource(ShopR.string.my_coupons),
+            onNavigateBack = navController::popBackStack,
+        ) { innerPadding ->
+            CouponsScreen(
+                onCouponSelected = { couponId -> navController.navigate(Destination.CouponDetail(couponId)) },
+                contentPadding = innerPadding,
+            )
+        }
+    }
+    dialog<Destination.CouponDetail>(dialogProperties = SheetDialogProperties) {
+        CouponDetailSheet(onDismiss = navController::popBackStack)
     }
 }

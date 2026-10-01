@@ -23,4 +23,6 @@
     <string name="xp_left_to_level">%1$d pts to level %2$d</string>
     <string name="streak_days">%1$d-day streak</string>
     <string name="cancel">Cancel</string>
+    <string name="coupon_expires_soon">Coupon expires soon</string>
+    <string name="coupon_valid_until_tomorrow_msg">“%1$s” is valid until tomorrow</string>
 </resources>

@@ -14,11 +14,20 @@ data class Coupon(
     val rewardId: String,
     val redeemedAtEpochMillis: Long,
     val expiresAtEpochMillis: Long?,
-)
+    val code: String? = null,
+    val usedAtEpochMillis: Long? = null,
+) {
+    fun status(nowEpochMillis: Long): CouponStatus = when {
+        usedAtEpochMillis != null -> CouponStatus.USED
+        expiresAtEpochMillis != null && expiresAtEpochMillis < nowEpochMillis -> CouponStatus.EXPIRED
+        else -> CouponStatus.ACTIVE
+    }
+}
 
 interface ShopRepository {
     fun observeRewards(): Flow<List<Reward>>
     fun observePurchases(userId: String): Flow<List<Coupon>>
+    fun observePurchase(couponId: String): Flow<Coupon?>
     suspend fun getRewards(): List<Reward>
     suspend fun getPurchases(userId: String): List<Coupon>
 }

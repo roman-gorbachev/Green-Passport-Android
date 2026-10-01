@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,9 +30,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
+import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.component.ListSection
 import com.smartcity.greenpassport.core.designsystem.component.ListSectionDivider
-import com.smartcity.greenpassport.core.designsystem.component.ListSectionRow
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.ProgressHeroCard
 import com.smartcity.greenpassport.core.designsystem.component.SectionHeader
@@ -42,12 +43,12 @@ import com.smartcity.greenpassport.core.model.Reward
 import com.smartcity.greenpassport.feature.shop.R
 import com.smartcity.greenpassport.feature.shop.presentation.state.ShopUiState
 import com.smartcity.greenpassport.feature.shop.presentation.viewmodels.ShopViewModel
-import java.text.DateFormat
-import java.util.Date
 import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun ShopScreen(
+    onCouponsClick: () -> Unit,
+    onCouponSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     viewModel: ShopViewModel = hiltViewModel(),
@@ -67,6 +68,13 @@ fun ShopScreen(
     if (uiState.isLoading) {
         LoadingContent(modifier = modifier.padding(contentPadding))
         return
+    }
+
+    LaunchedEffect(uiState.purchasedCouponId) {
+        uiState.purchasedCouponId?.let { couponId ->
+            viewModel.onPurchasedCouponShown()
+            onCouponSelected(couponId)
+        }
     }
 
     var pendingReward by remember { mutableStateOf<Reward?>(null) }
@@ -96,6 +104,7 @@ fun ShopScreen(
     ShopContent(
         uiState = uiState,
         onPurchase = { reward -> pendingReward = reward },
+        onCouponsClick = onCouponsClick,
         contentPadding = contentPadding,
         modifier = modifier,
     )
@@ -105,6 +114,7 @@ fun ShopScreen(
 private fun ShopContent(
     uiState: ShopUiState,
     onPurchase: (Reward) -> Unit,
+    onCouponsClick: () -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -147,30 +157,12 @@ private fun ShopContent(
         }
 
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(Dimens.SpacingCompact)) {
-                SectionHeader(title = stringResource(R.string.shop_history_title))
-                if (uiState.purchases.isEmpty()) {
-                    Text(
-                        text = stringResource(R.string.shop_empty_purchases),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                } else {
-                    ListSection {
-                        uiState.purchases.forEachIndexed { index, purchase ->
-                            val reward = uiState.rewards.firstOrNull { it.id == purchase.rewardId }
-                            ListSectionRow(
-                                title = reward?.title ?: purchase.rewardId,
-                                subtitle = DateFormat.getDateInstance().format(Date(purchase.redeemedAtEpochMillis)),
-                                leading = { SymbolTile(icon = Icons.Filled.ConfirmationNumber) },
-                                trailing = {},
-                                onClick = null,
-                                showDivider = index < uiState.purchases.lastIndex,
-                            )
-                        }
-                    }
-                }
-            }
+            GpListRow(
+                title = stringResource(R.string.my_coupons),
+                subtitle = stringResource(R.string.active_coupons_count, uiState.activeCouponCount),
+                leading = { SymbolTile(icon = Icons.Filled.ConfirmationNumber) },
+                onClick = onCouponsClick,
+            )
         }
     }
 }

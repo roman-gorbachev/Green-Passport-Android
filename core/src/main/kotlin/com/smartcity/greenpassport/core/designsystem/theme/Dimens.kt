@@ -37,6 +37,8 @@ object Dimens {
     val TileSizeMedium = 44.dp
     val TileSizeLarge = 56.dp
     val HistoryTileSize = 36.dp
+    val CouponTileSize = 40.dp
+    val CouponQrSize = 200.dp
     val InputFieldHeight = 50.dp
     val ProgressHeroHeight = 140.dp
     val ProgressHeroMascotSize = 96.dp

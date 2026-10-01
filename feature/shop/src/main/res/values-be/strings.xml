@@ -8,4 +8,25 @@
     <string name="shop_empty_rewards">Пакуль няма даступных купонаў</string>
     <string name="shop_empty_purchases">Вы яшчэ не абменьвалі балы на купоны</string>
     <string name="exchange_points_for_reward_msg">Абмяняць %1$d балаў на «%2$s»?</string>
+    <string name="my_coupons">Мае купоны</string>
+    <string name="active_coupons_count">Актыўных: %1$d</string>
+    <string name="coupons_active">Актыўныя</string>
+    <string name="coupons_used">Выкарыстаныя</string>
+    <string name="coupons_expired">Пратэрмінаваныя</string>
+    <string name="valid_until">Дзейнічае да %1$s</string>
+    <string name="days_left">Засталося дзён: %1$d</string>
+    <string name="used_on">Выкарыстаны %1$s</string>
+    <string name="expired_on">Скончыўся %1$s</string>
+    <string name="no_expiry_date">Без тэрміну дзеяння</string>
+    <string name="coupon_code">Код купона</string>
+    <string name="partner_scans_qr_msg">Партнёр скануе QR-код камерай — купон пагасіцца аўтаматычна</string>
+    <string name="mark_as_used">Адзначыць выкарыстаным</string>
+    <string name="mark_coupon_used_msg">Адзначыць купон выкарыстаным? Адмяніць гэта нельга</string>
+    <string name="coupon_already_used">Купон ужо выкарыстаны</string>
+    <string name="coupon_expired">Тэрмін дзеяння купона скончыўся</string>
+    <string name="no_active_coupons_msg">Актыўных купонаў няма — абмяняйце балы ў краме</string>
+    <string name="no_used_coupons">Выкарыстаных купонаў пакуль няма</string>
+    <string name="no_expired_coupons">Пратэрмінаваных купонаў няма</string>
+    <string name="no_internet_connection">Няма падключэння да інтэрнэту</string>
+    <string name="something_went_wrong_msg">Нешта пайшло не так. Паспрабуй яшчэ раз</string>
 </resources>

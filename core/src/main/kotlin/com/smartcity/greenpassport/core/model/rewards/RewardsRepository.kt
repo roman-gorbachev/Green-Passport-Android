@@ -8,4 +8,5 @@ interface RewardsRepository {
     suspend fun recordTipRead(tipId: String): RewardResult
     suspend fun recordGameResult(gameId: String, score: Int): RewardResult
     suspend fun redeemReward(rewardId: String): Coupon
+    suspend fun markCouponUsed(couponId: String): Long
 }

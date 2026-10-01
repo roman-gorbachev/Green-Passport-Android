@@ -25,6 +25,10 @@ private const val RESULT_XP = "xp"
 private const val RESULT_STREAK_BONUS = "streakBonus"
 private const val RESULT_COUPON_ID = "couponId"
 private const val RESULT_REDEEMED_AT = "redeemedAtEpochMillis"
+private const val RESULT_EXPIRES_AT = "expiresAtEpochMillis"
+private const val RESULT_CODE = "code"
+private const val RESULT_USED_AT = "usedAtEpochMillis"
+private const val PARAM_COUPON_ID = "couponId"
 
 class FirebaseRewardsRepository @Inject constructor(
     private val functions: FirebaseFunctions,
@@ -57,8 +61,14 @@ class FirebaseRewardsRepository @Inject constructor(
             id = result[RESULT_COUPON_ID] as? String ?: "",
             rewardId = rewardId,
             redeemedAtEpochMillis = (result[RESULT_REDEEMED_AT] as? Number)?.toLong() ?: System.currentTimeMillis(),
-            expiresAtEpochMillis = null,
+            expiresAtEpochMillis = (result[RESULT_EXPIRES_AT] as? Number)?.toLong(),
+            code = result[RESULT_CODE] as? String,
         )
+    }
+
+    override suspend fun markCouponUsed(couponId: String): Long {
+        val result = call(CloudFunctionNames.MARK_COUPON_USED, mapOf(PARAM_COUPON_ID to couponId))
+        return (result[RESULT_USED_AT] as? Number)?.toLong() ?: System.currentTimeMillis()
     }
 
     private suspend fun callForReward(name: String, data: Map<String, Any>, reason: PointsEarnReason): RewardResult {

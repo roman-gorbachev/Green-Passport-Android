@@ -1,6 +1,7 @@
 package com.smartcity.greenpassport.feature.shop.presentation.state
 
 import com.smartcity.greenpassport.core.model.Coupon
+import com.smartcity.greenpassport.core.model.CouponStatus
 import com.smartcity.greenpassport.core.model.Reward
 
 data class ShopUiState(
@@ -11,4 +12,11 @@ data class ShopUiState(
     val hasInsufficientPoints: Boolean = false,
     val isLoading: Boolean = true,
     val hasError: Boolean = false,
-)
+    val purchasedCouponId: String? = null,
+) {
+    val activeCouponCount: Int
+        get() {
+            val now = System.currentTimeMillis()
+            return purchases.count { it.status(now) == CouponStatus.ACTIVE }
+        }
+}

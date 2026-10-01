@@ -7,4 +7,25 @@
     <string name="shop_empty_rewards">No coupons available yet</string>
     <string name="shop_empty_purchases">You haven\'t redeemed any points yet</string>
     <string name="exchange_points_for_reward_msg">Exchange %1$d points for “%2$s”?</string>
+    <string name="my_coupons">My coupons</string>
+    <string name="active_coupons_count">Active: %1$d</string>
+    <string name="coupons_active">Active</string>
+    <string name="coupons_used">Used</string>
+    <string name="coupons_expired">Expired</string>
+    <string name="valid_until">Valid until %1$s</string>
+    <string name="days_left">Days left: %1$d</string>
+    <string name="used_on">Used on %1$s</string>
+    <string name="expired_on">Expired on %1$s</string>
+    <string name="no_expiry_date">No expiry date</string>
+    <string name="coupon_code">Coupon code</string>
+    <string name="partner_scans_qr_msg">The partner scans the QR code with a camera and the coupon is redeemed automatically</string>
+    <string name="mark_as_used">Mark as used</string>
+    <string name="mark_coupon_used_msg">Mark the coupon as used? This can\'t be undone</string>
+    <string name="coupon_already_used">The coupon has already been used</string>
+    <string name="coupon_expired">The coupon has expired</string>
+    <string name="no_active_coupons_msg">No active coupons yet — exchange points in the shop</string>
+    <string name="no_used_coupons">No used coupons yet</string>
+    <string name="no_expired_coupons">No expired coupons</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="something_went_wrong_msg">Something went wrong. Please try again</string>
 </resources>

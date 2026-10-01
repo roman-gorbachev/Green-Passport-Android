@@ -21,6 +21,8 @@ private const val FIELD_USER_ID = "userId"
 private const val FIELD_REWARD_ID = "rewardId"
 private const val FIELD_REDEEMED_AT = "redeemedAtEpochMillis"
 private const val FIELD_EXPIRES_AT = "expiresAtEpochMillis"
+private const val FIELD_CODE = "code"
+private const val FIELD_USED_AT = "usedAtEpochMillis"
 
 class FirestoreShopRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
@@ -36,6 +38,11 @@ class FirestoreShopRepository @Inject constructor(
             .whereEqualTo(FIELD_USER_ID, userId)
             .cacheFirstSnapshots()
             .map { snapshot -> snapshot.documents.mapNotNull { it.toCoupon() } }
+            .distinctUntilChanged()
+
+    override fun observePurchase(couponId: String): Flow<Coupon?> =
+        FirestoreCollections.purchases(firestore).document(couponId).cacheFirstSnapshots()
+            .map { snapshot -> snapshot.toCoupon() }
             .distinctUntilChanged()
 
     override suspend fun getRewards(): List<Reward> = observeRewards().first()
@@ -58,5 +65,7 @@ private fun DocumentSnapshot.toCoupon(): Coupon? {
         rewardId = rewardId,
         redeemedAtEpochMillis = redeemedAt,
         expiresAtEpochMillis = getLong(FIELD_EXPIRES_AT),
+        code = getString(FIELD_CODE),
+        usedAtEpochMillis = getLong(FIELD_USED_AT),
     )
 }
