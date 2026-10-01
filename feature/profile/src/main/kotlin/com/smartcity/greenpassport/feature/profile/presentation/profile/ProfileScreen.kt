@@ -13,10 +13,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BrightnessMedium
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Shield
@@ -55,6 +58,7 @@ import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.designsystem.theme.SectionColors
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import com.smartcity.greenpassport.core.model.settings.AppLanguage
+import com.smartcity.greenpassport.core.model.settings.AppTheme
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.profile.R
 import com.smartcity.greenpassport.core.R as CoreR
@@ -86,6 +90,7 @@ fun ProfileScreen(
     ProfileContent(
         uiState = uiState,
         onNotificationsToggle = viewModel::onNotificationsToggle,
+        onThemeSelected = viewModel::onThemeSelected,
         onSignOut = viewModel::onSignOut,
         onMenuEntrySelected = onMenuEntrySelected,
         contentPadding = contentPadding,
@@ -118,6 +123,7 @@ private val profileMenuEntries = listOf(
 private fun ProfileContent(
     uiState: ProfileUiState,
     onNotificationsToggle: (Boolean) -> Unit,
+    onThemeSelected: (AppTheme) -> Unit,
     onSignOut: () -> Unit,
     onMenuEntrySelected: (Destination) -> Unit,
     contentPadding: PaddingValues,
@@ -143,6 +149,7 @@ private fun ProfileContent(
             SettingsSection(
                 uiState = uiState,
                 onNotificationsToggle = onNotificationsToggle,
+                onThemeSelected = onThemeSelected,
                 onMenuEntrySelected = onMenuEntrySelected,
             )
         }
@@ -184,6 +191,7 @@ private fun ProfileContent(
 private fun SettingsSection(
     uiState: ProfileUiState,
     onNotificationsToggle: (Boolean) -> Unit,
+    onThemeSelected: (AppTheme) -> Unit,
     onMenuEntrySelected: (Destination) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -231,6 +239,7 @@ private fun SettingsSection(
             onClick = { onNotificationsToggle(!uiState.notificationsEnabled) },
             showDivider = true,
         )
+        ThemeRow(selected = uiState.theme, onSelect = onThemeSelected)
         LanguageRow()
     }
 }
@@ -281,6 +290,55 @@ private fun ProfileMenuIcon(
         size = Dimens.TileSizeSmall,
         modifier = modifier,
     )
+}
+
+@Composable
+private fun ThemeRow(
+    selected: AppTheme,
+    onSelect: (AppTheme) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var isMenuOpen by remember { mutableStateOf(false) }
+    ListSectionRow(
+        title = stringResource(R.string.theme),
+        leading = { ProfileMenuIcon(icon = themeIcon(selected), color = GreenPassportTheme.sectionColors.games) },
+        trailing = {
+            Box {
+                Text(
+                    text = stringResource(themeLabelRes(selected)),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                DropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }) {
+                    AppTheme.entries.forEach { theme ->
+                        DropdownMenuItem(
+                            text = { Text(stringResource(themeLabelRes(theme))) },
+                            leadingIcon = { Icon(imageVector = themeIcon(theme), contentDescription = null) },
+                            onClick = {
+                                isMenuOpen = false
+                                onSelect(theme)
+                            },
+                        )
+                    }
+                }
+            }
+        },
+        onClick = { isMenuOpen = true },
+        showDivider = true,
+        modifier = modifier,
+    )
+}
+
+private fun themeLabelRes(theme: AppTheme): Int = when (theme) {
+    AppTheme.SYSTEM -> R.string.system_theme
+    AppTheme.LIGHT -> R.string.light_theme
+    AppTheme.DARK -> R.string.dark_theme
+}
+
+private fun themeIcon(theme: AppTheme): ImageVector = when (theme) {
+    AppTheme.SYSTEM -> Icons.Filled.BrightnessMedium
+    AppTheme.LIGHT -> Icons.Filled.LightMode
+    AppTheme.DARK -> Icons.Filled.DarkMode
 }
 
 @Composable

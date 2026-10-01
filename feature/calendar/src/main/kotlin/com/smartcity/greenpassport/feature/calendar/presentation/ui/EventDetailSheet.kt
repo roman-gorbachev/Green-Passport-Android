@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.common.formatEventDate
@@ -43,7 +42,6 @@ import com.smartcity.greenpassport.feature.calendar.presentation.viewmodels.Even
 import com.smartcity.greenpassport.core.R as CoreR
 
 private const val EVENT_IMAGE_ASPECT_RATIO = 1.5f
-private const val DESCRIPTION_MAX_LINES = 2
 
 @Composable
 fun EventDetailSheet(
@@ -128,9 +126,7 @@ private fun EventDetailContent(
             Text(
                 text = event.description,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.outline,
-                maxLines = DESCRIPTION_MAX_LINES,
-                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = Dimens.SpacingMedium),
             )
         }

@@ -1,5 +1,6 @@
 package com.smartcity.greenpassport.feature.tasks.presentation.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,25 +8,28 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.designsystem.component.ChoiceCapsule
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.ListRowContent
@@ -36,10 +40,12 @@ import com.smartcity.greenpassport.core.designsystem.component.listSectionItems
 import com.smartcity.greenpassport.core.designsystem.layout.plus
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.Task
-import com.smartcity.greenpassport.core.model.TaskCategory
 import com.smartcity.greenpassport.feature.tasks.R
-import com.smartcity.greenpassport.feature.tasks.presentation.state.TaskFilter
+import com.smartcity.greenpassport.feature.tasks.presentation.state.TaskFilterChip
+import com.smartcity.greenpassport.feature.tasks.presentation.state.TaskFilters
 import com.smartcity.greenpassport.feature.tasks.presentation.state.TasksListUiState
+import com.smartcity.greenpassport.feature.tasks.presentation.state.statusFilterLabelRes
+import com.smartcity.greenpassport.feature.tasks.presentation.state.verificationLabelRes
 import com.smartcity.greenpassport.feature.tasks.presentation.viewmodels.TasksListViewModel
 import com.smartcity.greenpassport.core.R as CoreR
 
@@ -52,26 +58,31 @@ fun TasksListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LifecycleResumeEffect(viewModel) {
-        viewModel.refresh()
-        onPauseOrDispose {}
-    }
-
     TasksListContent(
         uiState = uiState,
-        onFilterSelected = viewModel::onFilterSelected,
+        onFiltersChanged = viewModel::onFiltersChanged,
         onTaskSelected = onTaskSelected,
         onToggleFavorite = viewModel::onToggleFavorite,
-        onRetry = viewModel::refresh,
+        onRetry = viewModel::retry,
         contentPadding = contentPadding,
         modifier = modifier,
     )
+
+    if (uiState.isFilterSheetVisible) {
+        TaskFiltersSheet(
+            initialFilters = uiState.filters,
+            profileCity = uiState.profile?.city,
+            resultCount = { filters -> uiState.tasksMatching(filters).size },
+            onApply = viewModel::onFiltersChanged,
+            onDismiss = { viewModel.onFilterSheetVisibilityChanged(false) },
+        )
+    }
 }
 
 @Composable
 private fun TasksListContent(
     uiState: TasksListUiState,
-    onFilterSelected: (TaskFilter) -> Unit,
+    onFiltersChanged: (TaskFilters) -> Unit,
     onTaskSelected: (String) -> Unit,
     onToggleFavorite: (String) -> Unit,
     onRetry: () -> Unit,
@@ -79,40 +90,26 @@ private fun TasksListContent(
     modifier: Modifier = Modifier,
 ) {
     val listPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding())
+    val chips = uiState.filters.chips()
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(top = contentPadding.calculateTopPadding()),
     ) {
-        LazyRow(
-            contentPadding = PaddingValues(
-                horizontal = Dimens.ScreenHorizontalPadding,
-                vertical = Dimens.SpacingSmall,
-            ),
-            horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
-        ) {
-            if (uiState.profile != null) {
-                item {
-                    ChoiceCapsule(
-                        label = stringResource(R.string.for_you),
-                        selected = uiState.effectiveFilter == TaskFilter.ForYou,
-                        onClick = { onFilterSelected(TaskFilter.ForYou) },
+        if (chips.isNotEmpty()) {
+            LazyRow(
+                contentPadding = PaddingValues(
+                    horizontal = Dimens.ScreenHorizontalPadding,
+                    vertical = Dimens.SpacingSmall
+                ),
+                horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+            ) {
+                items(chips) { chip ->
+                    ActiveFilterChip(
+                        label = chipLabel(chip, uiState.profile?.city),
+                        onRemove = { onFiltersChanged(chip.remaining) },
                     )
                 }
-            }
-            item {
-                ChoiceCapsule(
-                    label = stringResource(R.string.tasks_filter_all),
-                    selected = uiState.effectiveFilter == TaskFilter.All,
-                    onClick = { onFilterSelected(TaskFilter.All) },
-                )
-            }
-            items(TaskCategory.entries) { category ->
-                ChoiceCapsule(
-                    label = stringResource(taskCategoryLabelRes(category)),
-                    selected = uiState.effectiveFilter == TaskFilter.Category(category),
-                    onClick = { onFilterSelected(TaskFilter.Category(category)) },
-                )
             }
         }
 
@@ -148,6 +145,40 @@ private fun TasksListContent(
             }
         }
     }
+}
+
+@Composable
+private fun ActiveFilterChip(
+    label: String,
+    onRemove: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val removeLabel = stringResource(R.string.remove_filter)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
+        modifier = modifier
+            .clip(RoundedCornerShape(Dimens.CornerRadiusPill))
+            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+            .clickable(role = Role.Button, onClickLabel = removeLabel, onClick = onRemove)
+            .padding(horizontal = Dimens.SpacingCompact, vertical = Dimens.SpacingSmall),
+    ) {
+        Text(text = label, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        Icon(
+            imageVector = Icons.Filled.Close,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(Dimens.IconSizeExtraSmall),
+        )
+    }
+}
+
+@Composable
+private fun chipLabel(chip: TaskFilterChip, profileCity: String?): String = when (chip) {
+    is TaskFilterChip.Status -> stringResource(statusFilterLabelRes(chip.status))
+    is TaskFilterChip.City -> cityLabel(chip.city, profileCity)
+    is TaskFilterChip.Verification -> stringResource(verificationLabelRes(chip.verification))
+    is TaskFilterChip.Category -> stringResource(taskCategoryLabelRes(chip.category))
 }
 
 @Composable

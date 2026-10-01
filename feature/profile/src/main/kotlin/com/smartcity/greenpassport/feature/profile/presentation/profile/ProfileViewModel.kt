@@ -3,120 +3,122 @@ package com.smartcity.greenpassport.feature.profile.presentation.profile
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartcity.greenpassport.core.auth.AuthSession
+import com.smartcity.greenpassport.core.model.Level
 import com.smartcity.greenpassport.core.model.LevelProgression
-import com.smartcity.greenpassport.feature.profile.domain.GetExperienceUseCase
-import com.smartcity.greenpassport.feature.profile.domain.GetPointsBalanceUseCase
+import com.smartcity.greenpassport.core.model.settings.AppTheme
+import com.smartcity.greenpassport.feature.profile.domain.ObserveAppThemeUseCase
+import com.smartcity.greenpassport.feature.profile.domain.ObserveExperienceUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveIsModeratorUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveNotificationsEnabledUseCase
+import com.smartcity.greenpassport.feature.profile.domain.ObservePointsBalanceUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveProfileSessionUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveUserProfileUseCase
+import com.smartcity.greenpassport.feature.profile.domain.SetAppThemeUseCase
 import com.smartcity.greenpassport.feature.profile.domain.SetNotificationsEnabledUseCase
 import com.smartcity.greenpassport.feature.profile.domain.SignOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val observeSession: ObserveProfileSessionUseCase,
-    private val getPointsBalance: GetPointsBalanceUseCase,
-    private val getExperience: GetExperienceUseCase,
-    private val signOutUseCase: SignOutUseCase,
-    observeNotificationsEnabled: ObserveNotificationsEnabledUseCase,
+    observeSession: ObserveProfileSessionUseCase,
+    private val observePointsBalance: ObservePointsBalanceUseCase,
+    private val observeExperience: ObserveExperienceUseCase,
+    private val observeUserProfile: ObserveUserProfileUseCase,
+    private val observeIsModerator: ObserveIsModeratorUseCase,
+    private val observeNotificationsEnabled: ObserveNotificationsEnabledUseCase,
+    private val observeAppTheme: ObserveAppThemeUseCase,
     private val setNotificationsEnabled: SetNotificationsEnabledUseCase,
-    observeUserProfile: ObserveUserProfileUseCase,
-    observeIsModerator: ObserveIsModeratorUseCase,
+    private val setAppTheme: SetAppThemeUseCase,
+    private val signOutUseCase: SignOutUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ProfileUiState())
-    val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
+    private val retryRequests = MutableSharedFlow<Unit>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
 
-    init {
-        refresh()
-
-        viewModelScope.launch {
-            observeSession()
-                .flatMapLatest { session ->
-                    if (session == null) flowOf(null) else observeUserProfile(session.userId).catch { emit(null) }
-                }
-                .collectLatest { profile -> _uiState.update { it.copy(profile = profile) } }
-        }
-
-        viewModelScope.launch {
-            observeSession()
-                .flatMapLatest { session ->
-                    if (session == null) flowOf(false) else observeIsModerator(session.userId).catch { emit(false) }
-                }
-                .collectLatest { isModerator -> _uiState.update { it.copy(isModerator = isModerator) } }
-        }
-
-        viewModelScope.launch {
-            observeNotificationsEnabled().collectLatest { enabled ->
-                _uiState.update { it.copy(notificationsEnabled = enabled) }
-            }
-        }
-    }
+    val uiState = observeProfileUiState(observeSession()).stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        ProfileUiState(),
+    )
 
     fun refresh() {
-        viewModelScope.launch {
-            observeSession().collectLatest { session ->
-                if (session == null) {
-                    _uiState.update { it.copy(isLoading = false, userId = null) }
-                    return@collectLatest
-                }
-                _uiState.update {
-                    it.copy(
-                        isLoading = true,
-                        hasError = false,
-                        email = session.email,
-                        userId = session.userId,
-                        isAnonymous = session.isAnonymous,
-                    )
-                }
-                runCatching {
-                    val balance = getPointsBalance(session.userId)
-                    val experience = getExperience(session.userId)
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            points = balance.availablePoints,
-                            level = LevelProgression.levelFor(experience),
-                        )
-                    }
-                }.onFailure {
-                    _uiState.update { it.copy(isLoading = false, hasError = true) }
-                }
-            }
-        }
+        retryRequests.tryEmit(Unit)
     }
 
     fun onNotificationsToggle(enabled: Boolean) {
         viewModelScope.launch {
-            runCatching {
-                setNotificationsEnabled(enabled)
-            }.onFailure { error ->
-                Log.e("ProfileViewModel", error.message.orEmpty())
-            }
+            runCatching { setNotificationsEnabled(enabled) }
+                .onFailure { error -> Log.w(TAG, "Failed to save notifications switch", error) }
+        }
+    }
+
+    fun onThemeSelected(theme: AppTheme) {
+        viewModelScope.launch {
+            runCatching { setAppTheme(theme) }
+                .onFailure { error -> Log.w(TAG, "Failed to save theme", error) }
         }
     }
 
     fun onSignOut() {
         viewModelScope.launch {
-            runCatching {
-                signOutUseCase()
-            }.onFailure { error ->
-                Log.e("ProfileViewModel", error.message.orEmpty())
-            }
+            runCatching { signOutUseCase() }
+                .onFailure { error -> Log.w(TAG, "Failed to sign out", error) }
         }
+    }
+
+    private fun observeProfileUiState(sessions: Flow<AuthSession?>): Flow<ProfileUiState> {
+        val settings = combine(observeNotificationsEnabled(), observeAppTheme()) { enabled, theme -> enabled to theme }
+        val account = combine(sessions, retryRequests.onStart { emit(Unit) }) { session, _ -> session }
+            .flatMapLatest { session -> if (session == null) flowOf(
+                ProfileUiState(isLoading = false)
+            ) else observeAccount(session) }
+        return combine(account, settings) { state, (enabled, theme) ->
+            state.copy(notificationsEnabled = enabled, theme = theme)
+        }
+    }
+
+    private fun observeAccount(session: AuthSession): Flow<ProfileUiState> {
+        val profile = observeUserProfile(session.userId).onStart { emit(null) }.catch { emit(null) }
+        val isModerator = observeIsModerator(session.userId).onStart { emit(false) }.catch { emit(false) }
+        val points = observePointsBalance(session.userId).map { it.availablePoints }
+        val level = observeExperience(session.userId).map<_, Level> { LevelProgression.levelFor(it) }
+        return combine(profile, isModerator, points, level) { currentProfile, moderator, currentPoints, currentLevel ->
+            ProfileUiState(
+                userId = session.userId,
+                email = session.email,
+                isAnonymous = session.isAnonymous,
+                profile = currentProfile,
+                isModerator = moderator,
+                level = currentLevel,
+                points = currentPoints,
+                isLoading = false,
+            )
+        }.catch { error ->
+            Log.w(TAG, "Failed to observe profile", error)
+            emit(ProfileUiState(isLoading = false, hasError = true))
+        }
+    }
+
+    companion object {
+        private const val TAG = "ProfileViewModel"
+        private const val STOP_TIMEOUT_MILLIS = 5000L
     }
 }

@@ -3,10 +3,14 @@ package com.smartcity.greenpassport.core.datasource.remote.repository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
+import com.smartcity.greenpassport.core.datasource.remote.cacheFirstSnapshots
 import com.smartcity.greenpassport.core.model.EcoTip
 import com.smartcity.greenpassport.core.model.EcoTipCategory
 import com.smartcity.greenpassport.core.model.EcoTipsRepository
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 private const val FIELD_CATEGORY = "category"
@@ -24,18 +28,21 @@ class FirestoreEcoTipsRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
 ) : EcoTipsRepository {
 
-    override suspend fun getTips(): List<EcoTip> {
-        val snapshot = FirestoreCollections.ecoTips(firestore).get().await()
-        return snapshot.documents.mapNotNull { it.toEcoTip() }
-    }
+    override fun observeTips(): Flow<List<EcoTip>> =
+        FirestoreCollections.ecoTips(firestore).cacheFirstSnapshots()
+            .map { snapshot -> snapshot.documents.mapNotNull { it.toEcoTip() } }
+            .distinctUntilChanged()
 
-    override suspend fun getReadTipIds(userId: String): Set<String> {
-        val snapshot = FirestoreCollections.ecoTipReads(firestore)
+    override fun observeReadTipIds(userId: String): Flow<Set<String>> =
+        FirestoreCollections.ecoTipReads(firestore)
             .whereEqualTo(FIELD_USER_ID, userId)
-            .get()
-            .await()
-        return snapshot.documents.mapNotNull { it.getString(FIELD_TIP_ID) }.toSet()
-    }
+            .cacheFirstSnapshots()
+            .map { snapshot -> snapshot.documents.mapNotNull { it.getString(FIELD_TIP_ID) }.toSet() }
+            .distinctUntilChanged()
+
+    override suspend fun getTips(): List<EcoTip> = observeTips().first()
+
+    override suspend fun getReadTipIds(userId: String): Set<String> = observeReadTipIds(userId).first()
 }
 
 private fun DocumentSnapshot.toEcoTip(): EcoTip? {

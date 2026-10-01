@@ -16,7 +16,7 @@
     <string name="task_needs_other_confirmation_msg">Это задание подтверждается фото или QR-кодом</string>
     <string name="no_internet_connection">Нет подключения к интернету</string>
     <string name="something_went_wrong_msg">Что-то пошло не так. Попробуй ещё раз</string>
-    <string name="honor_system">Под честное слово</string>
+    <string name="no_proof_needed">Без подтверждения</string>
     <string name="photo_confirmation">Подтверждение фото</string>
     <string name="qr_code_on_site">QR-код на месте</string>
     <string name="up_to_3_such_tasks_per_day_msg">Засчитывается до 3 таких заданий в день</string>
@@ -30,4 +30,18 @@
     <string name="no_reason_given">причина не указана</string>
     <string name="photo_failed_automatic_check_msg">фото не прошло автоматическую проверку</string>
     <string name="under_review">На проверке</string>
+    <string name="filters">Фильтры</string>
+    <string name="status">Статус</string>
+    <string name="confirmation">Подтверждение</string>
+    <string name="city">Город</string>
+    <string name="category">Категория</string>
+    <string name="available_tasks">Доступные</string>
+    <string name="completed_tasks">Выполненные</string>
+    <string name="all_cities">Все города</string>
+    <string name="my_city">Мой город</string>
+    <string name="reset">Сбросить</string>
+    <string name="show_tasks_count">Показать задания (%1$d)</string>
+    <string name="remove_filter">Убрать фильтр</string>
+    <string name="take_photo">Снять фото</string>
+    <string name="choose_from_library">Выбрать из галереи</string>
 </resources>

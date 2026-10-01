@@ -2,8 +2,11 @@ package com.smartcity.greenpassport.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -41,7 +44,9 @@ import com.smartcity.greenpassport.feature.profile.presentation.notifications.No
 import com.smartcity.greenpassport.feature.profile.presentation.profile.ProfileScreen
 import com.smartcity.greenpassport.feature.shop.presentation.ui.ShopScreen
 import com.smartcity.greenpassport.feature.tasks.presentation.ui.TaskDetailSheet
+import com.smartcity.greenpassport.feature.tasks.presentation.ui.TasksFilterButton
 import com.smartcity.greenpassport.feature.tasks.presentation.ui.TasksListScreen
+import com.smartcity.greenpassport.feature.tasks.presentation.viewmodels.TasksListViewModel
 import com.smartcity.greenpassport.feature.community.R as CommunityR
 import com.smartcity.greenpassport.feature.moderation.R as ModerationR
 import com.smartcity.greenpassport.feature.profile.R as ProfileR
@@ -75,13 +80,22 @@ private fun NavGraphBuilder.mainRoutes(navController: NavHostController) {
         )
     }
     composable<Destination.Tasks> {
+        val viewModel: TasksListViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         FeatureScaffold(
             title = stringResource(destinationTitleRes(Destination.Tasks)),
             onNavigateBack = navController::popBackStack,
+            actions = {
+                TasksFilterButton(
+                    activeCount = uiState.filters.activeCount,
+                    onClick = { viewModel.onFilterSheetVisibilityChanged(true) },
+                )
+            },
         ) { innerPadding ->
             TasksListScreen(
                 onTaskSelected = { taskId -> navController.navigate(Destination.TaskDetail(taskId)) },
                 contentPadding = innerPadding,
+                viewModel = viewModel,
             )
         }
     }

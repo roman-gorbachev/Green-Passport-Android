@@ -1,5 +1,7 @@
 package com.smartcity.greenpassport.core.model
 
+import kotlinx.coroutines.flow.Flow
+
 enum class MapPointType {
     ECO_SHOP,
     RECYCLING_POINT,
@@ -17,5 +19,6 @@ data class MapPoint(
 )
 
 interface MapPointsRepository {
+    fun observePoints(): Flow<List<MapPoint>>
     suspend fun getPoints(): List<MapPoint>
 }

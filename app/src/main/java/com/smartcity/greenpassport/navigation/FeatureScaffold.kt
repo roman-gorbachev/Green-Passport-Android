@@ -14,6 +14,7 @@ fun FeatureScaffold(
     title: String,
     onNavigateBack: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    actions: @Composable () -> Unit = {},
     content: @Composable (contentPadding: PaddingValues) -> Unit,
 ) {
     val bottomInset = if (onNavigateBack == null) Dimens.BottomBarReservedHeight else Dimens.SpacingNone
@@ -22,6 +23,7 @@ fun FeatureScaffold(
         onNavigateBack = onNavigateBack,
         bottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + bottomInset,
         modifier = modifier,
+        actions = actions,
         content = content,
     )
 }

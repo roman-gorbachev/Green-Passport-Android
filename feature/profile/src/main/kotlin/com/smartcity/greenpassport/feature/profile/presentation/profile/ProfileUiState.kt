@@ -2,6 +2,7 @@ package com.smartcity.greenpassport.feature.profile.presentation.profile
 
 import com.smartcity.greenpassport.core.model.Level
 import com.smartcity.greenpassport.core.model.profile.UserProfile
+import com.smartcity.greenpassport.core.model.settings.AppTheme
 
 data class ProfileUiState(
     val userId: String? = null,
@@ -12,6 +13,7 @@ data class ProfileUiState(
     val level: Level? = null,
     val points: Int = 0,
     val notificationsEnabled: Boolean = false,
+    val theme: AppTheme = AppTheme.SYSTEM,
     val isLoading: Boolean = true,
     val hasError: Boolean = false,
 )

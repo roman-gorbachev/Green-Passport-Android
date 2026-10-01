@@ -46,4 +46,8 @@
     <string name="moderation">Мадэрацыя</string>
     <string name="language">Мова</string>
     <string name="system_language">Як у сістэме</string>
+    <string name="theme">Тэма</string>
+    <string name="system_theme">Сістэмная</string>
+    <string name="light_theme">Светлая</string>
+    <string name="dark_theme">Цёмная</string>
 </resources>

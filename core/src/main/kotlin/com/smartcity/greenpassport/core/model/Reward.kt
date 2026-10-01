@@ -1,5 +1,7 @@
 package com.smartcity.greenpassport.core.model
 
+import kotlinx.coroutines.flow.Flow
+
 data class Reward(
     val id: String,
     val title: String,
@@ -15,6 +17,8 @@ data class Coupon(
 )
 
 interface ShopRepository {
+    fun observeRewards(): Flow<List<Reward>>
+    fun observePurchases(userId: String): Flow<List<Coupon>>
     suspend fun getRewards(): List<Reward>
     suspend fun getPurchases(userId: String): List<Coupon>
 }

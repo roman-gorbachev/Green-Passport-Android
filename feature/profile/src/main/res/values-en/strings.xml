@@ -50,4 +50,8 @@
     <string name="moderation">Moderation</string>
     <string name="language">Language</string>
     <string name="system_language">System default</string>
+    <string name="theme">Theme</string>
+    <string name="system_theme">System</string>
+    <string name="light_theme">Light</string>
+    <string name="dark_theme">Dark</string>
 </resources>

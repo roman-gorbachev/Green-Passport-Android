@@ -3,8 +3,13 @@ package com.smartcity.greenpassport.core.datasource.remote.repository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
+import com.smartcity.greenpassport.core.datasource.remote.cacheFirstSnapshots
 import com.smartcity.greenpassport.core.model.EcoEvent
 import com.smartcity.greenpassport.core.model.EventsRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -24,18 +29,21 @@ class FirestoreEventsRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
 ) : EventsRepository {
 
-    override suspend fun getEvents(): List<EcoEvent> {
-        val snapshot = FirestoreCollections.events(firestore).get().await()
-        return snapshot.documents.mapNotNull { it.toEcoEvent() }
-    }
+    override fun observeEvents(): Flow<List<EcoEvent>> =
+        FirestoreCollections.events(firestore).cacheFirstSnapshots()
+            .map { snapshot -> snapshot.documents.mapNotNull { it.toEcoEvent() } }
+            .distinctUntilChanged()
 
-    override suspend fun getRegisteredEventIds(userId: String): Set<String> {
-        val snapshot = FirestoreCollections.eventRegistrations(firestore)
+    override fun observeRegisteredEventIds(userId: String): Flow<Set<String>> =
+        FirestoreCollections.eventRegistrations(firestore)
             .whereEqualTo(FIELD_USER_ID, userId)
-            .get()
-            .await()
-        return snapshot.documents.mapNotNull { it.getString(FIELD_EVENT_ID) }.toSet()
-    }
+            .cacheFirstSnapshots()
+            .map { snapshot -> snapshot.documents.mapNotNull { it.getString(FIELD_EVENT_ID) }.toSet() }
+            .distinctUntilChanged()
+
+    override suspend fun getEvents(): List<EcoEvent> = observeEvents().first()
+
+    override suspend fun getRegisteredEventIds(userId: String): Set<String> = observeRegisteredEventIds(userId).first()
 
     override suspend fun registerForEvent(userId: String, eventId: String) {
         val registrationId = "${userId}_$eventId"

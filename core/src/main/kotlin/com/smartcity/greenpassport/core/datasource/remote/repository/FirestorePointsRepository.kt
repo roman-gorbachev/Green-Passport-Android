@@ -3,10 +3,14 @@ package com.smartcity.greenpassport.core.datasource.remote.repository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
+import com.smartcity.greenpassport.core.datasource.remote.cacheFirstSnapshots
 import com.smartcity.greenpassport.core.model.Experience
 import com.smartcity.greenpassport.core.model.PointsBalance
 import com.smartcity.greenpassport.core.model.PointsRepository
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 private const val FIELD_AVAILABLE_POINTS = "availablePoints"
@@ -18,15 +22,19 @@ class FirestorePointsRepository @Inject constructor(
 
     private val users get() = FirestoreCollections.users(firestore)
 
-    override suspend fun getBalance(userId: String): PointsBalance {
-        val snapshot = users.document(userId).get().await()
-        return PointsBalance(userId = userId, availablePoints = snapshot.availablePointsOrZero())
-    }
+    override fun observeBalance(userId: String): Flow<PointsBalance> =
+        users.document(userId).cacheFirstSnapshots()
+            .map { snapshot -> PointsBalance(userId = userId, availablePoints = snapshot.availablePointsOrZero()) }
+            .distinctUntilChanged()
 
-    override suspend fun getExperience(userId: String): Experience {
-        val snapshot = users.document(userId).get().await()
-        return Experience(userId = userId, lifetimeXp = snapshot.lifetimeXpOrZero())
-    }
+    override fun observeExperience(userId: String): Flow<Experience> =
+        users.document(userId).cacheFirstSnapshots()
+            .map { snapshot -> Experience(userId = userId, lifetimeXp = snapshot.lifetimeXpOrZero()) }
+            .distinctUntilChanged()
+
+    override suspend fun getBalance(userId: String): PointsBalance = observeBalance(userId).first()
+
+    override suspend fun getExperience(userId: String): Experience = observeExperience(userId).first()
 }
 
 private fun DocumentSnapshot.availablePointsOrZero(): Int =

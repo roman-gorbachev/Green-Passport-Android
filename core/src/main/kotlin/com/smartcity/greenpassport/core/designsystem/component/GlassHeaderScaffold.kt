@@ -41,6 +41,7 @@ fun GlassHeaderScaffold(
     modifier: Modifier = Modifier,
     onNavigateBack: (() -> Unit)? = null,
     bottomPadding: Dp = Dimens.SpacingNone,
+    actions: @Composable () -> Unit = {},
     content: @Composable (contentPadding: PaddingValues) -> Unit,
 ) {
     val hazeState = rememberHazeState()
@@ -78,7 +79,7 @@ fun GlassHeaderScaffold(
                     },
                 ),
         ) {
-            ScreenHeader(title = title, onNavigateBack = onNavigateBack)
+            ScreenHeader(title = title, onNavigateBack = onNavigateBack, actions = actions)
             if (isContentUnderHeader) {
                 HorizontalDivider(
                     thickness = Dimens.DividerThickness,

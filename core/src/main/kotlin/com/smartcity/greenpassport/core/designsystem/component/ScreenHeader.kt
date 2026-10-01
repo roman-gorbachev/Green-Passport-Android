@@ -26,6 +26,7 @@ fun ScreenHeader(
     title: String,
     modifier: Modifier = Modifier,
     onNavigateBack: (() -> Unit)? = null,
+    actions: @Composable () -> Unit = {},
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
@@ -51,7 +52,9 @@ fun ScreenHeader(
                     .weight(1f)
                     .padding(horizontal = Dimens.SpacingSmall),
             )
-            Spacer(modifier = Modifier.size(Dimens.BackButtonSize))
+            Box(contentAlignment = Alignment.CenterEnd, modifier = Modifier.size(Dimens.BackButtonSize)) {
+                actions()
+            }
         }
     }
 }

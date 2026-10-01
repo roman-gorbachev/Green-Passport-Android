@@ -2,10 +2,11 @@ package com.smartcity.greenpassport.feature.profile.domain
 
 import com.smartcity.greenpassport.core.model.Experience
 import com.smartcity.greenpassport.core.model.PointsRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetExperienceUseCase @Inject constructor(
+class ObserveExperienceUseCase @Inject constructor(
     private val pointsRepository: PointsRepository,
 ) {
-    suspend operator fun invoke(userId: String): Experience = pointsRepository.getExperience(userId)
+    operator fun invoke(userId: String): Flow<Experience> = pointsRepository.observeExperience(userId)
 }

@@ -12,6 +12,7 @@ import com.smartcity.greenpassport.core.R
 import com.smartcity.greenpassport.core.messaging.helpers.NotificationChannels
 import com.smartcity.greenpassport.core.messaging.helpers.NotificationLogEntryPoint
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.first
 
 class EventReminderWorker(
     context: Context,
@@ -29,6 +30,7 @@ class EventReminderWorker(
         )
         entryPoint.notificationLogRepository().log(title = eventTitle, body = reminderBody)
 
+        if (!entryPoint.appSettingsRepository().observeNotificationsEnabled().first()) return Result.success()
         if (ContextCompat.checkSelfPermission(
                 applicationContext,
                 Manifest.permission.POST_NOTIFICATIONS,

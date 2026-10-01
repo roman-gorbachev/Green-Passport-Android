@@ -7,7 +7,7 @@ import com.smartcity.greenpassport.feature.tasks.R
 
 @StringRes
 fun verificationLabelRes(verification: TaskVerification): Int = when (verification) {
-    TaskVerification.SELF -> R.string.honor_system
+    TaskVerification.SELF -> R.string.no_proof_needed
     TaskVerification.PHOTO -> R.string.photo_confirmation
     TaskVerification.QR -> R.string.qr_code_on_site
 }

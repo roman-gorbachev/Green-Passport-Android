@@ -1,5 +1,6 @@
 package com.smartcity.greenpassport.feature.tasks.presentation.ui
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,11 +12,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,6 +67,27 @@ fun TaskDetailSheet(
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) viewModel.onPhotoPicked(uri)
     }
+    var cameraUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isSaved ->
+        val uri = cameraUri
+        if (isSaved && uri != null) viewModel.onPhotoPicked(uri)
+    }
+    var isPhotoSourceVisible by remember { mutableStateOf(false) }
+    if (isPhotoSourceVisible) {
+        PhotoSourceDialog(
+            onTakePhoto = {
+                isPhotoSourceVisible = false
+                val uri = createTaskPhotoUri(context)
+                cameraUri = uri
+                camera.launch(uri)
+            },
+            onChooseFromLibrary = {
+                isPhotoSourceVisible = false
+                photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            },
+            onDismiss = { isPhotoSourceVisible = false },
+        )
+    }
 
     GpSheetScaffold(onDismiss = onDismiss, modifier = modifier) {
         when {
@@ -77,12 +105,38 @@ fun TaskDetailSheet(
                 uiState = uiState,
                 onCompleteTask = viewModel::onCompleteTask,
                 onScanCode = { viewModel.onScanCode(context) },
-                onPickPhoto = {
-                    photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                },
+                onPickPhoto = { isPhotoSourceVisible = true },
             )
         }
     }
+}
+
+@Composable
+private fun PhotoSourceDialog(
+    onTakePhoto: () -> Unit,
+    onChooseFromLibrary: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.attach_photo)) },
+        text = {
+            Column {
+                TextButton(onClick = onTakePhoto, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.take_photo))
+                }
+                TextButton(onClick = onChooseFromLibrary, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.choose_from_library))
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(CoreR.string.cancel))
+            }
+        },
+    )
 }
 
 @Composable

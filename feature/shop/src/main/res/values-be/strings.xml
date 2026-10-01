@@ -7,4 +7,5 @@
     <string name="shop_insufficient_points">Недастаткова балаў для абмену</string>
     <string name="shop_empty_rewards">Пакуль няма даступных купонаў</string>
     <string name="shop_empty_purchases">Вы яшчэ не абменьвалі балы на купоны</string>
+    <string name="exchange_points_for_reward_msg">Абмяняць %1$d балаў на «%2$s»?</string>
 </resources>

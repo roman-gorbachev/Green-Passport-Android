@@ -1,5 +1,7 @@
 package com.smartcity.greenpassport.core.model
 
+import kotlinx.coroutines.flow.Flow
+
 data class EcoEvent(
     val id: String,
     val title: String,
@@ -12,6 +14,8 @@ data class EcoEvent(
 )
 
 interface EventsRepository {
+    fun observeEvents(): Flow<List<EcoEvent>>
+    fun observeRegisteredEventIds(userId: String): Flow<Set<String>>
     suspend fun getEvents(): List<EcoEvent>
     suspend fun getRegisteredEventIds(userId: String): Set<String>
     suspend fun registerForEvent(userId: String, eventId: String)

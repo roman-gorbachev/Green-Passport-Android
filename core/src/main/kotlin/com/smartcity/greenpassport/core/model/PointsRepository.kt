@@ -1,5 +1,7 @@
 package com.smartcity.greenpassport.core.model
 
+import kotlinx.coroutines.flow.Flow
+
 enum class PointsEarnReason {
     TASK_COMPLETED,
     GAME_PLAYED,
@@ -9,6 +11,8 @@ enum class PointsEarnReason {
 }
 
 interface PointsRepository {
+    fun observeBalance(userId: String): Flow<PointsBalance>
+    fun observeExperience(userId: String): Flow<Experience>
     suspend fun getBalance(userId: String): PointsBalance
     suspend fun getExperience(userId: String): Experience
 }

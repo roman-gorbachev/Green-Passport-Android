@@ -9,7 +9,9 @@ import androidx.core.content.ContextCompat
 import com.smartcity.greenpassport.core.R
 import com.smartcity.greenpassport.core.datasource.local.repository.NotificationLogRepository
 import com.smartcity.greenpassport.core.model.PointsEarnReason
+import com.smartcity.greenpassport.core.model.settings.AppSettingsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 private const val REWARD_NOTIFICATION_ID_BASE = 10_000
@@ -17,6 +19,7 @@ private const val REWARD_NOTIFICATION_ID_BASE = 10_000
 class AndroidRewardNotifier @Inject constructor(
     @ApplicationContext private val context: Context,
     private val notificationLogRepository: NotificationLogRepository,
+    private val appSettingsRepository: AppSettingsRepository,
 ) : RewardNotifier {
 
     override suspend fun notifyReward(reason: PointsEarnReason, points: Int, xp: Int) {
@@ -25,6 +28,7 @@ class AndroidRewardNotifier @Inject constructor(
 
         notificationLogRepository.log(title = title, body = body)
 
+        if (!appSettingsRepository.observeNotificationsEnabled().first()) return
         if (ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.POST_NOTIFICATIONS,

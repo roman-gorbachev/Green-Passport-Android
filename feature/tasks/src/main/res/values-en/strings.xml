@@ -16,7 +16,7 @@
     <string name="task_needs_other_confirmation_msg">This task is confirmed with a photo or a QR code</string>
     <string name="no_internet_connection">No internet connection</string>
     <string name="something_went_wrong_msg">Something went wrong. Please try again</string>
-    <string name="honor_system">Honor system</string>
+    <string name="no_proof_needed">No proof needed</string>
     <string name="photo_confirmation">Photo confirmation</string>
     <string name="qr_code_on_site">QR code on site</string>
     <string name="up_to_3_such_tasks_per_day_msg">Up to 3 such tasks count per day</string>
@@ -30,4 +30,18 @@
     <string name="no_reason_given">no reason given</string>
     <string name="photo_failed_automatic_check_msg">the photo failed the automatic check</string>
     <string name="under_review">Under review</string>
+    <string name="filters">Filters</string>
+    <string name="status">Status</string>
+    <string name="confirmation">Confirmation</string>
+    <string name="city">City</string>
+    <string name="category">Category</string>
+    <string name="available_tasks">Available</string>
+    <string name="completed_tasks">Completed</string>
+    <string name="all_cities">All cities</string>
+    <string name="my_city">My city</string>
+    <string name="reset">Reset</string>
+    <string name="show_tasks_count">Show tasks (%1$d)</string>
+    <string name="remove_filter">Remove filter</string>
+    <string name="take_photo">Take photo</string>
+    <string name="choose_from_library">Choose from library</string>
 </resources>

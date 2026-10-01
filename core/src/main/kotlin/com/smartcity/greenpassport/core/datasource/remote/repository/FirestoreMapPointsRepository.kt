@@ -3,10 +3,14 @@ package com.smartcity.greenpassport.core.datasource.remote.repository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
+import com.smartcity.greenpassport.core.datasource.remote.cacheFirstSnapshots
 import com.smartcity.greenpassport.core.model.MapPoint
 import com.smartcity.greenpassport.core.model.MapPointType
 import com.smartcity.greenpassport.core.model.MapPointsRepository
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 private const val FIELD_NAME = "name"
@@ -20,10 +24,12 @@ class FirestoreMapPointsRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
 ) : MapPointsRepository {
 
-    override suspend fun getPoints(): List<MapPoint> {
-        val snapshot = FirestoreCollections.mapPoints(firestore).get().await()
-        return snapshot.documents.mapNotNull { it.toMapPoint() }
-    }
+    override fun observePoints(): Flow<List<MapPoint>> =
+        FirestoreCollections.mapPoints(firestore).cacheFirstSnapshots()
+            .map { snapshot -> snapshot.documents.mapNotNull { it.toMapPoint() } }
+            .distinctUntilChanged()
+
+    override suspend fun getPoints(): List<MapPoint> = observePoints().first()
 }
 
 private fun DocumentSnapshot.toMapPoint(): MapPoint? {

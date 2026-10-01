@@ -3,10 +3,14 @@ package com.smartcity.greenpassport.core.datasource.remote.repository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
+import com.smartcity.greenpassport.core.datasource.remote.cacheFirstSnapshots
 import com.smartcity.greenpassport.core.model.Coupon
 import com.smartcity.greenpassport.core.model.Reward
 import com.smartcity.greenpassport.core.model.ShopRepository
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 private const val FIELD_TITLE = "title"
@@ -22,18 +26,21 @@ class FirestoreShopRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
 ) : ShopRepository {
 
-    override suspend fun getRewards(): List<Reward> {
-        val snapshot = FirestoreCollections.shopItems(firestore).get().await()
-        return snapshot.documents.mapNotNull { it.toReward() }
-    }
+    override fun observeRewards(): Flow<List<Reward>> =
+        FirestoreCollections.shopItems(firestore).cacheFirstSnapshots()
+            .map { snapshot -> snapshot.documents.mapNotNull { it.toReward() } }
+            .distinctUntilChanged()
 
-    override suspend fun getPurchases(userId: String): List<Coupon> {
-        val snapshot = FirestoreCollections.purchases(firestore)
+    override fun observePurchases(userId: String): Flow<List<Coupon>> =
+        FirestoreCollections.purchases(firestore)
             .whereEqualTo(FIELD_USER_ID, userId)
-            .get()
-            .await()
-        return snapshot.documents.mapNotNull { it.toCoupon() }
-    }
+            .cacheFirstSnapshots()
+            .map { snapshot -> snapshot.documents.mapNotNull { it.toCoupon() } }
+            .distinctUntilChanged()
+
+    override suspend fun getRewards(): List<Reward> = observeRewards().first()
+
+    override suspend fun getPurchases(userId: String): List<Coupon> = observePurchases(userId).first()
 }
 
 private fun DocumentSnapshot.toReward(): Reward? {

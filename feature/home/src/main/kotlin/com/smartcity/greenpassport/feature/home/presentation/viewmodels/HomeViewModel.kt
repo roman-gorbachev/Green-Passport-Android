@@ -4,20 +4,21 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.auth.AuthSession
+import com.smartcity.greenpassport.core.model.EcoEvent
+import com.smartcity.greenpassport.core.model.Level
+import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import com.smartcity.greenpassport.core.model.profile.UserProfile
-import com.smartcity.greenpassport.feature.home.domain.GetLevelUseCase
-import com.smartcity.greenpassport.feature.home.domain.GetPendingTasksUseCase
-import com.smartcity.greenpassport.feature.home.domain.GetPointsBalanceUseCase
-import com.smartcity.greenpassport.feature.home.domain.GetUpcomingEventUseCase
 import com.smartcity.greenpassport.feature.home.domain.ObserveHomeSessionUseCase
+import com.smartcity.greenpassport.feature.home.domain.ObserveLevelUseCase
+import com.smartcity.greenpassport.feature.home.domain.ObservePendingTasksUseCase
+import com.smartcity.greenpassport.feature.home.domain.ObservePointsBalanceUseCase
+import com.smartcity.greenpassport.feature.home.domain.ObserveUpcomingEventUseCase
 import com.smartcity.greenpassport.feature.home.domain.ObserveUserProfileUseCase
 import com.smartcity.greenpassport.feature.home.presentation.state.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,7 +28,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
@@ -36,15 +36,15 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     observeSession: ObserveHomeSessionUseCase,
-    private val getLevel: GetLevelUseCase,
-    private val getUpcomingEvent: GetUpcomingEventUseCase,
-    private val getPendingTasks: GetPendingTasksUseCase,
-    private val getPointsBalance: GetPointsBalanceUseCase,
+    private val observeLevel: ObserveLevelUseCase,
+    private val observeUpcomingEvent: ObserveUpcomingEventUseCase,
+    private val observePendingTasks: ObservePendingTasksUseCase,
+    private val observePointsBalance: ObservePointsBalanceUseCase,
     private val observeUserProfile: ObserveUserProfileUseCase,
 ) : ViewModel() {
 
-    private val refreshRequests = MutableSharedFlow<Unit>(
-        replay = 1,
+    private val retryRequests = MutableSharedFlow<Unit>(
+        extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
@@ -55,43 +55,71 @@ class HomeViewModel @Inject constructor(
     )
 
     fun refresh() {
-        refreshRequests.tryEmit(Unit)
+        retryRequests.tryEmit(Unit)
     }
 
     private fun observeHomeUiState(sessions: Flow<AuthSession?>): Flow<HomeUiState> {
-        val sessionsWithProfile = sessions.filterNotNull().flatMapLatest { session ->
-            observeUserProfile(session.userId)
-                .onStart { emit(null) }
-                .catch { emit(null) }
-                .distinctUntilChanged()
-                .map { profile -> session to profile }
-        }
-        return combine(
-            sessionsWithProfile,
-            refreshRequests.onStart { emit(Unit) }
-        ) { sessionWithProfile, _ -> sessionWithProfile }
-            .mapLatest { (session, profile) -> loadHomeUiState(session, profile) }
+        return combine(sessions.filterNotNull(), retryRequests.onStart { emit(Unit) }) { session, _ -> session }
+            .flatMapLatest { session -> observeSessionUiState(session) }
     }
 
-    private suspend fun loadHomeUiState(session: AuthSession, profile: UserProfile?): HomeUiState = coroutineScope {
-        val tasks = async {
-            runCatching { getPendingTasks(session.userId, profile) }
-                .onFailure { error -> Log.w(TAG, "Failed to load tasks", error) }
+    private fun observeSessionUiState(session: AuthSession): Flow<HomeUiState> {
+        val profile = observeUserProfile(session.userId)
+            .onStart { emit(null) }
+            .catch { emit(null) }
+            .distinctUntilChanged()
+        val tasks = profile.flatMapLatest { currentProfile ->
+            observePendingTasks(session.userId, currentProfile)
+                .map<List<Task>, TasksLoad> { TasksLoad.Loaded(it) }
+                .catch { error ->
+                    Log.w(TAG, "Failed to observe tasks", error)
+                    emit(TasksLoad.Failed)
+                }
         }
-        val balance = async { runCatching { getPointsBalance(session.userId) }.getOrNull() }
-        val level = async { runCatching { getLevel(session.userId) }.getOrNull() }
-        val upcomingEvent = async { runCatching { getUpcomingEvent() }.getOrNull() }
-        val loadedTasks = tasks.await()
-        HomeUiState(
-            isLoading = false,
-            hasTasksError = loadedTasks.isFailure,
-            displayName = profile?.firstName ?: session.displayName,
-            avatar = profile?.avatar ?: AvatarStyle.LIME,
-            points = balance.await()?.availablePoints ?: 0,
-            level = level.await(),
-            upcomingEvent = upcomingEvent.await(),
-            tasks = loadedTasks.getOrDefault(emptyList()),
-        )
+        val points = observePointsBalance(session.userId)
+            .map<_, Int?> { it.availablePoints }
+            .onStart { emit(null) }
+            .catch { emit(null) }
+        val level = observeLevel(session.userId)
+            .map<Level, Level?> { it }
+            .onStart { emit(null) }
+            .catch { emit(null) }
+        val event = observeUpcomingEvent()
+            .onStart { emit(null) }
+            .catch { emit(null) }
+        return combine(
+            profile,
+            tasks,
+            points,
+            level,
+            event
+        ) { currentProfile, tasksLoad, currentPoints, currentLevel, upcoming ->
+            homeUiState(session, currentProfile, tasksLoad, currentPoints, currentLevel, upcoming)
+        }
+    }
+
+    private fun homeUiState(
+        session: AuthSession,
+        profile: UserProfile?,
+        tasks: TasksLoad,
+        points: Int?,
+        level: Level?,
+        upcomingEvent: EcoEvent?,
+    ) = HomeUiState(
+        isLoading = false,
+        hasTasksError = tasks is TasksLoad.Failed,
+        displayName = profile?.firstName ?: session.displayName,
+        avatar = profile?.avatar ?: AvatarStyle.LIME,
+        points = points ?: 0,
+        level = level,
+        upcomingEvent = upcomingEvent,
+        tasks = (tasks as? TasksLoad.Loaded)?.tasks.orEmpty(),
+    )
+
+    private sealed interface TasksLoad {
+        data class Loaded(val tasks: List<Task>) : TasksLoad
+
+        data object Failed : TasksLoad
     }
 
     companion object {

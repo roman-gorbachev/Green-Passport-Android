@@ -1,6 +1,7 @@
 package com.smartcity.greenpassport.core.model
 
 import com.smartcity.greenpassport.core.model.verification.TaskVerification
+import kotlinx.coroutines.flow.Flow
 
 enum class TaskCategory {
     RECYCLING,
@@ -23,6 +24,8 @@ data class Task(
 )
 
 interface TasksRepository {
+    fun observeTasks(): Flow<List<Task>>
+    fun observeCompletedTaskIds(userId: String): Flow<Set<String>>
     suspend fun getTasks(): List<Task>
     suspend fun getCompletedTaskIds(userId: String): Set<String>
 }

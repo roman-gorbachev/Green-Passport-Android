@@ -1,6 +1,7 @@
 package com.smartcity.greenpassport.core.messaging.helpers
 
 import com.smartcity.greenpassport.core.datasource.local.repository.NotificationLogRepository
+import com.smartcity.greenpassport.core.model.settings.AppSettingsRepository
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -9,4 +10,5 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 interface NotificationLogEntryPoint {
     fun notificationLogRepository(): NotificationLogRepository
+    fun appSettingsRepository(): AppSettingsRepository
 }

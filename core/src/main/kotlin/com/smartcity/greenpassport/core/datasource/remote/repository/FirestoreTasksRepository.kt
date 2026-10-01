@@ -3,11 +3,15 @@ package com.smartcity.greenpassport.core.datasource.remote.repository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
+import com.smartcity.greenpassport.core.datasource.remote.cacheFirstSnapshots
 import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.core.model.TaskCategory
 import com.smartcity.greenpassport.core.model.TasksRepository
 import com.smartcity.greenpassport.core.model.verification.TaskVerification
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 private const val FIELD_TITLE = "title"
@@ -26,18 +30,21 @@ class FirestoreTasksRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
 ) : TasksRepository {
 
-    override suspend fun getTasks(): List<Task> {
-        val snapshot = FirestoreCollections.tasks(firestore).get().await()
-        return snapshot.documents.mapNotNull { it.toTask() }
-    }
+    override fun observeTasks(): Flow<List<Task>> =
+        FirestoreCollections.tasks(firestore).cacheFirstSnapshots()
+            .map { snapshot -> snapshot.documents.mapNotNull { it.toTask() } }
+            .distinctUntilChanged()
 
-    override suspend fun getCompletedTaskIds(userId: String): Set<String> {
-        val snapshot = FirestoreCollections.taskProgress(firestore)
+    override fun observeCompletedTaskIds(userId: String): Flow<Set<String>> =
+        FirestoreCollections.taskProgress(firestore)
             .whereEqualTo(FIELD_USER_ID, userId)
-            .get()
-            .await()
-        return snapshot.documents.mapNotNull { it.getString(FIELD_TASK_ID) }.toSet()
-    }
+            .cacheFirstSnapshots()
+            .map { snapshot -> snapshot.documents.mapNotNull { it.getString(FIELD_TASK_ID) }.toSet() }
+            .distinctUntilChanged()
+
+    override suspend fun getTasks(): List<Task> = observeTasks().first()
+
+    override suspend fun getCompletedTaskIds(userId: String): Set<String> = observeCompletedTaskIds(userId).first()
 }
 
 private fun DocumentSnapshot.toTask(): Task? {
