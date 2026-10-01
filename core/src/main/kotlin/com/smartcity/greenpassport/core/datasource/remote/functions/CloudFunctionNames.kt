@@ -8,6 +8,9 @@ object CloudFunctionNames {
     const val RECORD_GAME_RESULT = "recordGameResult"
     const val REDEEM_REWARD = "redeemReward"
     const val MARK_COUPON_USED = "markCouponUsed"
+    const val CHECK_IN_EVENT = "checkInEvent"
+    const val SUBMIT_FEEDBACK = "submitFeedback"
+    const val SUBMIT_SURVEY_ANSWER = "submitSurveyAnswer"
     const val REVIEW_SUBMISSION = "reviewSubmission"
     const val MODERATE_CONTENT = "moderateContent"
 }

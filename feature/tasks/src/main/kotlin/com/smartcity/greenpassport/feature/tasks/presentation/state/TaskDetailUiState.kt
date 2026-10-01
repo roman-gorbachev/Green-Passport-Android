@@ -12,5 +12,6 @@ data class TaskDetailUiState(
     val isSubmitting: Boolean = false,
     val hasError: Boolean = false,
     val earnedPoints: Int? = null,
+    val streakBonus: Int = 0,
     val failure: RewardFailure? = null,
 )

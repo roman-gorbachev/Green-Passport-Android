@@ -13,6 +13,7 @@ import com.smartcity.greenpassport.feature.home.domain.ObserveHomeSessionUseCase
 import com.smartcity.greenpassport.feature.home.domain.ObserveLevelUseCase
 import com.smartcity.greenpassport.feature.home.domain.ObservePendingTasksUseCase
 import com.smartcity.greenpassport.feature.home.domain.ObservePointsBalanceUseCase
+import com.smartcity.greenpassport.feature.home.domain.ObserveStreakUseCase
 import com.smartcity.greenpassport.feature.home.domain.ObserveUpcomingEventUseCase
 import com.smartcity.greenpassport.feature.home.domain.ObserveUserProfileUseCase
 import com.smartcity.greenpassport.feature.home.presentation.state.HomeUiState
@@ -41,6 +42,7 @@ class HomeViewModel @Inject constructor(
     private val observePendingTasks: ObservePendingTasksUseCase,
     private val observePointsBalance: ObservePointsBalanceUseCase,
     private val observeUserProfile: ObserveUserProfileUseCase,
+    private val observeStreak: ObserveStreakUseCase,
 ) : ViewModel() {
 
     private val retryRequests = MutableSharedFlow<Unit>(
@@ -87,14 +89,15 @@ class HomeViewModel @Inject constructor(
         val event = observeUpcomingEvent()
             .onStart { emit(null) }
             .catch { emit(null) }
-        return combine(
-            profile,
-            tasks,
-            points,
-            level,
-            event
-        ) { currentProfile, tasksLoad, currentPoints, currentLevel, upcoming ->
-            homeUiState(session, currentProfile, tasksLoad, currentPoints, currentLevel, upcoming)
+        val streakDays = observeStreak(session.userId)
+            .map { it?.currentCount(System.currentTimeMillis()) ?: 0 }
+            .onStart { emit(0) }
+            .catch { emit(0) }
+        val progress = combine(points, level, streakDays) { currentPoints, currentLevel, days ->
+            HomeProgress(points = currentPoints, level = currentLevel, streakDays = days)
+        }
+        return combine(profile, tasks, progress, event) { currentProfile, tasksLoad, currentProgress, upcoming ->
+            homeUiState(session, currentProfile, tasksLoad, currentProgress, upcoming)
         }
     }
 
@@ -102,18 +105,24 @@ class HomeViewModel @Inject constructor(
         session: AuthSession,
         profile: UserProfile?,
         tasks: TasksLoad,
-        points: Int?,
-        level: Level?,
+        progress: HomeProgress,
         upcomingEvent: EcoEvent?,
     ) = HomeUiState(
         isLoading = false,
         hasTasksError = tasks is TasksLoad.Failed,
         displayName = profile?.firstName ?: session.displayName,
         avatar = profile?.avatar ?: AvatarStyle.LIME,
-        points = points ?: 0,
-        level = level,
+        points = progress.points ?: 0,
+        level = progress.level,
+        streakDays = progress.streakDays,
         upcomingEvent = upcomingEvent,
         tasks = (tasks as? TasksLoad.Loaded)?.tasks.orEmpty(),
+    )
+
+    private data class HomeProgress(
+        val points: Int?,
+        val level: Level?,
+        val streakDays: Int,
     )
 
     private sealed interface TasksLoad {

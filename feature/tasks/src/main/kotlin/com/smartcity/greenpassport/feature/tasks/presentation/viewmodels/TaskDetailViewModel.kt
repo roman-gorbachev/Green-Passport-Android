@@ -105,7 +105,12 @@ class TaskDetailViewModel @Inject constructor(
                         if (reward == null) {
                             it.copy(isSubmitting = false)
                         } else {
-                            it.copy(isSubmitting = false, isCompleted = true, earnedPoints = reward.points)
+                            it.copy(
+                                isSubmitting = false,
+                                isCompleted = true,
+                                earnedPoints = reward.points,
+                                streakBonus = reward.streakBonus,
+                            )
                         }
                     }
                 }

@@ -9,4 +9,7 @@ interface RewardsRepository {
     suspend fun recordGameResult(gameId: String, score: Int): RewardResult
     suspend fun redeemReward(rewardId: String): Coupon
     suspend fun markCouponUsed(couponId: String): Long
+    suspend fun checkInEvent(code: String): RewardResult
+    suspend fun submitFeedback(type: String, message: String?, rating: Int?): RewardResult
+    suspend fun submitSurveyAnswer(surveyId: String, optionIndex: Int): RewardResult
 }

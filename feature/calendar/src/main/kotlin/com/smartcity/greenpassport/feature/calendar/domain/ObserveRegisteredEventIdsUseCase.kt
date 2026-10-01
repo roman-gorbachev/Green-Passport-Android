@@ -1,10 +1,11 @@
 package com.smartcity.greenpassport.feature.calendar.domain
 
 import com.smartcity.greenpassport.core.model.EventsRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetRegisteredEventIdsUseCase @Inject constructor(
+class ObserveRegisteredEventIdsUseCase @Inject constructor(
     private val eventsRepository: EventsRepository,
 ) {
-    suspend operator fun invoke(userId: String): Set<String> = eventsRepository.getRegisteredEventIds(userId)
+    operator fun invoke(userId: String): Flow<Set<String>> = eventsRepository.observeRegisteredEventIds(userId)
 }

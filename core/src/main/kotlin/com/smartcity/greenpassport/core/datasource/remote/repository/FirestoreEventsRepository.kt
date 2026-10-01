@@ -41,6 +41,13 @@ class FirestoreEventsRepository @Inject constructor(
             .map { snapshot -> snapshot.documents.mapNotNull { it.getString(FIELD_EVENT_ID) }.toSet() }
             .distinctUntilChanged()
 
+    override fun observeAttendedEventIds(userId: String): Flow<Set<String>> =
+        FirestoreCollections.eventAttendance(firestore)
+            .whereEqualTo(FIELD_USER_ID, userId)
+            .cacheFirstSnapshots()
+            .map { snapshot -> snapshot.documents.mapNotNull { it.getString(FIELD_EVENT_ID) }.toSet() }
+            .distinctUntilChanged()
+
     override suspend fun getEvents(): List<EcoEvent> = observeEvents().first()
 
     override suspend fun getRegisteredEventIds(userId: String): Set<String> = observeRegisteredEventIds(userId).first()

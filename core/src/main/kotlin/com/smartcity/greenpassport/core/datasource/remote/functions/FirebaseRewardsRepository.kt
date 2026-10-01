@@ -29,6 +29,11 @@ private const val RESULT_EXPIRES_AT = "expiresAtEpochMillis"
 private const val RESULT_CODE = "code"
 private const val RESULT_USED_AT = "usedAtEpochMillis"
 private const val PARAM_COUPON_ID = "couponId"
+private const val PARAM_TYPE = "type"
+private const val PARAM_MESSAGE = "message"
+private const val PARAM_RATING = "rating"
+private const val PARAM_SURVEY_ID = "surveyId"
+private const val PARAM_OPTION_INDEX = "optionIndex"
 
 class FirebaseRewardsRepository @Inject constructor(
     private val functions: FirebaseFunctions,
@@ -70,6 +75,25 @@ class FirebaseRewardsRepository @Inject constructor(
         val result = call(CloudFunctionNames.MARK_COUPON_USED, mapOf(PARAM_COUPON_ID to couponId))
         return (result[RESULT_USED_AT] as? Number)?.toLong() ?: System.currentTimeMillis()
     }
+
+    override suspend fun checkInEvent(code: String): RewardResult =
+        callForReward(CloudFunctionNames.CHECK_IN_EVENT, mapOf(PARAM_CODE to code), PointsEarnReason.EVENT_ATTENDED)
+
+    override suspend fun submitFeedback(type: String, message: String?, rating: Int?): RewardResult {
+        val data = buildMap<String, Any> {
+            put(PARAM_TYPE, type)
+            message?.let { put(PARAM_MESSAGE, it) }
+            rating?.let { put(PARAM_RATING, it) }
+        }
+        return callForReward(CloudFunctionNames.SUBMIT_FEEDBACK, data, PointsEarnReason.FEEDBACK_SUBMITTED)
+    }
+
+    override suspend fun submitSurveyAnswer(surveyId: String, optionIndex: Int): RewardResult =
+        callForReward(
+            CloudFunctionNames.SUBMIT_SURVEY_ANSWER,
+            mapOf(PARAM_SURVEY_ID to surveyId, PARAM_OPTION_INDEX to optionIndex),
+            PointsEarnReason.FEEDBACK_SUBMITTED,
+        )
 
     private suspend fun callForReward(name: String, data: Map<String, Any>, reason: PointsEarnReason): RewardResult {
         val result = call(name, data)

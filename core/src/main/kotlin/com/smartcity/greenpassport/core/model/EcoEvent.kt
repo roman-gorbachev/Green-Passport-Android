@@ -16,6 +16,7 @@ data class EcoEvent(
 interface EventsRepository {
     fun observeEvents(): Flow<List<EcoEvent>>
     fun observeRegisteredEventIds(userId: String): Flow<Set<String>>
+    fun observeAttendedEventIds(userId: String): Flow<Set<String>>
     suspend fun getEvents(): List<EcoEvent>
     suspend fun getRegisteredEventIds(userId: String): Set<String>
     suspend fun registerForEvent(userId: String, eventId: String)

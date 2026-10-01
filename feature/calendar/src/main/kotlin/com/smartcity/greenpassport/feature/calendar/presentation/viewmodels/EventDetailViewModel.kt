@@ -1,13 +1,18 @@
 package com.smartcity.greenpassport.feature.calendar.presentation.viewmodels
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.auth.AuthSession
-import com.smartcity.greenpassport.feature.calendar.domain.GetEventsUseCase
-import com.smartcity.greenpassport.feature.calendar.domain.GetRegisteredEventIdsUseCase
+import com.smartcity.greenpassport.core.model.rewards.RewardFailure
+import com.smartcity.greenpassport.core.model.rewards.RewardFailureException
+import com.smartcity.greenpassport.feature.calendar.domain.CheckInEventUseCase
+import com.smartcity.greenpassport.feature.calendar.domain.ObserveAttendedEventIdsUseCase
 import com.smartcity.greenpassport.feature.calendar.domain.ObserveCalendarSessionUseCase
+import com.smartcity.greenpassport.feature.calendar.domain.ObserveEventsUseCase
+import com.smartcity.greenpassport.feature.calendar.domain.ObserveRegisteredEventIdsUseCase
 import com.smartcity.greenpassport.feature.calendar.domain.RegisterForEventUseCase
 import com.smartcity.greenpassport.feature.calendar.presentation.state.EventDetailUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,10 +22,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -31,20 +37,22 @@ import javax.inject.Inject
 @HiltViewModel
 class EventDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getEvents: GetEventsUseCase,
-    private val getRegisteredEventIds: GetRegisteredEventIdsUseCase,
+    private val observeEvents: ObserveEventsUseCase,
+    private val observeRegisteredEventIds: ObserveRegisteredEventIdsUseCase,
+    private val observeAttendedEventIds: ObserveAttendedEventIdsUseCase,
     private val registerForEvent: RegisterForEventUseCase,
+    private val checkInEvent: CheckInEventUseCase,
     private val observeSession: ObserveCalendarSessionUseCase,
 ) : ViewModel() {
 
     private val eventId: String = checkNotNull(savedStateHandle[EVENT_ID_KEY])
 
-    private val refreshRequests = MutableSharedFlow<Unit>(
+    private val retryRequests = MutableSharedFlow<Unit>(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
-    private val registration = MutableStateFlow(RegistrationState())
+    private val actions = MutableStateFlow(ActionState())
 
     val uiState = observeEventDetailUiState().stateIn(
         viewModelScope,
@@ -53,57 +61,95 @@ class EventDetailViewModel @Inject constructor(
     )
 
     fun retry() {
-        refreshRequests.tryEmit(Unit)
+        retryRequests.tryEmit(Unit)
     }
 
     fun onSignUp() {
         val state = uiState.value
         val event = state.event ?: return
         if (state.isRegistered || state.isRegistering) return
-
         viewModelScope.launch {
             val userId = observeSession().first()?.userId ?: return@launch
-            registration.update { it.copy(isRegistering = true) }
+            actions.update { it.copy(isRegistering = true) }
             runCatching { registerForEvent(userId, event) }
-                .onSuccess { registration.update { RegistrationState(isRegistered = true) } }
+                .onFailure { error -> Log.w(TAG, "Failed to register for event", error) }
+            actions.update { it.copy(isRegistering = false) }
+        }
+    }
+
+    fun onCheckIn(activityContext: Context) {
+        val state = uiState.value
+        if (state.isCheckedIn || state.isCheckingIn) return
+        viewModelScope.launch {
+            actions.update { it.copy(isCheckingIn = true, checkInFailure = null) }
+            runCatching { checkInEvent(activityContext) }
+                .onSuccess { reward ->
+                    actions.update {
+                        it.copy(
+                            isCheckingIn = false,
+                            checkInPoints = reward?.points ?: it.checkInPoints,
+                            streakBonus = reward?.streakBonus ?: it.streakBonus,
+                            isCheckedIn = it.isCheckedIn || reward != null,
+                        )
+                    }
+                }
                 .onFailure { error ->
-                    Log.w(TAG, "Failed to register for event", error)
-                    registration.update { it.copy(isRegistering = false) }
+                    Log.w(TAG, "Failed to check in", error)
+                    val failure = (error as? RewardFailureException)?.failure ?: RewardFailure.UNKNOWN
+                    actions.update { it.copy(isCheckingIn = false, checkInFailure = failure) }
                 }
         }
     }
 
     private fun observeEventDetailUiState(): Flow<EventDetailUiState> {
-        val loaded = refreshRequests
-            .onStart { emit(Unit) }
-            .flatMapLatest { observeSession() }
-            .flatMapLatest { session -> loadEvent(session) }
-        return combine(loaded, registration) { state, registrationState ->
+        val data = combine(observeSession(), retryRequests.onStart { emit(Unit) }) { session, _ -> session }
+            .flatMapLatest { session -> observeEventData(session) }
+        return combine(data, actions) { state, action ->
             state.copy(
-                isRegistered = state.isRegistered || registrationState.isRegistered,
-                isRegistering = registrationState.isRegistering,
+                isRegistering = action.isRegistering,
+                isCheckingIn = action.isCheckingIn,
+                isCheckedIn = state.isCheckedIn || action.isCheckedIn,
+                isRegistered = state.isRegistered || action.isCheckedIn,
+                checkInPoints = action.checkInPoints,
+                streakBonus = action.streakBonus,
+                checkInFailure = action.checkInFailure,
             )
         }
     }
 
-    private fun loadEvent(session: AuthSession?): Flow<EventDetailUiState> = flow {
-        emit(EventDetailUiState(isLoading = true))
-        val result = runCatching {
-            val event = getEvents().firstOrNull { it.id == eventId }
-            val registeredIds = session?.let { getRegisteredEventIds(it.userId) }.orEmpty()
+    private fun observeEventData(session: AuthSession?): Flow<EventDetailUiState> {
+        val userId = session?.userId
+        val registered = if (userId == null) {
+            flowOf(emptySet())
+        } else {
+            observeRegisteredEventIds(userId).catch { emit(emptySet()) }
+        }
+        val attended = if (userId == null) {
+            flowOf(emptySet())
+        } else {
+            observeAttendedEventIds(userId).catch { emit(emptySet()) }
+        }
+        return combine(observeEvents(), registered, attended) { events, registeredIds, attendedIds ->
+            val event = events.firstOrNull { it.id == eventId }
             EventDetailUiState(
                 event = event,
                 isRegistered = eventId in registeredIds,
+                isCheckedIn = eventId in attendedIds,
                 isLoading = false,
                 hasError = event == null,
             )
         }
-        emit(result.getOrDefault(EventDetailUiState(isLoading = false, hasError = true)))
+            .onStart { emit(EventDetailUiState()) }
+            .catch { emit(EventDetailUiState(isLoading = false, hasError = true)) }
     }
 
-    private data class RegistrationState(
-        val isRegistered: Boolean = false,
+    private data class ActionState(
         val isRegistering: Boolean = false,
+        val isCheckingIn: Boolean = false,
+        val isCheckedIn: Boolean = false,
+        val checkInPoints: Int? = null,
+        val streakBonus: Int = 0,
+        val checkInFailure: RewardFailure? = null,
     )
 
     companion object {

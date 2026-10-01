@@ -1,5 +1,6 @@
 package com.smartcity.greenpassport.feature.calendar.presentation.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,9 +25,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.common.formatEventDate
@@ -38,6 +42,7 @@ import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.EcoEvent
 import com.smartcity.greenpassport.feature.calendar.R
 import com.smartcity.greenpassport.feature.calendar.presentation.state.EventDetailUiState
+import com.smartcity.greenpassport.feature.calendar.presentation.state.checkInFailureMessageRes
 import com.smartcity.greenpassport.feature.calendar.presentation.viewmodels.EventDetailViewModel
 import com.smartcity.greenpassport.core.R as CoreR
 
@@ -51,6 +56,7 @@ fun EventDetailSheet(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = uiState.event
+    val context = LocalContext.current
 
     GpSheetScaffold(onDismiss = onDismiss, modifier = modifier) {
         when {
@@ -74,6 +80,7 @@ fun EventDetailSheet(
                 event = event,
                 uiState = uiState,
                 onSignUp = viewModel::onSignUp,
+                onCheckIn = { viewModel.onCheckIn(context) },
             )
         }
     }
@@ -84,6 +91,7 @@ private fun EventDetailContent(
     event: EcoEvent,
     uiState: EventDetailUiState,
     onSignUp: () -> Unit,
+    onCheckIn: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val locale = LocalLocale.current.platformLocale
@@ -137,25 +145,89 @@ private fun EventDetailContent(
                 .padding(top = Dimens.SpacingLarge),
             contentAlignment = Alignment.Center,
         ) {
-            when {
-                uiState.isRegistered -> Text(
-                    text = stringResource(R.string.calendar_registered_label),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-
-                uiState.isRegistering -> CircularProgressIndicator()
-
-                else -> GpPrimaryButton(
-                    text = if (event.rewardPoints > 0) {
-                        stringResource(R.string.sign_up_points, event.rewardPoints)
-                    } else {
-                        stringResource(R.string.sign_up)
-                    },
-                    onClick = onSignUp,
-                )
-            }
+            EventActions(event = event, uiState = uiState, onSignUp = onSignUp, onCheckIn = onCheckIn)
         }
+    }
+}
+
+@Composable
+private fun EventActions(
+    event: EcoEvent,
+    uiState: EventDetailUiState,
+    onSignUp: () -> Unit,
+    onCheckIn: () -> Unit,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingCompact),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        when {
+            uiState.isCheckedIn -> {
+                EventStatusLabel(
+                    text = uiState.checkInPoints?.let { stringResource(R.string.event_points_earned, it) }
+                        ?: stringResource(R.string.checked_in_at_event),
+                )
+                if (uiState.streakBonus > 0) {
+                    Text(
+                        text = stringResource(R.string.streak_bonus_msg, uiState.streakBonus),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+
+            uiState.isRegistered -> {
+                EventStatusLabel(text = stringResource(R.string.calendar_registered_label))
+                if (uiState.isCheckInOpen(System.currentTimeMillis())) {
+                    GpPrimaryButton(
+                        text = stringResource(R.string.check_in_on_site),
+                        onClick = onCheckIn,
+                        isLoading = uiState.isCheckingIn,
+                    )
+                } else {
+                    Text(
+                        text = stringResource(R.string.check_in_window_msg),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                uiState.checkInFailure?.let { failure ->
+                    Text(
+                        text = stringResource(checkInFailureMessageRes(failure)),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+
+            else -> GpPrimaryButton(
+                text = if (event.rewardPoints > 0) {
+                    stringResource(R.string.sign_up_points, event.rewardPoints)
+                } else {
+                    stringResource(R.string.sign_up)
+                },
+                onClick = onSignUp,
+                isLoading = uiState.isRegistering,
+            )
+        }
+    }
+}
+
+@Composable
+private fun EventStatusLabel(text: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+    ) {
+        Icon(
+            imageVector = Icons.Filled.CheckCircle,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Text(text = text, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
     }
 }
 

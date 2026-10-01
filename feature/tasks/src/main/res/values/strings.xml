@@ -44,4 +44,5 @@
     <string name="remove_filter">Убрать фильтр</string>
     <string name="take_photo">Снять фото</string>
     <string name="choose_from_library">Выбрать из галереи</string>
+    <string name="streak_bonus_msg">+%1$d оч. за серию дней</string>
 </resources>

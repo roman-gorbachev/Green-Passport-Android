@@ -44,4 +44,5 @@
     <string name="remove_filter">Remove filter</string>
     <string name="take_photo">Take photo</string>
     <string name="choose_from_library">Choose from library</string>
+    <string name="streak_bonus_msg">+%1$d pts for your streak</string>
 </resources>

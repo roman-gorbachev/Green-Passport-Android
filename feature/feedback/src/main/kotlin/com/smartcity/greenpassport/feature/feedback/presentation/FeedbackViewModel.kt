@@ -75,7 +75,7 @@ class FeedbackViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmittingReview = true) }
             runCatching {
-                submitFeedback(userId, FeedbackType.REVIEW, state.reviewMessage.trim(), state.rating)
+                submitFeedback(FeedbackType.REVIEW, state.reviewMessage.trim(), state.rating)
                 _uiState.update { it.copy(isSubmittingReview = false, reviewSubmitted = true) }
             }.onFailure { error ->
                 _uiState.update {
@@ -98,7 +98,7 @@ class FeedbackViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmittingSuggestion = true) }
             runCatching {
-                submitFeedback(userId, FeedbackType.SUGGESTION, text, null)
+                submitFeedback(FeedbackType.SUGGESTION, text, null)
                 _uiState.update {
                     it.copy(isSubmittingSuggestion = false, suggestionSubmitted = true, suggestionMessage = "")
                 }
@@ -118,7 +118,7 @@ class FeedbackViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmittingSurveyAnswer = true) }
             runCatching {
-                submitSurveyAnswer(userId, survey.id, optionIndex)
+                submitSurveyAnswer(survey.id, optionIndex)
                 _uiState.update { it.copy(isSubmittingSurveyAnswer = false, hasAnsweredSurvey = true) }
             }.onFailure {
                 _uiState.update { it.copy(isSubmittingSurveyAnswer = false) }

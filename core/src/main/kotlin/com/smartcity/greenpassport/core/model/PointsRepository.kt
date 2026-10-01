@@ -13,6 +13,7 @@ enum class PointsEarnReason {
 interface PointsRepository {
     fun observeBalance(userId: String): Flow<PointsBalance>
     fun observeExperience(userId: String): Flow<Experience>
+    fun observeStreak(userId: String): Flow<Streak?>
     suspend fun getBalance(userId: String): PointsBalance
     suspend fun getExperience(userId: String): Experience
 }

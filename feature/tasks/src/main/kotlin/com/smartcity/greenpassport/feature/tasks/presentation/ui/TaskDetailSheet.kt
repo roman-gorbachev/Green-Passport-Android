@@ -214,11 +214,19 @@ private fun ConfirmationSection(
         modifier = modifier.fillMaxWidth(),
     ) {
         when {
-            uiState.isCompleted -> StatusText(
-                text = uiState.earnedPoints?.let { stringResource(R.string.task_done_points_earned, it) }
-                    ?: stringResource(R.string.task_detail_completed_label),
-                color = MaterialTheme.colorScheme.primary,
-            )
+            uiState.isCompleted -> {
+                StatusText(
+                    text = uiState.earnedPoints?.let { stringResource(R.string.task_done_points_earned, it) }
+                        ?: stringResource(R.string.task_detail_completed_label),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                if (uiState.streakBonus > 0) {
+                    StatusText(
+                        text = stringResource(R.string.streak_bonus_msg, uiState.streakBonus),
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
 
             task.verification == TaskVerification.PHOTO && submission?.status == SubmissionStatus.PENDING ->
                 StatusText(

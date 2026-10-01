@@ -5,4 +5,12 @@
     <string name="sign_up_points">Запісацца · +%1$d ач.</string>
     <string name="sign_up">Запісацца</string>
     <string name="date_time">%1$s · %2$s</string>
+    <string name="check_in_on_site">Адзначыцца на месцы</string>
+    <string name="checked_in_at_event">Вы адзначыліся на падзеі</string>
+    <string name="check_in_window_msg">Адзначыцца можна за 2 гадзіны да пачатку і на працягу 6 гадзін пасля</string>
+    <string name="event_code_does_not_match_msg">Код не падыходзіць да гэтай падзеі</string>
+    <string name="event_points_earned">Вы адзначыліся: +%1$d ач.</string>
+    <string name="streak_bonus_msg">+%1$d ач. за серыю дзён</string>
+    <string name="no_internet_connection">Няма падключэння да інтэрнэту</string>
+    <string name="something_went_wrong_msg">Нешта пайшло не так. Паспрабуй яшчэ раз</string>
 </resources>
