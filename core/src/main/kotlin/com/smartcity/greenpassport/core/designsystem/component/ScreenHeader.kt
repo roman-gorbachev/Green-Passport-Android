@@ -34,7 +34,12 @@ fun ScreenHeader(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = Dimens.ScreenHorizontalPadding, vertical = Dimens.SpacingExtraSmall),
+                .padding(
+                    start = Dimens.ScreenHorizontalPadding,
+                    end = Dimens.ScreenHorizontalPadding,
+                    top = Dimens.SpacingExtraSmall,
+                    bottom = Dimens.SpacingCompact,
+                ),
         ) {
             Box(modifier = Modifier.size(Dimens.BackButtonSize)) {
                 if (onNavigateBack != null) {
