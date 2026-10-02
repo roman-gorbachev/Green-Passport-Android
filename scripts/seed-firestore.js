@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const QRCode = require('qrcode');
+const { ecoTips, plainText, COVERS_BASE_URL } = require('./eco-tips');
 
 const args = process.argv.slice(2);
 const serviceAccountPath = args.find((arg) => !arg.startsWith('--')) || path.join(__dirname, 'service-account.json');
@@ -60,30 +61,19 @@ const events = [
   { title: 'Велопробег за чистый воздух', description: 'Массовый велопробег по центру города в поддержку чистого воздуха.', location: 'Старт у стелы «Минск — город-герой»', city: 'Минск', startAtEpochMillis: 1795244400000, imageUrl: null, rewardPoints: 40 },
 ];
 
-const ecoTips = [
-  { category: 'ARTICLE', title: 'Как правильно сортировать пластик', body: 'Разбираем маркировку пластика на упаковке и что можно сдать на переработку уже сегодня.', mediaUrl: null, isDailyTip: true, rewardPoints: 15, rewardXp: 15 },
-  { category: 'ARTICLE', title: '5 привычек для дома без отходов', body: 'Простые изменения в быту, которые заметно снижают количество мусора.', mediaUrl: null, isDailyTip: false, rewardPoints: 15, rewardXp: 15 },
-  { category: 'ARTICLE', title: 'Что такое углеродный след', body: 'Объясняем простыми словами, как повседневные привычки влияют на климат.', mediaUrl: null, isDailyTip: false, rewardPoints: 20, rewardXp: 20 },
-  { category: 'VIDEO', title: 'Как перерабатывают стекло', body: 'Короткое видео о полном цикле переработки стеклянной тары.', mediaUrl: 'https://youtu.be/example-glass-recycling', isDailyTip: false, rewardPoints: 20, rewardXp: 20 },
-  { category: 'VIDEO', title: 'Путешествие пластиковой бутылки', body: 'От прилавка магазина до нового изделия — весь путь пластиковой бутылки.', mediaUrl: 'https://youtu.be/example-bottle-journey', isDailyTip: false, rewardPoints: 20, rewardXp: 20 },
-  { category: 'KIDS', title: 'Почему нужно беречь воду', body: 'Простое объяснение для детей о том, откуда берётся вода и почему её нельзя тратить зря.', mediaUrl: null, isDailyTip: false, rewardPoints: 10, rewardXp: 10 },
-  { category: 'KIDS', title: 'Сказка про мусорного гнома', body: 'Добрая история о гноме, который учит зверей сортировать мусор в лесу.', mediaUrl: null, isDailyTip: false, rewardPoints: 10, rewardXp: 10 },
-];
-
 const surveys = [
   { question: 'Как вы обычно избавляетесь от старой одежды?', options: ['Выбрасываю', 'Отдаю на переработку', 'Отдаю нуждающимся', 'Продаю или меняю'], isActive: true },
 ];
 
 const games = [
-  { id: 'eco_puzzle', titles: { ru: 'Эко-головоломка', be: 'Эка-галаваломка', en: 'Eco puzzle' }, path: 'eco_puzzle/index.html', sfSymbol: 'puzzlepiece.extension.fill', materialIcon: 'Extension', maxPoints: 30, order: 1, isActive: true },
-  { id: 'waste_sorting', titles: { ru: 'Сортировка отходов', be: 'Сартаванне адходаў', en: 'Waste sorting' }, path: 'waste_sorting/index.html', sfSymbol: 'trash.fill', materialIcon: 'DeleteSweep', maxPoints: 30, order: 2, isActive: true },
-  { id: 'eco_maze', titles: { ru: 'Эко-лабиринт', be: 'Эка-лабірынт', en: 'Eco maze' }, path: 'eco_maze/index.html', sfSymbol: 'safari.fill', materialIcon: 'Explore', maxPoints: 30, order: 3, isActive: true },
-  { id: 'eco_quiz', titles: { ru: 'Эко-викторина', be: 'Эка-віктарына', en: 'Eco quiz' }, path: 'eco_quiz/index.html', sfSymbol: 'questionmark.bubble.fill', materialIcon: 'Quiz', maxPoints: 30, order: 4, isActive: true },
-  { id: 'waste_catcher', titles: { ru: 'Поймай отходы', be: 'Злаві адходы', en: 'Waste catcher' }, path: 'waste_catcher/index.html', sfSymbol: 'arrow.down.to.line.compact', materialIcon: 'MoveDown', maxPoints: 30, order: 5, isActive: true },
-  { id: 'myth_or_fact', titles: { ru: 'Правда или миф', be: 'Праўда ці міф', en: 'Myth or fact' }, path: 'myth_or_fact/index.html', sfSymbol: 'checkmark.circle.badge.questionmark.fill', materialIcon: 'FactCheck', maxPoints: 30, order: 6, isActive: true },
-  { id: 'eco_words', titles: { ru: 'Эко-слова', be: 'Эка-словы', en: 'Eco words' }, path: 'eco_words/index.html', sfSymbol: 'textformat.abc', materialIcon: 'Abc', maxPoints: 30, order: 7, isActive: true },
-  { id: 'water_saver', titles: { ru: 'Сбереги воду', be: 'Беражы ваду', en: 'Water saver' }, path: 'water_saver/index.html', sfSymbol: 'drop.fill', materialIcon: 'WaterDrop', maxPoints: 30, order: 8, isActive: true },
+  { id: 'eco_runner', titles: { ru: 'Эко-забег', be: 'Эка-забег', en: 'Eco run' }, path: 'eco_runner/index.html', sfSymbol: 'figure.run', materialIcon: 'DirectionsRun', maxPoints: 30, order: 1, isActive: true },
+  { id: 'sort_conveyor', titles: { ru: 'Сортировочный конвейер', be: 'Сартавальны канвеер', en: 'Sorting line' }, path: 'sort_conveyor/index.html', sfSymbol: 'shippingbox.fill', materialIcon: 'Inventory', maxPoints: 30, order: 2, isActive: true },
+  { id: 'ocean_cleanup', titles: { ru: 'Чистый океан', be: 'Чысты акіян', en: 'Ocean cleanup' }, path: 'ocean_cleanup/index.html', sfSymbol: 'water.waves', materialIcon: 'Waves', maxPoints: 30, order: 3, isActive: true },
+  { id: 'forest_guard', titles: { ru: 'Лесной патруль', be: 'Лясны патруль', en: 'Forest guard' }, path: 'forest_guard/index.html', sfSymbol: 'tree.fill', materialIcon: 'Forest', maxPoints: 30, order: 4, isActive: true },
+  { id: 'eco_merge', titles: { ru: 'Эко-2048', be: 'Эка-2048', en: 'Eco merge' }, path: 'eco_merge/index.html', sfSymbol: 'square.grid.2x2.fill', materialIcon: 'GridView', maxPoints: 30, order: 5, isActive: true },
 ];
+
+const retiredGameIds = ['eco_puzzle', 'waste_sorting', 'eco_maze', 'eco_quiz', 'waste_catcher', 'myth_or_fact', 'eco_words', 'water_saver'];
 
 async function seedCollection(collectionName, documents) {
   if (onlyCollections && !onlyCollections.includes(collectionName)) {
@@ -132,6 +122,33 @@ async function seedEventSecrets(writtenEvents) {
   }
 }
 
+async function seedEcoTips() {
+  if (onlyCollections && !onlyCollections.includes('ecoTips')) {
+    return;
+  }
+  const collectionRef = root.collection('ecoTips');
+  const existing = await collectionRef.get();
+  const idByTitle = new Map(existing.docs.map((doc) => [doc.get('title'), doc.id]));
+  const batch = db.batch();
+  let updated = 0;
+  for (const { id, titles, bodies, ...tip } of ecoTips) {
+    const existingId = idByTitle.get(titles.ru);
+    if (existingId) {
+      updated += 1;
+    }
+    batch.set(collectionRef.doc(existingId ?? id), {
+      ...tip,
+      title: titles.ru,
+      body: plainText(bodies.ru),
+      titles,
+      bodies,
+      imageUrl: `${COVERS_BASE_URL}/${id}.jpg`,
+    });
+  }
+  await batch.commit();
+  console.log(`ecoTips: ${ecoTips.length} documents written, ${updated} updated in place`);
+}
+
 async function seedGames() {
   if (onlyCollections && !onlyCollections.includes('games')) {
     return;
@@ -140,8 +157,11 @@ async function seedGames() {
   for (const { id, ...game } of games) {
     batch.set(root.collection('games').doc(id), game);
   }
+  for (const id of retiredGameIds) {
+    batch.set(root.collection('games').doc(id), { isActive: false }, { merge: true });
+  }
   await batch.commit();
-  console.log(`games: ${games.length} documents written`);
+  console.log(`games: ${games.length} documents written, ${retiredGameIds.length} retired`);
 }
 
 async function seedAdmin() {
@@ -159,7 +179,7 @@ async function main() {
   await seedCollection('mapPoints', mapPoints);
   const writtenEvents = await seedCollection('events', events);
   await seedEventSecrets(writtenEvents);
-  await seedCollection('ecoTips', ecoTips);
+  await seedEcoTips();
   await seedCollection('surveys', surveys);
   await seedGames();
   await seedAdmin();
