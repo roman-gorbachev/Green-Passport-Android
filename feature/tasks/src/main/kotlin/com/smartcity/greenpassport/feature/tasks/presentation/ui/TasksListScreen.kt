@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.ListRowContent
@@ -38,6 +39,7 @@ import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
 import com.smartcity.greenpassport.core.designsystem.component.PointsChip
 import com.smartcity.greenpassport.core.designsystem.component.listSectionItems
 import com.smartcity.greenpassport.core.designsystem.layout.plus
+import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.feature.tasks.R
@@ -47,7 +49,6 @@ import com.smartcity.greenpassport.feature.tasks.presentation.state.TasksListUiS
 import com.smartcity.greenpassport.feature.tasks.presentation.state.statusFilterLabelRes
 import com.smartcity.greenpassport.feature.tasks.presentation.state.verificationLabelRes
 import com.smartcity.greenpassport.feature.tasks.presentation.viewmodels.TasksListViewModel
-import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun TasksListScreen(
@@ -192,7 +193,7 @@ private fun TaskRow(
     modifier: Modifier = Modifier,
 ) {
     ListRowContent(
-        title = task.title,
+        title = task.title.localized(),
         subtitle = when {
             isCompleted -> stringResource(R.string.task_detail_completed_label)
             isPending -> stringResource(R.string.under_review)

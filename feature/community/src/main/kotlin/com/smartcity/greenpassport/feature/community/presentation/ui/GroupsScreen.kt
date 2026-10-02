@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,19 +28,20 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.GpTextField
 import com.smartcity.greenpassport.core.designsystem.component.ListRowContent
 import com.smartcity.greenpassport.core.designsystem.component.ListSection
 import com.smartcity.greenpassport.core.designsystem.component.ListSectionDivider
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
+import com.smartcity.greenpassport.core.designsystem.component.LoadingLabel
 import com.smartcity.greenpassport.core.designsystem.component.SymbolTile
 import com.smartcity.greenpassport.core.designsystem.layout.plus
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.CommunityGroup
 import com.smartcity.greenpassport.feature.community.R
 import com.smartcity.greenpassport.feature.community.presentation.viewmodels.GroupsViewModel
-import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun GroupsScreen(
@@ -148,14 +147,12 @@ private fun CreateGroupSection(
                 singleLine = true,
                 modifier = Modifier.weight(1f),
             )
-            if (isCreating) {
-                CircularProgressIndicator(modifier = Modifier.size(Dimens.IconSizeMedium))
-            } else {
-                Button(
-                    onClick = onCreate,
-                    enabled = draftName.isNotBlank(),
-                    shape = RoundedCornerShape(Dimens.CornerRadiusPill),
-                ) {
+            Button(
+                onClick = { if (!isCreating) onCreate() },
+                enabled = draftName.isNotBlank() || isCreating,
+                shape = RoundedCornerShape(Dimens.CornerRadiusPill),
+            ) {
+                LoadingLabel(isLoading = isCreating, color = MaterialTheme.colorScheme.onPrimary) {
                     Text(
                         text = stringResource(R.string.groups_create_button),
                         style = MaterialTheme.typography.titleSmall
@@ -187,13 +184,16 @@ private fun GroupRow(
                     color = MaterialTheme.colorScheme.primary,
                 )
 
-                isJoining -> CircularProgressIndicator(modifier = Modifier.size(Dimens.IconSizeMedium))
-
-                else -> FilledTonalButton(onClick = onJoin, shape = RoundedCornerShape(Dimens.CornerRadiusPill)) {
-                    Text(
-                        text = stringResource(R.string.groups_join_button),
-                        style = MaterialTheme.typography.titleSmall
-                    )
+                else -> FilledTonalButton(
+                    onClick = { if (!isJoining) onJoin() },
+                    shape = RoundedCornerShape(Dimens.CornerRadiusPill),
+                ) {
+                    LoadingLabel(isLoading = isJoining) {
+                        Text(
+                            text = stringResource(R.string.groups_join_button),
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                    }
                 }
             }
         },
@@ -228,8 +228,10 @@ private fun JoinByCodeDialog(
             )
         },
         confirmButton = {
-            TextButton(onClick = onJoin, enabled = code.isNotBlank() && !isJoining) {
-                Text(stringResource(R.string.groups_join_button))
+            TextButton(onClick = { if (!isJoining) onJoin() }, enabled = code.isNotBlank() || isJoining) {
+                LoadingLabel(isLoading = isJoining) {
+                    Text(stringResource(R.string.groups_join_button))
+                }
             }
         },
         dismissButton = {

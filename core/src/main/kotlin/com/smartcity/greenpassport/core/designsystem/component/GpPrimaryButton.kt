@@ -3,10 +3,8 @@ package com.smartcity.greenpassport.core.designsystem.component
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,21 +22,15 @@ fun GpPrimaryButton(
     isLoading: Boolean = false,
 ) {
     Button(
-        onClick = onClick,
-        enabled = enabled && !isLoading,
+        onClick = { if (!isLoading) onClick() },
+        enabled = enabled,
         shape = RoundedCornerShape(Dimens.CornerRadiusPill),
         contentPadding = PaddingValues(horizontal = Dimens.SpacingLarge),
         modifier = modifier
             .fillMaxWidth()
             .height(Dimens.PrimaryButtonHeight),
     ) {
-        if (isLoading) {
-            CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.onPrimary,
-                strokeWidth = Dimens.ProgressStrokeWidth,
-                modifier = Modifier.size(Dimens.IconSizeMedium),
-            )
-        } else {
+        LoadingLabel(isLoading = isLoading, color = MaterialTheme.colorScheme.onPrimary) {
             Text(text = text, style = MaterialTheme.typography.labelLarge)
         }
     }

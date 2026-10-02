@@ -32,19 +32,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.common.formatEventDate
 import com.smartcity.greenpassport.core.common.formatEventTime
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSheetScaffold
 import com.smartcity.greenpassport.core.designsystem.component.NetworkImage
+import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.EcoEvent
 import com.smartcity.greenpassport.feature.calendar.R
 import com.smartcity.greenpassport.feature.calendar.presentation.state.EventDetailUiState
 import com.smartcity.greenpassport.feature.calendar.presentation.state.checkInFailureMessageRes
 import com.smartcity.greenpassport.feature.calendar.presentation.viewmodels.EventDetailViewModel
-import com.smartcity.greenpassport.core.R as CoreR
 
 private const val EVENT_IMAGE_ASPECT_RATIO = 1.5f
 
@@ -112,7 +113,7 @@ private fun EventDetailContent(
                     .clip(MaterialTheme.shapes.large),
             )
             Text(
-                text = event.title,
+                text = event.title.localized(),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(top = Dimens.SpacingMedium),
@@ -128,11 +129,11 @@ private fun EventDetailContent(
             )
             EventInfoRow(
                 icon = Icons.Outlined.Place,
-                text = event.location,
+                text = event.location.localized(),
                 modifier = Modifier.padding(top = Dimens.SpacingSmall),
             )
             Text(
-                text = event.description,
+                text = event.description.localized(),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = Dimens.SpacingMedium),

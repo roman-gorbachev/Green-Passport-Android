@@ -32,6 +32,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.common.formatEventDate
 import com.smartcity.greenpassport.core.common.formatEventTime
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
@@ -47,6 +48,8 @@ import com.smartcity.greenpassport.core.designsystem.component.ProgressHeroCard
 import com.smartcity.greenpassport.core.designsystem.component.QuickActionButton
 import com.smartcity.greenpassport.core.designsystem.component.SectionHeader
 import com.smartcity.greenpassport.core.designsystem.component.avatarColor
+import com.smartcity.greenpassport.core.designsystem.text.cityName
+import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.EcoEvent
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
@@ -58,7 +61,6 @@ import com.smartcity.greenpassport.feature.home.presentation.viewmodels.HomeView
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import com.smartcity.greenpassport.core.R as CoreR
 
 private const val TODAY_PATTERN = "EEEE, d MMM"
 private const val TASK_PLACEHOLDER_COUNT = 3
@@ -147,7 +149,7 @@ private fun HomeContent(
             item(key = KEY_EVENT) {
                 HeroImageCard(
                     imageUrl = event.imageUrl,
-                    title = event.title,
+                    title = event.title.localized(),
                     subtitle = eventSubtitle(event),
                     onClick = { onEventSelected(event.id) },
                     modifier = Modifier.screenPadding(),
@@ -191,8 +193,8 @@ private fun HomeTasks(
 
         else -> uiState.tasks.forEach { task ->
             GpListRow(
-                title = task.title,
-                subtitle = task.city.takeIf { it.isNotBlank() },
+                title = task.title.localized(),
+                subtitle = task.city.takeIf { it.isNotBlank() }?.let { cityName(it) },
                 leading = { MascotWidget(size = Dimens.ListRowMascotSize) },
                 trailing = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -311,7 +313,7 @@ private fun eventSubtitle(event: EcoEvent): String {
         R.string.date_time_place,
         formatEventDate(event.startAtEpochMillis, locale),
         formatEventTime(event.startAtEpochMillis, locale),
-        event.location,
+        event.location.localized(),
     )
 }
 

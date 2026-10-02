@@ -13,4 +13,7 @@
     <string name="streak_bonus_msg">+%1$d ач. за серыю дзён</string>
     <string name="no_internet_connection">Няма падключэння да інтэрнэту</string>
     <string name="something_went_wrong_msg">Нешта пайшло не так. Паспрабуй яшчэ раз</string>
+    <string name="calendar_no_events_on_day">У гэты дзень мерапрыемстваў няма</string>
+    <string name="calendar_previous_month">Папярэдні месяц</string>
+    <string name="calendar_next_month">Наступны месяц</string>
 </resources>

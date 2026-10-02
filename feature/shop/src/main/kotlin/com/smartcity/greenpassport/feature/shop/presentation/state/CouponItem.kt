@@ -2,6 +2,7 @@ package com.smartcity.greenpassport.feature.shop.presentation.state
 
 import com.smartcity.greenpassport.core.model.Coupon
 import com.smartcity.greenpassport.core.model.CouponStatus
+import com.smartcity.greenpassport.core.model.LocalizedText
 import com.smartcity.greenpassport.core.model.Reward
 import kotlin.math.ceil
 
@@ -9,8 +10,8 @@ data class CouponItem(
     val coupon: Coupon,
     val reward: Reward?,
 ) {
-    val title: String
-        get() = reward?.title ?: coupon.rewardId
+    val title: LocalizedText
+        get() = reward?.title ?: LocalizedText(coupon.rewardId)
 
     fun daysLeft(nowEpochMillis: Long): Int? = coupon.expiresAtEpochMillis?.let { expiresAt ->
         ceil((expiresAt - nowEpochMillis).toDouble() / DAY_MILLIS).toInt().coerceAtLeast(0)

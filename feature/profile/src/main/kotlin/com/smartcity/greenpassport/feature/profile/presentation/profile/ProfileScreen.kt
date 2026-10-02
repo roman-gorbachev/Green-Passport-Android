@@ -12,20 +12,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BrightnessMedium
 import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.Style
-import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -45,6 +41,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.ListSection
 import com.smartcity.greenpassport.core.designsystem.component.ListSectionRow
@@ -54,6 +51,7 @@ import com.smartcity.greenpassport.core.designsystem.component.ProgressHeroCard
 import com.smartcity.greenpassport.core.designsystem.component.SymbolTile
 import com.smartcity.greenpassport.core.designsystem.component.SymbolTileStyle
 import com.smartcity.greenpassport.core.designsystem.layout.plus
+import com.smartcity.greenpassport.core.designsystem.text.cityName
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.designsystem.theme.SectionColors
@@ -62,7 +60,6 @@ import com.smartcity.greenpassport.core.model.settings.AppLanguage
 import com.smartcity.greenpassport.core.model.settings.AppTheme
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.profile.R
-import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun ProfileScreen(
@@ -108,7 +105,6 @@ private data class ProfileMenuEntry(
 
 private val profileMenuEntries = listOf(
     ProfileMenuEntry(R.string.profile_achievements, Icons.Filled.EmojiEvents, Destination.Achievements) { it.tips },
-    ProfileMenuEntry(R.string.profile_cards, Icons.Filled.Style, Destination.Cards) { it.games },
     ProfileMenuEntry(R.string.my_coupons, Icons.Filled.ConfirmationNumber, Destination.Coupons) { it.community },
     ProfileMenuEntry(R.string.profile_history, Icons.Filled.History, Destination.History) { it.calendar },
     ProfileMenuEntry(
@@ -116,9 +112,6 @@ private val profileMenuEntries = listOf(
         Icons.Filled.Notifications,
         Destination.Notifications,
     ) { it.feedback },
-    ProfileMenuEntry(R.string.profile_favorites, Icons.Filled.Favorite, Destination.Favorites) { it.feedback },
-    ProfileMenuEntry(R.string.profile_bookmarks, Icons.Filled.Bookmark, Destination.Bookmarks) { it.community },
-    ProfileMenuEntry(R.string.profile_exchange, Icons.Filled.SwapHoriz, Destination.Exchange) { it.games },
 )
 
 @Composable
@@ -269,7 +262,7 @@ private fun ProfileHeader(
             )
             Text(
                 text = if (profile != null && profile.city.isNotBlank()) {
-                    stringResource(R.string.city_and_points, profile.city, uiState.points)
+                    stringResource(R.string.city_and_points, cityName(profile.city), uiState.points)
                 } else {
                     stringResource(R.string.points_balance, uiState.points)
                 },
@@ -315,7 +308,6 @@ private fun ThemeRow(
                     AppTheme.entries.forEach { theme ->
                         DropdownMenuItem(
                             text = { Text(stringResource(themeLabelRes(theme))) },
-                            leadingIcon = { Icon(imageVector = themeIcon(theme), contentDescription = null) },
                             onClick = {
                                 isMenuOpen = false
                                 onSelect(theme)

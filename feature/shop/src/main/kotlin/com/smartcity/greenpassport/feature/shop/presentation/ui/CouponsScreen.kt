@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
@@ -33,6 +34,7 @@ import com.smartcity.greenpassport.core.designsystem.component.SegmentedControl
 import com.smartcity.greenpassport.core.designsystem.component.SymbolTile
 import com.smartcity.greenpassport.core.designsystem.component.SymbolTileStyle
 import com.smartcity.greenpassport.core.designsystem.layout.plus
+import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.CouponStatus
 import com.smartcity.greenpassport.feature.shop.presentation.state.CouponItem
@@ -40,7 +42,6 @@ import com.smartcity.greenpassport.feature.shop.presentation.state.couponStatusT
 import com.smartcity.greenpassport.feature.shop.presentation.state.couponsEmptyMessageRes
 import com.smartcity.greenpassport.feature.shop.presentation.state.couponsTabLabelRes
 import com.smartcity.greenpassport.feature.shop.presentation.viewmodels.CouponsViewModel
-import com.smartcity.greenpassport.core.R as CoreR
 
 private const val TITLE_MAX_LINES = 2
 
@@ -125,12 +126,12 @@ private fun CouponCard(
                 modifier = Modifier.weight(1f),
             ) {
                 Text(
-                    text = item.title,
+                    text = item.title.localized(),
                     style = MaterialTheme.typography.titleLarge,
                     maxLines = TITLE_MAX_LINES,
                     overflow = TextOverflow.Ellipsis,
                 )
-                item.reward?.partnerName?.let { partner ->
+                item.reward?.partnerName?.localized()?.let { partner ->
                     Text(
                         text = partner,
                         style = MaterialTheme.typography.bodyMedium,

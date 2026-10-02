@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LifecycleStartEffect
+import com.smartcity.greenpassport.core.common.resolveForDeviceLanguage
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.MapPoint
 import com.smartcity.greenpassport.core.model.map.GeoPoint
@@ -84,7 +85,7 @@ fun YandexMap(
                             true
                         }
                         state.tapListeners += listener
-                        val pin = pinRenderer.render(point.name)
+                        val pin = pinRenderer.render(point.name.resolveForDeviceLanguage())
                         map.mapObjects.addPlacemark().apply {
                             geometry = Point(point.latitude, point.longitude)
                             setIcon(ImageProvider.fromBitmap(pin.bitmap), IconStyle().setAnchor(pin.anchor))

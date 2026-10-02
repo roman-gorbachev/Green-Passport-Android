@@ -6,14 +6,17 @@ import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
 import com.smartcity.greenpassport.core.datasource.remote.cacheFirstSnapshots
 import com.smartcity.greenpassport.core.model.games.Game
 import com.smartcity.greenpassport.core.model.games.GamesRepository
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 private const val FIELD_TITLES = "titles"
 private const val FIELD_PATH = "path"
 private const val FIELD_MATERIAL_ICON = "materialIcon"
+private const val FIELD_ICON_PATH = "iconPath"
+private const val FIELD_ICON_EMOJI = "iconEmoji"
+private const val FIELD_ICON_COLORS = "iconColors"
 private const val FIELD_MAX_POINTS = "maxPoints"
 private const val FIELD_ORDER = "order"
 private const val FIELD_IS_ACTIVE = "isActive"
@@ -46,6 +49,9 @@ private fun DocumentSnapshot.toGame(): Game? {
         titles = titles,
         path = path,
         materialIcon = getString(FIELD_MATERIAL_ICON),
+        iconPath = getString(FIELD_ICON_PATH),
+        iconEmoji = getString(FIELD_ICON_EMOJI),
+        iconColors = (get(FIELD_ICON_COLORS) as? List<*>)?.filterIsInstance<String>().orEmpty(),
         maxPoints = getLong(FIELD_MAX_POINTS)?.toInt() ?: DEFAULT_MAX_POINTS,
         order = getLong(FIELD_ORDER)?.toInt() ?: Int.MAX_VALUE,
     )

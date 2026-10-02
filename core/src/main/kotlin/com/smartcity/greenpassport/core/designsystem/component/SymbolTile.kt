@@ -21,7 +21,7 @@ import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 
 private const val CORNER_FRACTION = 0.28f
-const val SYMBOL_TILE_DEFAULT_ICON_FRACTION = 0.5f
+const val SYMBOL_TILE_DEFAULT_ICON_FRACTION = 0.42f
 
 @Composable
 fun SymbolTile(

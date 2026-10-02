@@ -4,8 +4,8 @@ import kotlinx.coroutines.flow.Flow
 
 data class Reward(
     val id: String,
-    val title: String,
-    val partnerName: String,
+    val title: LocalizedText,
+    val partnerName: LocalizedText,
     val pointsCost: Int,
 )
 

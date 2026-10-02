@@ -12,4 +12,7 @@
     <string name="streak_bonus_msg">+%1$d pts for your streak</string>
     <string name="no_internet_connection">No internet connection</string>
     <string name="something_went_wrong_msg">Something went wrong. Please try again</string>
+    <string name="calendar_no_events_on_day">No events on this day</string>
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
 </resources>

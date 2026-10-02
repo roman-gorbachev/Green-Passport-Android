@@ -1,5 +1,6 @@
 package com.smartcity.greenpassport.feature.shop.domain
 
+import com.smartcity.greenpassport.core.common.resolveForDeviceLanguage
 import com.smartcity.greenpassport.core.messaging.helpers.ReminderScheduler
 import com.smartcity.greenpassport.core.model.Coupon
 import com.smartcity.greenpassport.core.model.Reward
@@ -13,7 +14,7 @@ class PurchaseRewardUseCase @Inject constructor(
     suspend operator fun invoke(reward: Reward): Coupon {
         val coupon = rewardsRepository.redeemReward(reward.id)
         coupon.expiresAtEpochMillis?.let { expiresAt ->
-            reminderScheduler.scheduleCouponReminder(coupon.id, reward.title, expiresAt)
+            reminderScheduler.scheduleCouponReminder(coupon.id, reward.title.resolveForDeviceLanguage(), expiresAt)
         }
         return coupon
     }

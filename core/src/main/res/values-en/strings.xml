@@ -25,4 +25,18 @@
     <string name="cancel">Cancel</string>
     <string name="coupon_expires_soon">Coupon expires soon</string>
     <string name="coupon_valid_until_tomorrow_msg">“%1$s” is valid until tomorrow</string>
+    <string name="city_minsk">Minsk</string>
+    <string name="city_brest">Brest</string>
+    <string name="city_vitebsk">Vitebsk</string>
+    <string name="city_gomel">Gomel</string>
+    <string name="city_grodno">Grodno</string>
+    <string name="city_mogilev">Mogilev</string>
+    <string name="city_bobruisk">Bobruisk</string>
+    <string name="city_baranovichi">Baranovichi</string>
+    <string name="city_borisov">Borisov</string>
+    <string name="city_pinsk">Pinsk</string>
+    <string name="city_orsha">Orsha</string>
+    <string name="city_mozyr">Mozyr</string>
+    <string name="watch_video">Watch video</string>
+    <string name="read_minutes_format">%1$d min read</string>
 </resources>

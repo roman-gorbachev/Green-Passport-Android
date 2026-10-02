@@ -4,18 +4,21 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
 import com.smartcity.greenpassport.core.datasource.remote.cacheFirstSnapshots
+import com.smartcity.greenpassport.core.datasource.remote.localizedText
 import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.core.model.TaskCategory
 import com.smartcity.greenpassport.core.model.TasksRepository
 import com.smartcity.greenpassport.core.model.verification.TaskVerification
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 private const val FIELD_TITLE = "title"
 private const val FIELD_DESCRIPTION = "description"
+private const val FIELD_TITLES = "titles"
+private const val FIELD_DESCRIPTIONS = "descriptions"
 private const val FIELD_CATEGORY = "category"
 private const val FIELD_CITY = "city"
 private const val FIELD_REWARD_POINTS = "rewardPoints"
@@ -48,8 +51,8 @@ class FirestoreTasksRepository @Inject constructor(
 }
 
 private fun DocumentSnapshot.toTask(): Task? {
-    val title = getString(FIELD_TITLE) ?: return null
-    val description = getString(FIELD_DESCRIPTION) ?: return null
+    val title = localizedText(FIELD_TITLE, FIELD_TITLES) ?: return null
+    val description = localizedText(FIELD_DESCRIPTION, FIELD_DESCRIPTIONS) ?: return null
     val category = getString(FIELD_CATEGORY)?.let { name ->
         runCatching { TaskCategory.valueOf(name) }.getOrNull()
     } ?: return null

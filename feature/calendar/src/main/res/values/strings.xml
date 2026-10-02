@@ -12,4 +12,7 @@
     <string name="streak_bonus_msg">+%1$d оч. за серию дней</string>
     <string name="no_internet_connection">Нет подключения к интернету</string>
     <string name="something_went_wrong_msg">Что-то пошло не так. Попробуй ещё раз</string>
+    <string name="calendar_no_events_on_day">В этот день событий нет</string>
+    <string name="calendar_previous_month">Предыдущий месяц</string>
+    <string name="calendar_next_month">Следующий месяц</string>
 </resources>

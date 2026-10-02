@@ -37,6 +37,7 @@ import com.smartcity.greenpassport.core.designsystem.component.ListSectionRow
 import com.smartcity.greenpassport.core.designsystem.component.SymbolTile
 import com.smartcity.greenpassport.core.designsystem.component.SymbolTileStyle
 import com.smartcity.greenpassport.core.designsystem.icon.taskCategoryIcon
+import com.smartcity.greenpassport.core.designsystem.text.cityName
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.TaskCategory
 import com.smartcity.greenpassport.core.model.profile.SupportedCities
@@ -229,9 +230,9 @@ private fun CityRow(
 
 @Composable
 fun cityLabel(city: TaskCityFilter, profileCity: String?): String = when (city) {
-    TaskCityFilter.ProfileCity -> profileCity?.takeIf { it.isNotBlank() } ?: stringResource(R.string.my_city)
+    TaskCityFilter.ProfileCity -> profileCity?.takeIf { it.isNotBlank() }?.let { cityName(it) } ?: stringResource(R.string.my_city)
     TaskCityFilter.All -> stringResource(R.string.all_cities)
-    is TaskCityFilter.City -> city.name
+    is TaskCityFilter.City -> cityName(city.name)
 }
 
 @Composable

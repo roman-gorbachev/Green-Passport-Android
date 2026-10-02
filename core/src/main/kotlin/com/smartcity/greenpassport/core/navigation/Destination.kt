@@ -25,12 +25,6 @@ sealed interface Destination {
     data object Achievements : Destination
 
     @Serializable
-    data object Cards : Destination
-
-    @Serializable
-    data object Exchange : Destination
-
-    @Serializable
     data object History : Destination
 
     @Serializable
@@ -38,9 +32,6 @@ sealed interface Destination {
 
     @Serializable
     data object Favorites : Destination
-
-    @Serializable
-    data object Bookmarks : Destination
 
     @Serializable
     data object Calendar : Destination

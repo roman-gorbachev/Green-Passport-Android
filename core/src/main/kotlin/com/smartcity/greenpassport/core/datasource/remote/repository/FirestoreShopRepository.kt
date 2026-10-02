@@ -4,17 +4,20 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
 import com.smartcity.greenpassport.core.datasource.remote.cacheFirstSnapshots
+import com.smartcity.greenpassport.core.datasource.remote.localizedText
 import com.smartcity.greenpassport.core.model.Coupon
 import com.smartcity.greenpassport.core.model.Reward
 import com.smartcity.greenpassport.core.model.ShopRepository
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 private const val FIELD_TITLE = "title"
 private const val FIELD_PARTNER_NAME = "partnerName"
+private const val FIELD_TITLES = "titles"
+private const val FIELD_PARTNER_NAMES = "partnerNames"
 private const val FIELD_POINTS_COST = "pointsCost"
 
 private const val FIELD_USER_ID = "userId"
@@ -51,8 +54,8 @@ class FirestoreShopRepository @Inject constructor(
 }
 
 private fun DocumentSnapshot.toReward(): Reward? {
-    val title = getString(FIELD_TITLE) ?: return null
-    val partnerName = getString(FIELD_PARTNER_NAME) ?: return null
+    val title = localizedText(FIELD_TITLE, FIELD_TITLES) ?: return null
+    val partnerName = localizedText(FIELD_PARTNER_NAME, FIELD_PARTNER_NAMES) ?: return null
     val pointsCost = getLong(FIELD_POINTS_COST)?.toInt() ?: return null
     return Reward(id = id, title = title, partnerName = partnerName, pointsCost = pointsCost)
 }

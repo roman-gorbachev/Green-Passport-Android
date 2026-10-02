@@ -1,5 +1,6 @@
 package com.smartcity.greenpassport.feature.calendar.domain
 
+import com.smartcity.greenpassport.core.common.resolveForDeviceLanguage
 import com.smartcity.greenpassport.core.messaging.helpers.ReminderScheduler
 import com.smartcity.greenpassport.core.model.EcoEvent
 import com.smartcity.greenpassport.core.model.EventsRepository
@@ -16,7 +17,7 @@ class RegisterForEventUseCase @Inject constructor(
         eventsRepository.registerForEvent(userId, event.id)
         reminderScheduler.scheduleEventReminder(
             eventId = event.id,
-            eventTitle = event.title,
+            eventTitle = event.title.resolveForDeviceLanguage(),
             triggerAtEpochMillis = event.startAtEpochMillis - REMINDER_OFFSET_MILLIS,
         )
     }

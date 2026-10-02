@@ -7,8 +7,8 @@ enum class FeedbackType {
 
 data class SurveyQuestion(
     val id: String,
-    val question: String,
-    val options: List<String>,
+    val question: LocalizedText,
+    val options: LocalizedTextList,
 )
 
 interface FeedbackRepository {

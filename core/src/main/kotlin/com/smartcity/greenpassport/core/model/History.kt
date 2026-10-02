@@ -9,7 +9,7 @@ enum class HistoryEntryType {
 data class HistoryEntry(
     val id: String,
     val type: HistoryEntryType,
-    val title: String,
+    val title: LocalizedText,
     val timestampEpochMillis: Long,
 )
 

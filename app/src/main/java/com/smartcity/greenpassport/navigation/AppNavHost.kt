@@ -33,10 +33,7 @@ import com.smartcity.greenpassport.feature.games.presentation.web.ui.GameWebScre
 import com.smartcity.greenpassport.feature.home.presentation.ui.HomeScreen
 import com.smartcity.greenpassport.feature.map.presentation.ui.MapScreen
 import com.smartcity.greenpassport.feature.moderation.presentation.ui.ModerationScreen
-import com.smartcity.greenpassport.feature.profile.presentation.CardsScreen
-import com.smartcity.greenpassport.feature.profile.presentation.ExchangeScreen
 import com.smartcity.greenpassport.feature.profile.presentation.achievements.AchievementsScreen
-import com.smartcity.greenpassport.feature.profile.presentation.bookmarks.BookmarksScreen
 import com.smartcity.greenpassport.feature.profile.presentation.favorites.FavoritesTabScreen
 import com.smartcity.greenpassport.feature.profile.presentation.history.HistoryScreen
 import com.smartcity.greenpassport.feature.profile.presentation.notifications.NotificationsScreen
@@ -169,22 +166,6 @@ private fun NavGraphBuilder.profileRoutes(navController: NavHostController) {
             AchievementsScreen(contentPadding = innerPadding)
         }
     }
-    composable<Destination.Cards> {
-        FeatureScaffold(
-            title = stringResource(ProfileR.string.cards_screen_title),
-            onNavigateBack = navController::popBackStack,
-        ) { innerPadding ->
-            CardsScreen(contentPadding = innerPadding)
-        }
-    }
-    composable<Destination.Exchange> {
-        FeatureScaffold(
-            title = stringResource(ProfileR.string.exchange_screen_title),
-            onNavigateBack = navController::popBackStack,
-        ) { innerPadding ->
-            ExchangeScreen(contentPadding = innerPadding)
-        }
-    }
     composable<Destination.History> {
         FeatureScaffold(
             title = stringResource(ProfileR.string.history_screen_title),
@@ -199,17 +180,6 @@ private fun NavGraphBuilder.profileRoutes(navController: NavHostController) {
             onNavigateBack = navController::popBackStack,
         ) { innerPadding ->
             NotificationsScreen(contentPadding = innerPadding)
-        }
-    }
-    composable<Destination.Bookmarks> {
-        FeatureScaffold(
-            title = stringResource(ProfileR.string.bookmarks_screen_title),
-            onNavigateBack = navController::popBackStack,
-        ) { innerPadding ->
-            BookmarksScreen(
-                onTipSelected = { tipId -> navController.navigate(Destination.EcoTipDetail(tipId)) },
-                contentPadding = innerPadding,
-            )
         }
     }
     composable<Destination.Moderation> {

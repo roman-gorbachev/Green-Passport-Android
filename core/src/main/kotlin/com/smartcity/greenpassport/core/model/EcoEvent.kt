@@ -4,9 +4,9 @@ import kotlinx.coroutines.flow.Flow
 
 data class EcoEvent(
     val id: String,
-    val title: String,
-    val description: String,
-    val location: String,
+    val title: LocalizedText,
+    val description: LocalizedText,
+    val location: LocalizedText,
     val city: String,
     val startAtEpochMillis: Long,
     val imageUrl: String?,

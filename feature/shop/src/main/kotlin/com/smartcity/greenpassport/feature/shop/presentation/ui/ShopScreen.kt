@@ -7,14 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -29,21 +27,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.component.ListSection
 import com.smartcity.greenpassport.core.designsystem.component.ListSectionDivider
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
+import com.smartcity.greenpassport.core.designsystem.component.LoadingLabel
 import com.smartcity.greenpassport.core.designsystem.component.ProgressHeroCard
 import com.smartcity.greenpassport.core.designsystem.component.SectionHeader
 import com.smartcity.greenpassport.core.designsystem.component.SymbolTile
 import com.smartcity.greenpassport.core.designsystem.layout.plus
+import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.Reward
 import com.smartcity.greenpassport.feature.shop.R
 import com.smartcity.greenpassport.feature.shop.presentation.state.ShopUiState
 import com.smartcity.greenpassport.feature.shop.presentation.viewmodels.ShopViewModel
-import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun ShopScreen(
@@ -82,7 +82,7 @@ fun ShopScreen(
         AlertDialog(
             onDismissRequest = { pendingReward = null },
             title = { Text(stringResource(R.string.shop_purchase_button)) },
-            text = { Text(stringResource(R.string.exchange_points_for_reward_msg, reward.pointsCost, reward.title)) },
+            text = { Text(stringResource(R.string.exchange_points_for_reward_msg, reward.pointsCost, reward.title.localized())) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -204,12 +204,12 @@ private fun RewardRow(
             modifier = Modifier.weight(1f),
         ) {
             Text(
-                text = reward.title,
+                text = reward.title.localized(),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                text = reward.partnerName,
+                text = reward.partnerName.localized(),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -219,14 +219,12 @@ private fun RewardRow(
                 color = MaterialTheme.colorScheme.primary,
             )
         }
-        if (isPurchasing) {
-            CircularProgressIndicator(modifier = Modifier.size(Dimens.IconSizeMedium))
-        } else {
-            Button(
-                onClick = onPurchase,
-                shape = RoundedCornerShape(Dimens.CornerRadiusPill),
-                modifier = Modifier.padding(start = Dimens.SpacingCompact),
-            ) {
+        Button(
+            onClick = { if (!isPurchasing) onPurchase() },
+            shape = RoundedCornerShape(Dimens.CornerRadiusPill),
+            modifier = Modifier.padding(start = Dimens.SpacingCompact),
+        ) {
+            LoadingLabel(isLoading = isPurchasing, color = MaterialTheme.colorScheme.onPrimary) {
                 Text(text = stringResource(R.string.shop_purchase_button), style = MaterialTheme.typography.titleSmall)
             }
         }

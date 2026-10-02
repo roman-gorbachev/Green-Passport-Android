@@ -25,4 +25,18 @@
     <string name="cancel">Скасаваць</string>
     <string name="coupon_expires_soon">Купон хутка скончыцца</string>
     <string name="coupon_valid_until_tomorrow_msg">«%1$s» дзейнічае да заўтра</string>
+    <string name="city_minsk">Мінск</string>
+    <string name="city_brest">Брэст</string>
+    <string name="city_vitebsk">Віцебск</string>
+    <string name="city_gomel">Гомель</string>
+    <string name="city_grodno">Гродна</string>
+    <string name="city_mogilev">Магілёў</string>
+    <string name="city_bobruisk">Бабруйск</string>
+    <string name="city_baranovichi">Баранавічы</string>
+    <string name="city_borisov">Барысаў</string>
+    <string name="city_pinsk">Пінск</string>
+    <string name="city_orsha">Орша</string>
+    <string name="city_mozyr">Мазыр</string>
+    <string name="watch_video">Глядзець відэа</string>
+    <string name="read_minutes_format">%1$d хв чытання</string>
 </resources>

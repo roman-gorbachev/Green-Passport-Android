@@ -10,9 +10,9 @@ enum class MapPointType {
 
 data class MapPoint(
     val id: String,
-    val name: String,
+    val name: LocalizedText,
     val type: MapPointType,
-    val address: String,
+    val address: LocalizedText,
     val city: String,
     val latitude: Double,
     val longitude: Double,

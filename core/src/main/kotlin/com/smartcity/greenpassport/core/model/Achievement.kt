@@ -11,8 +11,12 @@ enum class AchievementId {
 
 data class Achievement(
     val id: AchievementId,
-    val isUnlocked: Boolean,
-)
+    val progress: Int,
+    val target: Int,
+) {
+    val isUnlocked: Boolean get() = progress >= target
+    val clampedProgress: Int get() = progress.coerceAtMost(target)
+}
 
 interface AchievementsRepository {
     suspend fun getAchievements(userId: String): List<Achievement>

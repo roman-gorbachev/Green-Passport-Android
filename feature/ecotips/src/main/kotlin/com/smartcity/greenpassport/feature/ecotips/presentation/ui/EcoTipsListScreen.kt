@@ -3,42 +3,52 @@ package com.smartcity.greenpassport.feature.ecotips.presentation.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Eco
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.R as CoreR
+import com.smartcity.greenpassport.core.common.articlePreview
+import com.smartcity.greenpassport.core.common.articleReadMinutes
 import com.smartcity.greenpassport.core.designsystem.component.ChoiceCapsule
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
-import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
-import com.smartcity.greenpassport.core.designsystem.component.SymbolTile
 import com.smartcity.greenpassport.core.designsystem.layout.plus
+import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.EcoTip
 import com.smartcity.greenpassport.core.model.EcoTipCategory
 import com.smartcity.greenpassport.feature.ecotips.R
 import com.smartcity.greenpassport.feature.ecotips.presentation.state.EcoTipsListUiState
 import com.smartcity.greenpassport.feature.ecotips.presentation.viewmodels.EcoTipsListViewModel
-import com.smartcity.greenpassport.core.R as CoreR
+
+private const val PREVIEW_LINES = 2
+private const val META_SEPARATOR = " · "
 
 @Composable
 fun EcoTipsListScreen(
@@ -149,11 +159,43 @@ private fun TipRow(
     onToggleBookmark: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    GpListRow(
-        title = tip.title,
-        subtitle = stringResource(ecoTipCategoryLabelRes(tip.category)),
-        leading = { SymbolTile(icon = if (isRead) Icons.Filled.Check else Icons.Filled.Eco) },
-        trailing = {
+    val body = tip.body.localized()
+    GpSurfaceCard(
+        onClick = onClick,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = Dimens.ScreenHorizontalPadding),
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingCompact),
+            modifier = Modifier.padding(start = Dimens.CardPadding, top = Dimens.SpacingCompact, bottom = Dimens.SpacingCompact),
+        ) {
+            ArticleCover(
+                tip = tip,
+                modifier = Modifier
+                    .size(Dimens.ArticleThumbnailSize)
+                    .clip(RoundedCornerShape(Dimens.CornerRadiusMedium)),
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    text = tip.title.localized(),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = PREVIEW_LINES,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = remember(body) { articlePreview(body) },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = PREVIEW_LINES,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                TipMeta(tip = tip, body = body, isRead = isRead)
+            }
             IconButton(onClick = onToggleBookmark) {
                 Icon(
                     imageVector = if (isBookmarked) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
@@ -165,10 +207,31 @@ private fun TipRow(
                     },
                 )
             }
-        },
-        onClick = onClick,
-        modifier = modifier.padding(horizontal = Dimens.ScreenHorizontalPadding),
-    )
+        }
+    }
+}
+
+@Composable
+private fun TipMeta(tip: EcoTip, body: String, isRead: Boolean) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
+    ) {
+        if (isRead) {
+            Icon(
+                imageVector = Icons.Filled.CheckCircle,
+                contentDescription = stringResource(R.string.ecotip_detail_read_label),
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(Dimens.IconSizeExtraSmall),
+            )
+        }
+        Text(
+            text = stringResource(ecoTipCategoryLabelRes(tip.category)) + META_SEPARATOR +
+                stringResource(CoreR.string.read_minutes_format, remember(body) { articleReadMinutes(body) }),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }
 
 @Composable
@@ -176,6 +239,7 @@ private fun DailyTipCard(
     tip: EcoTip,
     onClick: () -> Unit,
 ) {
+    val body = tip.body.localized()
     GpSurfaceCard(
         onClick = onClick,
         modifier = Modifier
@@ -190,9 +254,17 @@ private fun DailyTipCard(
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = tip.title,
+                text = tip.title.localized(),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(top = Dimens.SpacingExtraSmall),
+            )
+            Text(
+                text = remember(body) { articlePreview(body) },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = PREVIEW_LINES,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = Dimens.SpacingExtraSmall),
             )
         }

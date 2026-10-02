@@ -29,8 +29,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSheetScaffold
+import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.CouponStatus
 import com.smartcity.greenpassport.feature.shop.R
@@ -39,7 +41,6 @@ import com.smartcity.greenpassport.feature.shop.presentation.state.CouponItem
 import com.smartcity.greenpassport.feature.shop.presentation.state.couponFailureMessageRes
 import com.smartcity.greenpassport.feature.shop.presentation.state.couponStatusText
 import com.smartcity.greenpassport.feature.shop.presentation.viewmodels.CouponDetailViewModel
-import com.smartcity.greenpassport.core.R as CoreR
 
 private const val INACTIVE_ALPHA = 0.4f
 private const val CODE_LETTER_SPACING_SP = 4
@@ -114,14 +115,14 @@ private fun CouponDetailContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
         ) {
-            item.reward?.partnerName?.let { partner ->
+            item.reward?.partnerName?.localized()?.let { partner ->
                 Text(
                     text = partner,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            Text(text = item.title, style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
+            Text(text = item.title.localized(), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
             Text(
                 text = couponStatusText(item, uiState.nowEpochMillis),
                 style = MaterialTheme.typography.labelMedium,

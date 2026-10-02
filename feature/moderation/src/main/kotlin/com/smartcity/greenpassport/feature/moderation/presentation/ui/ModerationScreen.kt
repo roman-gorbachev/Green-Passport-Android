@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
@@ -38,6 +39,7 @@ import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.NetworkImage
 import com.smartcity.greenpassport.core.designsystem.component.SegmentedControl
 import com.smartcity.greenpassport.core.designsystem.layout.plus
+import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.ForumPost
 import com.smartcity.greenpassport.core.model.moderation.ModerationAction
@@ -45,7 +47,6 @@ import com.smartcity.greenpassport.feature.moderation.R
 import com.smartcity.greenpassport.feature.moderation.domain.SubmissionItem
 import com.smartcity.greenpassport.feature.moderation.presentation.state.ModerationTab
 import com.smartcity.greenpassport.feature.moderation.presentation.viewmodels.ModerationViewModel
-import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun ModerationScreen(
@@ -158,7 +159,7 @@ private fun SubmissionCard(
                     .clip(MaterialTheme.shapes.medium),
             )
             Text(
-                text = item.taskTitle ?: item.submission.taskId,
+                text = item.taskTitle?.localized() ?: item.submission.taskId,
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(top = Dimens.SpacingSmall),
             )

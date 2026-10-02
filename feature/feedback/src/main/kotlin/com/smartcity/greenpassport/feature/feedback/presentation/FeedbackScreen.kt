@@ -14,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,21 +21,26 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.GpTextField
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
+import com.smartcity.greenpassport.core.designsystem.component.LoadingLabel
 import com.smartcity.greenpassport.core.designsystem.layout.plus
+import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.SurveyQuestion
 import com.smartcity.greenpassport.feature.feedback.R
-import com.smartcity.greenpassport.core.R as CoreR
 
 private const val MAX_RATING = 5
 private const val SUPPORT_EMAIL = "support@greenpassport.app"
@@ -154,13 +158,13 @@ private fun ReviewSection(
                     modifier = Modifier.padding(top = Dimens.SpacingSmall),
                 )
 
-                isSubmitting -> CircularProgressIndicator(modifier = Modifier.padding(top = Dimens.SpacingSmall))
-
                 else -> Button(
-                    onClick = onSubmit,
+                    onClick = { if (!isSubmitting) onSubmit() },
                     modifier = Modifier.padding(top = Dimens.SpacingSmall),
                 ) {
-                    Text(stringResource(R.string.feedback_review_submit_button))
+                    LoadingLabel(isLoading = isSubmitting, color = MaterialTheme.colorScheme.onPrimary) {
+                        Text(stringResource(R.string.feedback_review_submit_button))
+                    }
                 }
             }
         }
@@ -202,13 +206,11 @@ private fun SuggestionSection(
                 )
             }
 
-            if (isSubmitting) {
-                CircularProgressIndicator(modifier = Modifier.padding(top = Dimens.SpacingSmall))
-            } else {
-                Button(
-                    onClick = onSubmit,
-                    modifier = Modifier.padding(top = Dimens.SpacingSmall),
-                ) {
+            Button(
+                onClick = { if (!isSubmitting) onSubmit() },
+                modifier = Modifier.padding(top = Dimens.SpacingSmall),
+            ) {
+                LoadingLabel(isLoading = isSubmitting, color = MaterialTheme.colorScheme.onPrimary) {
                     Text(stringResource(R.string.feedback_suggestion_submit_button))
                 }
             }
@@ -223,11 +225,12 @@ private fun SurveySection(
     isSubmitting: Boolean,
     onOptionSelected: (Int) -> Unit,
 ) {
+    var selectedIndex by remember(survey.id) { mutableStateOf<Int?>(null) }
     GpSurfaceCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Dimens.SpacingMedium)) {
             Text(text = stringResource(R.string.feedback_survey_title), style = MaterialTheme.typography.titleMedium)
             Text(
-                text = survey.question,
+                text = survey.question.localized(),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(top = Dimens.SpacingSmall),
             )
@@ -239,17 +242,23 @@ private fun SurveySection(
                     modifier = Modifier.padding(top = Dimens.SpacingSmall),
                 )
 
-                isSubmitting -> CircularProgressIndicator(modifier = Modifier.padding(top = Dimens.SpacingSmall))
-
                 else -> Column(modifier = Modifier.padding(top = Dimens.SpacingSmall)) {
-                    survey.options.forEachIndexed { index, option ->
+                    survey.options.localized().forEachIndexed { index, option ->
                         OutlinedButton(
-                            onClick = { onOptionSelected(index) },
+                            onClick = {
+                                if (!isSubmitting) {
+                                    selectedIndex = index
+                                    onOptionSelected(index)
+                                }
+                            },
+                            enabled = !isSubmitting || selectedIndex == index,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = Dimens.SpacingExtraSmall),
                         ) {
-                            Text(option)
+                            LoadingLabel(isLoading = isSubmitting && selectedIndex == index) {
+                                Text(option)
+                            }
                         }
                     }
                 }

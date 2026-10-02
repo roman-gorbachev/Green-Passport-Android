@@ -4,18 +4,22 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
 import com.smartcity.greenpassport.core.datasource.remote.cacheFirstSnapshots
+import com.smartcity.greenpassport.core.datasource.remote.localizedText
 import com.smartcity.greenpassport.core.model.EcoEvent
 import com.smartcity.greenpassport.core.model.EventsRepository
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
-import javax.inject.Inject
 
 private const val FIELD_TITLE = "title"
 private const val FIELD_DESCRIPTION = "description"
 private const val FIELD_LOCATION = "location"
+private const val FIELD_TITLES = "titles"
+private const val FIELD_DESCRIPTIONS = "descriptions"
+private const val FIELD_LOCATIONS = "locations"
 private const val FIELD_CITY = "city"
 private const val FIELD_START_AT = "startAtEpochMillis"
 private const val FIELD_IMAGE_URL = "imageUrl"
@@ -67,9 +71,9 @@ class FirestoreEventsRepository @Inject constructor(
 }
 
 private fun DocumentSnapshot.toEcoEvent(): EcoEvent? {
-    val title = getString(FIELD_TITLE) ?: return null
-    val description = getString(FIELD_DESCRIPTION) ?: return null
-    val location = getString(FIELD_LOCATION) ?: return null
+    val title = localizedText(FIELD_TITLE, FIELD_TITLES) ?: return null
+    val description = localizedText(FIELD_DESCRIPTION, FIELD_DESCRIPTIONS) ?: return null
+    val location = localizedText(FIELD_LOCATION, FIELD_LOCATIONS) ?: return null
     val city = getString(FIELD_CITY) ?: return null
     val startAt = getLong(FIELD_START_AT) ?: return null
 

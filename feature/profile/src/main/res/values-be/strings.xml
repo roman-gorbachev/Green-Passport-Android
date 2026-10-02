@@ -3,11 +3,7 @@
     <string name="profile_anonymous_label">Госць</string>
     <string name="profile_notifications_label">Апавяшчэнні</string>
     <string name="profile_achievements">Дасягненні</string>
-    <string name="profile_cards">Мае карткі</string>
     <string name="profile_history">Гісторыя</string>
-    <string name="profile_favorites">Абранае</string>
-    <string name="profile_bookmarks">Закладкі</string>
-    <string name="profile_exchange">Абмен</string>
     <string name="profile_sign_out">Выхад</string>
     <string name="achievement_first_task_title">Першы крок</string>
     <string name="achievement_first_task_description">Выканайце першае заданне</string>
@@ -22,14 +18,9 @@
     <string name="achievement_level_five_title">Дасведчаны эка-герой</string>
     <string name="achievement_level_five_description">Дасягніце 5 узроўню</string>
     <string name="achievements_screen_title">Мае дасягненні</string>
-    <string name="cards_screen_title">Мае карткі</string>
-    <string name="cards_locked_label">Заблакавана</string>
-    <string name="exchange_screen_title">Абмен карткамі</string>
     <string name="history_screen_title">Гісторыя</string>
     <string name="notifications_screen_title">Апавяшчэнні</string>
     <string name="favorites_screen_title">Абранае</string>
-    <string name="bookmarks_screen_title">Закладкі</string>
-    <string name="exchange_unavailable_message">Абмен карткамі з’явіцца, калі ў праграме можна будзе знайсці іншага гульца — пакуль няма спіса або пошуку карыстальнікаў</string>
     <string name="history_type_task_completed">Заданне выканана</string>
     <string name="history_type_event_attended">Рэгістрацыя на падзею</string>
     <string name="history_type_reward_redeemed">Узнагарода атрымана</string>
@@ -51,4 +42,7 @@
     <string name="light_theme">Светлая</string>
     <string name="dark_theme">Цёмная</string>
     <string name="my_coupons">Мае купоны</string>
+    <string name="achievement_unlocked_label">Атрымана</string>
+    <string name="achievement_progress_format">%1$d з %2$d</string>
+    <string name="achievements_unlocked_format">Адкрыта %1$d з %2$d</string>
 </resources>

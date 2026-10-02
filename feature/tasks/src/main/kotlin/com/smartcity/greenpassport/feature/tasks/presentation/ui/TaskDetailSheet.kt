@@ -33,11 +33,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSheetScaffold
 import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
 import com.smartcity.greenpassport.core.designsystem.component.PointsChip
+import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.core.model.verification.SubmissionStatus
@@ -49,7 +51,6 @@ import com.smartcity.greenpassport.feature.tasks.presentation.state.rewardFailur
 import com.smartcity.greenpassport.feature.tasks.presentation.state.verificationHintRes
 import com.smartcity.greenpassport.feature.tasks.presentation.state.verificationLabelRes
 import com.smartcity.greenpassport.feature.tasks.presentation.viewmodels.TaskDetailViewModel
-import com.smartcity.greenpassport.core.R as CoreR
 
 private const val SHEET_MIN_HEIGHT_FRACTION = 0.55f
 private const val UNSAFE_PHOTO_REASON = "unsafe_photo"
@@ -161,7 +162,7 @@ private fun TaskDetailContent(
                 MascotWidget(size = Dimens.SheetMascotSize)
                 Column(modifier = Modifier.padding(start = Dimens.SpacingMedium)) {
                     Text(
-                        text = task.title,
+                        text = task.title.localized(),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -181,7 +182,7 @@ private fun TaskDetailContent(
             }
 
             Text(
-                text = task.description,
+                text = task.description.localized(),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.outline,
                 modifier = Modifier.padding(top = Dimens.SpacingLarge),

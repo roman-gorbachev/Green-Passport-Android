@@ -11,9 +11,10 @@ enum class EcoTipCategory {
 data class EcoTip(
     val id: String,
     val category: EcoTipCategory,
-    val title: String,
-    val body: String,
+    val title: LocalizedText,
+    val body: LocalizedText,
     val mediaUrl: String?,
+    val imageUrl: String?,
     val isDailyTip: Boolean,
     val rewardPoints: Int,
     val rewardXp: Int,

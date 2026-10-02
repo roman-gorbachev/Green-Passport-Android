@@ -13,8 +13,8 @@ enum class TaskCategory {
 
 data class Task(
     val id: String,
-    val title: String,
-    val description: String,
+    val title: LocalizedText,
+    val description: LocalizedText,
     val category: TaskCategory,
     val city: String,
     val rewardPoints: Int,

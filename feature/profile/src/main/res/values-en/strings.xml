@@ -2,11 +2,7 @@
     <string name="profile_anonymous_label">Guest</string>
     <string name="profile_notifications_label">Notifications</string>
     <string name="profile_achievements">Achievements</string>
-    <string name="profile_cards">My cards</string>
     <string name="profile_history">History</string>
-    <string name="profile_favorites">Favorites</string>
-    <string name="profile_bookmarks">Bookmarks</string>
-    <string name="profile_exchange">Exchange</string>
     <string name="profile_sign_out">Sign out</string>
 
     <string name="achievement_first_task_title">First step</string>
@@ -23,14 +19,9 @@
     <string name="achievement_level_five_description">Reach level 5</string>
 
     <string name="achievements_screen_title">My achievements</string>
-    <string name="cards_screen_title">My cards</string>
-    <string name="cards_locked_label">Locked</string>
-    <string name="exchange_screen_title">Card exchange</string>
     <string name="history_screen_title">History</string>
     <string name="notifications_screen_title">Notifications</string>
     <string name="favorites_screen_title">Favorites</string>
-    <string name="bookmarks_screen_title">Bookmarks</string>
-    <string name="exchange_unavailable_message">Card exchange will become available once the app can find another player — there\'s no user list or search yet</string>
 
     <string name="history_type_task_completed">Task completed</string>
     <string name="history_type_event_attended">Event registration</string>
@@ -55,4 +46,7 @@
     <string name="light_theme">Light</string>
     <string name="dark_theme">Dark</string>
     <string name="my_coupons">My coupons</string>
+    <string name="achievement_unlocked_label">Unlocked</string>
+    <string name="achievement_progress_format">%1$d of %2$d</string>
+    <string name="achievements_unlocked_format">%1$d of %2$d unlocked</string>
 </resources>

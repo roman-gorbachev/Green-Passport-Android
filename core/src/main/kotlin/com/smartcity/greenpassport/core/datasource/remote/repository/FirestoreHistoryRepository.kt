@@ -6,6 +6,7 @@ import com.smartcity.greenpassport.core.model.EventsRepository
 import com.smartcity.greenpassport.core.model.HistoryEntry
 import com.smartcity.greenpassport.core.model.HistoryEntryType
 import com.smartcity.greenpassport.core.model.HistoryRepository
+import com.smartcity.greenpassport.core.model.LocalizedText
 import com.smartcity.greenpassport.core.model.ShopRepository
 import com.smartcity.greenpassport.core.model.TasksRepository
 import kotlinx.coroutines.tasks.await
@@ -40,7 +41,7 @@ class FirestoreHistoryRepository @Inject constructor(
                 HistoryEntry(
                     id = doc.id,
                     type = HistoryEntryType.TASK_COMPLETED,
-                    title = taskTitles[taskId] ?: taskId,
+                    title = taskTitles[taskId] ?: LocalizedText(taskId),
                     timestampEpochMillis = completedAt,
                 )
             }
@@ -56,7 +57,7 @@ class FirestoreHistoryRepository @Inject constructor(
                 HistoryEntry(
                     id = doc.id,
                     type = HistoryEntryType.EVENT_ATTENDED,
-                    title = eventTitles[eventId] ?: eventId,
+                    title = eventTitles[eventId] ?: LocalizedText(eventId),
                     timestampEpochMillis = registeredAt,
                 )
             }
@@ -65,7 +66,7 @@ class FirestoreHistoryRepository @Inject constructor(
             HistoryEntry(
                 id = coupon.id,
                 type = HistoryEntryType.REWARD_REDEEMED,
-                title = rewardTitles[coupon.rewardId] ?: coupon.rewardId,
+                title = rewardTitles[coupon.rewardId] ?: LocalizedText(coupon.rewardId),
                 timestampEpochMillis = coupon.redeemedAtEpochMillis,
             )
         }

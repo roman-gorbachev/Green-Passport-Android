@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -70,17 +69,11 @@ fun MessageComposer(
                 modifier = Modifier.weight(1f),
             )
             FilledIconButton(
-                onClick = onSend,
-                enabled = draft.isNotBlank() && !isSending,
+                onClick = { if (!isSending) onSend() },
+                enabled = draft.isNotBlank() || isSending,
                 modifier = Modifier.size(Dimens.PrimaryButtonHeight),
             ) {
-                if (isSending) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        strokeWidth = Dimens.ProgressStrokeWidth,
-                        modifier = Modifier.size(Dimens.IconSizeSmall),
-                    )
-                } else {
+                LoadingLabel(isLoading = isSending, color = MaterialTheme.colorScheme.onPrimary) {
                     Icon(imageVector = Icons.Filled.ArrowUpward, contentDescription = sendLabel)
                 }
             }

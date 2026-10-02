@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.smartcity.greenpassport.core.designsystem.component.ChoiceCapsule
 import com.smartcity.greenpassport.core.designsystem.component.GpTextField
 import com.smartcity.greenpassport.core.designsystem.component.ProfileAvatar
+import com.smartcity.greenpassport.core.designsystem.text.cityName
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.TaskCategory
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
@@ -87,7 +88,7 @@ fun CityStep(
         ) {
             SupportedCities.all.forEach { city ->
                 ChoiceCapsule(
-                    label = city,
+                    label = cityName(city),
                     selected = uiState.city == city,
                     onClick = { actions.onCitySelected(city) },
                 )

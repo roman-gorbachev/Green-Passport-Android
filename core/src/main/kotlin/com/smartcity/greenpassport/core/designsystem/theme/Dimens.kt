@@ -31,6 +31,12 @@ object Dimens {
     val ButtonElevation = 2.dp
     val ChipElevation = 1.dp
     val ProgressStrokeWidth = 2.dp
+    val LoadingIndicatorSize = 16.dp
+    val CalendarDaySize = 36.dp
+    val CalendarBadgeMinSize = 16.dp
+    val ArticleCoverHeight = 220.dp
+    val ArticleThumbnailSize = 64.dp
+    val AchievementCardMinHeight = 196.dp
     val QuickActionWidth = 76.dp
     val TileSize = 32.dp
     val TileSizeSmall = 30.dp

@@ -1,5 +1,6 @@
 package com.smartcity.greenpassport.feature.map.presentation.state
 
+import com.smartcity.greenpassport.core.common.matches
 import com.smartcity.greenpassport.core.model.MapPoint
 import com.smartcity.greenpassport.core.model.MapPointType
 import com.smartcity.greenpassport.core.model.map.MapFocus
@@ -17,7 +18,7 @@ data class MapUiState(
     val visiblePoints: List<MapPoint>
         get() = points
             .filter { selectedType == null || it.type == selectedType }
-            .filter { searchQuery.isBlank() || it.name.contains(searchQuery, ignoreCase = true) }
+            .filter { searchQuery.isBlank() || it.name.matches(searchQuery) }
 
     val selectedPoint: MapPoint?
         get() = points.firstOrNull { it.id == selectedPointId }
