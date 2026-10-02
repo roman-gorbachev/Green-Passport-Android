@@ -3,6 +3,7 @@ package com.smartcity.greenpassport.feature.games.presentation.web.ui
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -31,6 +32,10 @@ fun GameWebView(
     AndroidView(
         factory = { context ->
             WebView(context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                )
                 setBackgroundColor(Color.TRANSPARENT)
                 overScrollMode = View.OVER_SCROLL_NEVER
                 isVerticalScrollBarEnabled = false
