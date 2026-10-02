@@ -73,6 +73,7 @@ Mini-games are HTML5 pages in `games/` (plain HTML/CSS/JS, no build step), serve
 - User profile (`core/model/profile`: `UserProfile`, `UserProfileRepository`) lives in the same `apps/greenpassport/users/{uid}` document as points; write it with `SetOptions.merge()` so points are never overwritten. Personalize screens from the profile, not from `AuthSession.displayName`.
 - Every piece of user-generated text (forum posts, chat messages, group names, feedback, profile names) goes through `core/moderation/TextModerator` in the use case before it is written, and the UI shows `ContentRejectedException` as a field error. `firestore.rules` repeats a shorter check (`hasBannedWords`) so the filter can't be bypassed; keep both word lists (`core/src/main/res/raw/banned_roots.txt`, rules regex) in sync.
 
+- Content archived in the web admin panel has `isActive: false` (missing means active). Models carry `isActive`; repositories return everything because coupons, history, moderation and detail screens resolve documents by id; only catalog use cases (`ObserveTasksUseCase`, `ObserveActiveEventsUseCase`, `ObserveRewardCatalogUseCase`, …) hide archived items. Plan: `claude/admin-apps-plan.ru.md`.
 - Screens have to survive Firestore failures (e.g. `PERMISSION_DENIED` while Auth isn't enabled). ViewModels wrap repository calls in `runCatching`/`resultOf` and surface an error state rather than crashing.
 - Firestore security rules and indexes are in `firestore.rules`, `firestore.indexes.json` and `storage.rules` (project config in `firebase.json` / `.firebaserc`).
 
