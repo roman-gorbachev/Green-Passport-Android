@@ -5,6 +5,7 @@ const Engine = (() => {
   const SHAKE_DECAY_SECONDS = 0.3;
   const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
   const glyphCache = new Map();
+  const stages = [];
 
   function token(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -57,17 +58,19 @@ const Engine = (() => {
 
     new ResizeObserver(resize).observe(canvas);
     resize();
+    stages.push(stage);
     return stage;
   }
 
   function loop(update, render) {
     let last = performance.now();
     function frame(now) {
+      requestAnimationFrame(frame);
       const dt = Math.min(MAX_FRAME_SECONDS, Math.max(0, (now - last) / 1000));
       last = now;
+      if (stages.some((stage) => stage.width === 0 || stage.height === 0)) return;
       update(dt);
       render(dt);
-      requestAnimationFrame(frame);
     }
     document.addEventListener('visibilitychange', () => {
       last = performance.now();
@@ -134,7 +137,9 @@ const Engine = (() => {
   }
 
   function drawGlyph(ctx, emoji, x, y, size, rotation = 0, scale = 1) {
+    if (!(size > 0)) return;
     const image = glyph(emoji, size);
+    if (image.width === 0 || image.height === 0) return;
     const side = size * 1.3;
     ctx.save();
     ctx.translate(x, y);
