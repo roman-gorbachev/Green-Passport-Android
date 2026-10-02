@@ -45,7 +45,6 @@ fun StreakSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        dragHandle = null,
         containerColor = MaterialTheme.colorScheme.surface,
     ) {
         Column(
@@ -54,7 +53,7 @@ fun StreakSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = Dimens.ScreenHorizontalPadding)
-                .padding(top = Dimens.SpacingLarge, bottom = Dimens.SpacingLarge),
+                .padding(bottom = Dimens.SpacingLarge),
         ) {
             StreakHeadline(days = summary.days)
             StreakWeekStrip(week = summary.week)

@@ -41,7 +41,6 @@ fun GpSheetScaffold(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        dragHandle = null,
         shape = RoundedCornerShape(topStart = Dimens.CornerRadiusSheet, topEnd = Dimens.CornerRadiusSheet),
         containerColor = MaterialTheme.colorScheme.surface,
         modifier = modifier.statusBarsPadding(),
@@ -49,7 +48,6 @@ fun GpSheetScaffold(
         Column(
             modifier = Modifier.padding(
                 start = Dimens.SheetContentPadding,
-                top = Dimens.SheetContentPadding,
                 end = Dimens.SheetContentPadding,
                 bottom = Dimens.CardPadding,
             ),
