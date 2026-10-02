@@ -1,0 +1,16 @@
+const games = [
+  { id: 'eco_runner', titles: { ru: 'Эко-забег', be: 'Эка-забег', en: 'Eco run' }, path: 'eco_runner/index.html', sfSymbol: 'figure.run', materialIcon: 'DirectionsRun', iconEmoji: '🏃', iconColors: ['#34C77B', '#1F6B47'], maxPoints: 30, order: 1, isActive: true },
+  { id: 'sort_conveyor', titles: { ru: 'Сортировочный конвейер', be: 'Сартавальны канвеер', en: 'Sorting line' }, path: 'sort_conveyor/index.html', sfSymbol: 'shippingbox.fill', materialIcon: 'Inventory', iconEmoji: '♻️', iconColors: ['#4DA3FF', '#2E6FD1'], maxPoints: 30, order: 2, isActive: true },
+  { id: 'ocean_cleanup', titles: { ru: 'Чистый океан', be: 'Чысты акіян', en: 'Ocean cleanup' }, path: 'ocean_cleanup/index.html', sfSymbol: 'water.waves', materialIcon: 'Waves', iconEmoji: '🐳', iconColors: ['#2BB3E8', '#145F8F'], maxPoints: 30, order: 3, isActive: true },
+  { id: 'forest_guard', titles: { ru: 'Лесной патруль', be: 'Лясны патруль', en: 'Forest guard' }, path: 'forest_guard/index.html', sfSymbol: 'tree.fill', materialIcon: 'Forest', iconEmoji: '🌲', iconColors: ['#7ED957', '#2E8C5E'], maxPoints: 30, order: 4, isActive: true },
+  { id: 'eco_merge', titles: { ru: 'Эко-2048', be: 'Эка-2048', en: 'Eco merge' }, path: 'eco_merge/index.html', sfSymbol: 'square.grid.2x2.fill', materialIcon: 'GridView', iconEmoji: '🌱', iconColors: ['#C3EE5A', '#4E9F3D'], maxPoints: 30, order: 5, isActive: true },
+  { id: 'quiz_rush', titles: { ru: 'Эко-блиц', be: 'Эка-бліц', en: 'Eco blitz' }, path: 'quiz_rush/index.html', sfSymbol: 'brain.head.profile', materialIcon: 'Psychology', iconEmoji: '🧠', iconColors: ['#FF9F43', '#E8590C'], maxPoints: 30, order: 6, isActive: true },
+  { id: 'light_switch', titles: { ru: 'Выключи свет', be: 'Выключы святло', en: 'Lights out' }, path: 'light_switch/index.html', sfSymbol: 'lightbulb.fill', materialIcon: 'Lightbulb', iconEmoji: '💡', iconColors: ['#FFD54F', '#F08F33'], maxPoints: 30, order: 7, isActive: true },
+  { id: 'bee_garden', titles: { ru: 'Опылитель', be: 'Апыляльнік', en: 'Pollinator' }, path: 'bee_garden/index.html', sfSymbol: 'ladybug.fill', materialIcon: 'EmojiNature', iconEmoji: '🐝', iconColors: ['#FFB703', '#FB8500'], maxPoints: 30, order: 8, isActive: true },
+  { id: 'bike_lane', titles: { ru: 'Велодорожка', be: 'Веласцежка', en: 'Bike lane' }, path: 'bike_lane/index.html', sfSymbol: 'bicycle', materialIcon: 'PedalBike', iconEmoji: '🚲', iconColors: ['#8E7CF0', '#5B4BC4'], maxPoints: 30, order: 9, isActive: true },
+  { id: 'eco_memory', titles: { ru: 'Эко-мемори', be: 'Эка-мэмары', en: 'Eco memory' }, path: 'eco_memory/index.html', sfSymbol: 'rectangle.on.rectangle.angled.fill', materialIcon: 'Style', iconEmoji: '🃏', iconColors: ['#FF6B8A', '#C9184A'], maxPoints: 30, order: 10, isActive: true },
+];
+
+const retiredGameIds = ['eco_puzzle', 'waste_sorting', 'eco_maze', 'eco_quiz', 'waste_catcher', 'myth_or_fact', 'eco_words', 'water_saver'];
+
+module.exports = { games, retiredGameIds };

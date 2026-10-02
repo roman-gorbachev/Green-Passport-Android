@@ -1,0 +1,92 @@
+module.exports = [
+  {
+    id: 'coffee_discount',
+    titles: { ru: 'Скидка 10% на кофе', be: 'Зніжка 10% на каву', en: '10% off coffee' },
+    partnerNames: { ru: 'Кофейня «Зелёный лист»', be: 'Кавярня «Зялёны ліст»', en: 'Green Leaf Café' },
+    pointsCost: 100, validityDays: 14,
+  },
+  {
+    id: 'organic_food_discount',
+    titles: { ru: 'Скидка 15% на органические продукты', be: 'Зніжка 15% на арганічныя прадукты', en: '15% off organic food' },
+    partnerNames: { ru: 'Эко-маркет «Природа»', be: 'Эка-маркет «Прырода»', en: 'Nature Eco Market' },
+    pointsCost: 200, validityDays: 30,
+  },
+  {
+    id: 'free_reusable_bottle',
+    titles: { ru: 'Бесплатная многоразовая бутылка', be: 'Бясплатная шматразовая бутэлька', en: 'Free reusable bottle' },
+    partnerNames: { ru: 'Магазин «ЭкоДом»', be: 'Крама «ЭкаДом»', en: 'EcoHome store' },
+    pointsCost: 300, validityDays: 60,
+  },
+  {
+    id: 'bike_rental_discount',
+    titles: { ru: 'Скидка 20% на велопрокат', be: 'Зніжка 20% на велапракат', en: '20% off bike rental' },
+    partnerNames: { ru: 'Велопрокат «КрутиПедали»', be: 'Велапракат «КруціПедалі»', en: 'PedalOn bike rental' },
+    pointsCost: 250, validityDays: 30,
+  },
+  {
+    id: 'tree_planting_coupon',
+    titles: { ru: 'Купон на посадку дерева', be: 'Купон на пасадку дрэва', en: 'Plant-a-tree coupon' },
+    partnerNames: { ru: 'Фонд «Зелёный город»', be: 'Фонд «Зялёны горад»', en: 'Green City Foundation' },
+    pointsCost: 150, validityDays: 60,
+  },
+  {
+    id: 'eco_dry_cleaning',
+    titles: { ru: 'Скидка 10% на химчистку с эко-средствами', be: 'Зніжка 10% на хімчыстку з эка-сродкамі', en: '10% off eco dry cleaning' },
+    partnerNames: { ru: 'Химчистка «ЭкоКлин»', be: 'Хімчыстка «ЭкаКлін»', en: 'EcoClean dry cleaners' },
+    pointsCost: 120, validityDays: 21,
+  },
+  {
+    id: 'bulk_store_discount',
+    titles: { ru: 'Скидка 15% в магазине без упаковки', be: 'Зніжка 15% у краме без упакоўкі', en: '15% off at a zero-packaging store' },
+    partnerNames: { ru: 'Магазин «На развес»', be: 'Крама «На развагу»', en: 'Bulk & Co store' },
+    pointsCost: 180, validityDays: 30,
+  },
+  {
+    id: 'bamboo_toothbrush',
+    titles: { ru: 'Бамбуковая зубная щётка в подарок', be: 'Бамбукавая зубная шчотка ў падарунак', en: 'Free bamboo toothbrush' },
+    partnerNames: { ru: 'Эко-лавка «Листок»', be: 'Эка-крамка «Лісток»', en: 'Leaflet eco shop' },
+    pointsCost: 90, validityDays: 30,
+  },
+  {
+    id: 'cinema_ticket_discount',
+    titles: { ru: 'Скидка 30% на эко-кинопоказ', be: 'Зніжка 30% на эка-кінапаказ', en: '30% off an eco film screening' },
+    partnerNames: { ru: 'Кинокафе «Кадр»', be: 'Кінакавярня «Кадр»', en: 'Frame cinema café' },
+    pointsCost: 160, validityDays: 30,
+  },
+  {
+    id: 'scooter_minutes',
+    titles: { ru: '30 бесплатных минут на электросамокате', be: '30 бясплатных хвілін на электрасамакаце', en: '30 free e-scooter minutes' },
+    partnerNames: { ru: 'Сервис «Самокатыч»', be: 'Сэрвіс «Самакатыч»', en: 'Scootly service' },
+    pointsCost: 220, validityDays: 14,
+  },
+  {
+    id: 'repair_cafe_discount',
+    titles: { ru: 'Скидка 20% на ремонт одежды и обуви', be: 'Зніжка 20% на рамонт адзення і абутку', en: '20% off clothing and shoe repair' },
+    partnerNames: { ru: 'Мастерская «Вторая жизнь»', be: 'Майстэрня «Другое жыццё»', en: 'Second Life repair shop' },
+    pointsCost: 140, validityDays: 45,
+  },
+  {
+    id: 'plant_pot',
+    titles: { ru: 'Комнатное растение в подарок', be: 'Пакаёвая расліна ў падарунак', en: 'Free houseplant' },
+    partnerNames: { ru: 'Цветочная лавка «Флора»', be: 'Кветкавая крамка «Флора»', en: 'Flora flower shop' },
+    pointsCost: 260, validityDays: 30,
+  },
+  {
+    id: 'vegan_lunch_discount',
+    titles: { ru: 'Скидка 15% на растительный обед', be: 'Зніжка 15% на раслінны абед', en: '15% off a plant-based lunch' },
+    partnerNames: { ru: 'Кафе «Зелёная тарелка»', be: 'Кавярня «Зялёная талерка»', en: 'Green Plate café' },
+    pointsCost: 130, validityDays: 21,
+  },
+  {
+    id: 'workshop_pass',
+    titles: { ru: 'Билет на мастер-класс по апсайклингу', be: 'Білет на майстар-клас па апсайклінгу', en: 'Upcycling workshop ticket' },
+    partnerNames: { ru: 'Креатив-студия «Переделка»', be: 'Крэатыў-студыя «Перарабка»', en: 'Remake creative studio' },
+    pointsCost: 280, validityDays: 60,
+  },
+  {
+    id: 'thermos_discount',
+    titles: { ru: 'Скидка 25% на термокружку', be: 'Зніжка 25% на тэрмакубак', en: '25% off a travel mug' },
+    partnerNames: { ru: 'Магазин «ЭкоДом»', be: 'Крама «ЭкаДом»', en: 'EcoHome store' },
+    pointsCost: 170, validityDays: 30,
+  },
+];

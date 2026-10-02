@@ -99,8 +99,10 @@ export const scanCoupon = onRequest({ region: REGION }, async (request, response
     return { outcome: result, rewardId: coupon.get('rewardId') as string | undefined };
   });
   const reward = rewardId && outcome === 'redeemed' ? await db.doc(paths.shopItem(rewardId)).get() : undefined;
+  const titles = reward?.get('titles') as Record<string, string> | undefined;
+  const title = titles?.[language] ?? (reward?.get('title') as string | undefined);
   response
     .status(STATUS_CODES[outcome])
     .set('Cache-Control', 'no-store')
-    .send(renderScanPage(outcome, reward?.get('title') as string | undefined, language));
+    .send(renderScanPage(outcome, title, language));
 });

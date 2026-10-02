@@ -1,10 +1,18 @@
 # Demo data seed script
 
-Fills `apps/greenpassport/{tasks,shopItems,mapPoints,events,ecoTips,surveys}` in Firestore with
-sample content, matching the exact field names the app's repositories expect
-(see `core.database.Firestore*Repository`). These are the collections that were empty
-placeholders — Tasks (10), Shop rewards (6), Map points (5), Calendar events (4),
-Eco tips (7, one marked as tip of the day), one active survey.
+Fills `apps/greenpassport/{tasks,shopItems,mapPoints,events,ecoTips,surveys,games}` in Firestore,
+matching the exact field names the app's repositories expect
+(see `core.database.Firestore*Repository`). The content lives in `content/`, one module per
+collection, with every text as a `{ru, be, en}` map plus the Russian field as a fallback:
+tasks (30, all 12 cities), shop rewards (15), map points (19), calendar events (12),
+eco tips (20, one marked as tip of the day; covers in `games/covers/`), surveys (3, one active)
+and the games catalog (10 active, 8 retired).
+
+Re-running is safe: existing documents are matched by their Russian title (map points by
+name and address) and updated in place, so completed tasks, registrations and coupons keep
+their references; QR secrets are only created when missing. New map points must be real
+collection points — only add an address you found in an official source and confirmed by
+geocoding.
 
 Not seeded: `posts`/`groups`/`chats` (need real Firebase Auth user IDs, which don't
 exist until a real user signs in) and `users` (created lazily by the app itself).
@@ -35,23 +43,21 @@ Or point at a key stored elsewhere:
 node seed-firestore.js /path/to/service-account.json
 ```
 
-Each run **adds** new documents (auto-generated IDs) — running it twice duplicates
-the data. Delete the collections in the Firebase Console first if you want to reset,
-or edit the script to use fixed doc IDs instead of `collectionRef.doc()`.
+Each run updates the seeded documents in place (see above), so it can be repeated.
+Documents that are no longer in `content/` are not deleted — remove them in the Firebase
+Console if needed.
 
 ### Refreshing demo events
 
 The home screen only shows an upcoming event (`startAtEpochMillis` in the future). The seeded
-events are dated October–November 2026. Once they are in the past, or if you seeded an older
-version of the script, delete the `apps/greenpassport/events` collection in the Firebase Console,
-move the dates in `seed-firestore.js` forward and re-seed only that collection:
+events are dated October 2026 – January 2027 (`startAt` in `content/events.js`, Minsk time).
+Once they are in the past, move the dates forward and re-seed only that collection:
 
 ```
 node seed-firestore.js --only=events
 ```
 
-`--only` takes a comma-separated list of collection names and skips the rest, so the other
-collections are not duplicated.
+`--only` takes a comma-separated list of collection names and skips the rest.
 
 ## Backfill groups
 
