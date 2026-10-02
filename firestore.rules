@@ -9,6 +9,36 @@ service cloud.firestore {
       exists(/databases/(default)/documents/apps/greenpassport/admins/$(request.auth.uid));
   }
 
+  function staffRole() {
+    let adminPath = /databases/(default)/documents/apps/greenpassport/admins/$(request.auth.uid);
+    return exists(adminPath) ? get(adminPath).data.get('role', 'MODERATOR') : null;
+  }
+
+  function isEditor() {
+    return request.auth != null && staffRole() in ['SUPER_ADMIN', 'EDITOR'];
+  }
+
+  function isStampedByEditor() {
+    return isEditor() &&
+      request.resource.data.updatedBy == request.auth.uid &&
+      request.resource.data.updatedAtEpochMillis is int;
+  }
+
+  function serverCounters() {
+    return ['issuedCount', 'usedCount', 'poolAvailableCount', 'selfMarkedCount'];
+  }
+
+  function isContentCollection(collection) {
+    return collection in ['tasks', 'events', 'shopItems', 'ecoTips', 'mapPoints', 'surveys', 'games', 'partners'];
+  }
+
+  function isClosedCollection(collection) {
+    return collection in [
+      'taskSecrets', 'admins', 'reports', 'taskSubmissions', 'pointsLedger', 'taskProgress', 'purchases',
+      'ecoTipReads', 'eventSecrets', 'eventAttendance', 'chats', 'partnerUsers', 'auditLog',
+    ];
+  }
+
   function isOwnerOrAdmin(data) {
     return request.auth != null && (data.userId == request.auth.uid || isAdmin());
   }
@@ -198,11 +228,27 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    match /apps/greenpassport/{collection}/{document=**} {
-      allow read: if request.auth != null && !(collection in [
-        'taskSecrets', 'admins', 'reports', 'taskSubmissions', 'pointsLedger',
-        'taskProgress', 'purchases', 'ecoTipReads', 'eventSecrets', 'eventAttendance', 'chats',
-      ]);
+    match /apps/greenpassport/partnerUsers/{uid} {
+      allow read: if isOwner(uid) || isEditor();
+      allow write: if false;
+    }
+
+    match /apps/greenpassport/auditLog/{entryId} {
+      allow read: if isEditor();
+      allow write: if false;
+    }
+
+    match /apps/greenpassport/{collection}/{docId} {
+      allow read: if request.auth != null && !isClosedCollection(collection);
+      allow create: if isContentCollection(collection) && isStampedByEditor() &&
+        !request.resource.data.keys().hasAny(serverCounters());
+      allow update: if isContentCollection(collection) && isStampedByEditor() &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(serverCounters());
+      allow delete: if isContentCollection(collection) && isEditor();
+    }
+
+    match /apps/greenpassport/{collection}/{docId}/{subcollection}/{rest=**} {
+      allow read: if request.auth != null && !isClosedCollection(collection) && subcollection != 'codePool';
       allow write: if false;
     }
   }

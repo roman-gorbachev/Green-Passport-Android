@@ -2,7 +2,20 @@ const fs = require('fs');
 const path = require('path');
 const { after, before, beforeEach, test } = require('node:test');
 const { assertFails, assertSucceeds, initializeTestEnvironment } = require('@firebase/rules-unit-testing');
-const { arrayRemove, arrayUnion, collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } = require('firebase/firestore');
+const {
+  arrayRemove,
+  arrayUnion,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} = require('firebase/firestore');
 const { ref, uploadBytes, getBytes } = require('firebase/storage');
 
 const ROOT = 'apps/greenpassport';
@@ -10,6 +23,9 @@ const ALICE = 'alice';
 const BOB = 'bob';
 const ADMIN = 'moderator';
 const CAROL = 'carol';
+const EDITOR = 'editor';
+const SUPER_ADMIN = 'superAdmin';
+const CASHIER = 'cashier';
 
 let env;
 
@@ -35,6 +51,13 @@ beforeEach(async () => {
     const db = context.firestore();
     await setDoc(doc(db, `${ROOT}/users/${ALICE}`), { availablePoints: 100, lifetimeXp: 100, firstName: 'Алиса' });
     await setDoc(doc(db, `${ROOT}/admins/${ADMIN}`), { grantedAt: 1 });
+    await setDoc(doc(db, `${ROOT}/admins/${EDITOR}`), { role: 'EDITOR' });
+    await setDoc(doc(db, `${ROOT}/admins/${SUPER_ADMIN}`), { role: 'SUPER_ADMIN' });
+    await setDoc(doc(db, `${ROOT}/partners/cafe`), { name: 'Кафе', isActive: true });
+    await setDoc(doc(db, `${ROOT}/partnerUsers/${CASHIER}`), { partnerId: 'cafe' });
+    await setDoc(doc(db, `${ROOT}/shopItems/coffee`), { title: 'Кофе', partnerId: 'cafe', issuedCount: 3 });
+    await setDoc(doc(db, `${ROOT}/shopItems/coffee/codePool/CODE1`), { status: 'AVAILABLE' });
+    await setDoc(doc(db, `${ROOT}/auditLog/entry1`), { collection: 'tasks', docId: 'selfTask', by: EDITOR, atEpochMillis: 1 });
     await setDoc(doc(db, `${ROOT}/tasks/photoTask`), { title: 'Уборка', verification: 'PHOTO', rewardPoints: 100 });
     await setDoc(doc(db, `${ROOT}/tasks/selfTask`), { title: 'Сумка', verification: 'SELF', rewardPoints: 20 });
     await setDoc(doc(db, `${ROOT}/taskSecrets/qrTask`), { code: 'secret' });
@@ -198,4 +221,66 @@ test('users can query only their own progress, everyone reads the forum', async 
   await assertFails(getDocs(query(collection(firestoreOf(BOB), `${ROOT}/taskProgress`), where('userId', '==', ALICE))));
   await assertSucceeds(getDocs(collection(firestoreOf(BOB), `${ROOT}/posts`)));
   await assertSucceeds(getDocs(collection(firestoreOf(BOB), `${ROOT}/tasks`)));
+});
+
+const stamped = (uid, data) => ({ ...data, updatedBy: uid, updatedAtEpochMillis: 1 });
+
+test('editors write stamped content, moderators and users cannot', async () => {
+  const task = (uid) => doc(firestoreOf(uid), `${ROOT}/tasks/newTask`);
+  await assertSucceeds(setDoc(task(EDITOR), stamped(EDITOR, { title: 'Новое', verification: 'SELF' })));
+  await assertSucceeds(setDoc(task(SUPER_ADMIN), stamped(SUPER_ADMIN, { title: 'Новое' })));
+  await assertFails(setDoc(task(EDITOR), { title: 'Без штампа' }));
+  await assertFails(setDoc(task(EDITOR), stamped(SUPER_ADMIN, { title: 'Чужой штамп' })));
+  await assertFails(setDoc(task(ADMIN), stamped(ADMIN, { title: 'Модератор' })));
+  await assertFails(setDoc(task(ALICE), stamped(ALICE, { title: 'Пользователь' })));
+  await assertFails(setDoc(doc(firestoreOf(EDITOR), `${ROOT}/users/${ALICE}`), stamped(EDITOR, { availablePoints: 1 })));
+  await assertSucceeds(deleteDoc(doc(firestoreOf(EDITOR), `${ROOT}/tasks/selfTask`)));
+  await assertFails(deleteDoc(doc(firestoreOf(ADMIN), `${ROOT}/tasks/photoTask`)));
+});
+
+test('editors cannot change the counters the server keeps', async () => {
+  const coffee = doc(firestoreOf(EDITOR), `${ROOT}/shopItems/coffee`);
+  await assertSucceeds(updateDoc(coffee, stamped(EDITOR, { title: 'Капучино' })));
+  await assertFails(updateDoc(coffee, stamped(EDITOR, { issuedCount: 0 })));
+  await assertFails(setDoc(doc(firestoreOf(EDITOR), `${ROOT}/shopItems/tea`), stamped(EDITOR, { usedCount: 5 })));
+});
+
+test('the code pool is closed to everyone, even editors', async () => {
+  await assertFails(getDoc(doc(firestoreOf(ALICE), `${ROOT}/shopItems/coffee/codePool/CODE1`)));
+  await assertFails(getDocs(collection(firestoreOf(EDITOR), `${ROOT}/shopItems/coffee/codePool`)));
+  await assertFails(getDoc(doc(firestoreOf(CASHIER), `${ROOT}/shopItems/coffee/codePool/CODE1`)));
+  await assertSucceeds(getDoc(doc(firestoreOf(ALICE), `${ROOT}/users/${ALICE}/rewardState/main`)));
+});
+
+test('partner accounts are visible to their owner and editors only', async () => {
+  await assertSucceeds(getDoc(doc(firestoreOf(CASHIER), `${ROOT}/partnerUsers/${CASHIER}`)));
+  await assertFails(getDoc(doc(firestoreOf(ALICE), `${ROOT}/partnerUsers/${CASHIER}`)));
+  await assertFails(getDocs(collection(firestoreOf(ADMIN), `${ROOT}/partnerUsers`)));
+  const linked = query(collection(firestoreOf(EDITOR), `${ROOT}/partnerUsers`), where('partnerId', '==', 'cafe'), limit(1));
+  await assertSucceeds(getDocs(linked));
+  await assertFails(setDoc(doc(firestoreOf(CASHIER), `${ROOT}/partnerUsers/${CASHIER}`), { partnerId: 'other' }));
+});
+
+test('the audit log is read by editors and written by nobody', async () => {
+  await assertSucceeds(getDocs(collection(firestoreOf(EDITOR), `${ROOT}/auditLog`)));
+  await assertFails(getDocs(collection(firestoreOf(ADMIN), `${ROOT}/auditLog`)));
+  await assertFails(getDoc(doc(firestoreOf(ALICE), `${ROOT}/auditLog/entry1`)));
+  await assertFails(setDoc(doc(firestoreOf(SUPER_ADMIN), `${ROOT}/auditLog/fake`), { by: SUPER_ADMIN }));
+});
+
+test('staff check references and count purchases', async () => {
+  const progress = query(collection(firestoreOf(EDITOR), `${ROOT}/taskProgress`), where('taskId', '==', 'selfTask'), limit(1));
+  await assertSucceeds(getDocs(progress));
+  await assertSucceeds(getDocs(query(collection(firestoreOf(ADMIN), `${ROOT}/purchases`), where('usedAtEpochMillis', '>=', 0))));
+  await assertFails(getDocs(collection(firestoreOf(CASHIER), `${ROOT}/purchases`)));
+});
+
+test('storage: content images are public to users, uploads need an editor', async () => {
+  const image = new Uint8Array([0xff, 0xd8, 0xff]);
+  const path = 'greenpassport/content/tasks/selfTask/cover.jpg';
+  await env.withSecurityRulesDisabled((context) => uploadBytes(ref(context.storage(), path), image, { contentType: 'image/jpeg' }));
+  await assertSucceeds(getBytes(ref(env.authenticatedContext(ALICE).storage(), path)));
+  await assertFails(getBytes(ref(env.unauthenticatedContext().storage(), path)));
+  await assertFails(uploadBytes(ref(env.authenticatedContext(ALICE).storage(), path), image, { contentType: 'image/jpeg' }));
+  await assertFails(uploadBytes(ref(env.authenticatedContext(ADMIN).storage(), path), image, { contentType: 'image/jpeg' }));
 });

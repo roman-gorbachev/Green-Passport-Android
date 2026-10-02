@@ -10,6 +10,7 @@ import { dayKey } from './dates';
 import { db, paths, storage } from './db';
 import { requireAdmin, requireString, requireUser } from './guards';
 import { award, readDailyCount, RewardResult, taskReward, writeDailyCount } from './rewards';
+import { taskQrProblem, TaskQrSettings } from './taskQr';
 import { withStreak } from './streak';
 
 const SELF_TASKS_COUNTER = 'selfTasks';
@@ -54,11 +55,18 @@ export const redeemTaskCode = onCall({ region: REGION }, async (request): Promis
     const taskSecret = await tx.get(db.doc(paths.taskSecret(taskId)));
     const progress = await tx.get(db.doc(paths.taskProgress(uid, taskId)));
 
-    if (!task.exists || !taskSecret.exists || taskSecret.get('code') !== secret) {
+    if (
+      !task.exists || task.get('verification') !== 'QR' || task.get('isActive') === false ||
+      !taskSecret.exists || taskSecret.get('code') !== secret
+    ) {
       throw new HttpsError('not-found', 'Unknown code');
     }
     if (progress.exists) throw new HttpsError('already-exists', 'Task already completed');
+    const problem = taskQrProblem(task.data() as TaskQrSettings, Number(taskSecret.get('scanCount') ?? 0), Date.now());
+    if (problem === 'notActive') throw new HttpsError('failed-precondition', 'qr_not_active');
+    if (problem === 'limitReached') throw new HttpsError('resource-exhausted', 'qr_limit_reached');
 
+    tx.update(taskSecret.ref, { scanCount: FieldValue.increment(1) });
     tx.create(db.doc(paths.taskProgress(uid, taskId)), {
       userId: uid,
       taskId,

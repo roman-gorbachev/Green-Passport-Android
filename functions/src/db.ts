@@ -32,4 +32,10 @@ export const paths = {
   surveyAnswer: (uid: string, surveyId: string) => `${APP_ROOT}/surveyAnswers/${uid}_${surveyId}`,
   pointsLedger: () => `${APP_ROOT}/pointsLedger`,
   post: (postId: string) => `${APP_ROOT}/posts/${postId}`,
+  admins: () => `${APP_ROOT}/admins`,
+  partner: (partnerId: string) => `${APP_ROOT}/partners/${partnerId}`,
+  partnerUsers: () => `${APP_ROOT}/partnerUsers`,
+  partnerUser: (uid: string) => `${APP_ROOT}/partnerUsers/${uid}`,
+  codePool: (rewardId: string) => `${APP_ROOT}/shopItems/${rewardId}/codePool`,
+  auditLog: () => `${APP_ROOT}/auditLog`,
 };

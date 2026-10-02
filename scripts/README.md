@@ -59,6 +59,22 @@ node seed-firestore.js --only=events
 
 `--only` takes a comma-separated list of collection names and skips the rest.
 
+### After the hand-over: the admin panel is the source of truth
+
+Once content is edited in the admin panel (`greenpassport-admin`), a plain re-run would overwrite
+those edits, because documents are matched by their Russian title. Seed only what is missing:
+
+```
+node seed-firestore.js --only-missing
+```
+
+Existing documents are left untouched; new ones from `content/` are added. Every seeded write
+is merged (fields set in the admin panel, such as `partnerId` or the shop counters, survive) and
+stamped with `updatedBy: "system"`, so the admin's change log shows it as a script change.
+
+`--admin=<uid>` makes that account a super admin (`admins/{uid}.role = SUPER_ADMIN`), who then
+grants the other roles in the admin panel.
+
 ## Backfill groups
 
 Groups created before invite codes existed have no `inviteCode`, `ownerId` or

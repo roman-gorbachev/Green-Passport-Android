@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const { createHmac } = require('node:crypto');
 const { before, test } = require('node:test');
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
@@ -12,11 +13,11 @@ const ROOT = 'apps/greenpassport';
 initializeApp({ projectId: PROJECT_ID });
 const db = getFirestore();
 
-async function signUp() {
+async function signUp(email) {
   const response = await fetch(AUTH_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ returnSecureToken: true }),
+    body: JSON.stringify(email ? { email, password: 'secret123', returnSecureToken: true } : { returnSecureToken: true }),
   });
   const body = await response.json();
   return { uid: body.localId, token: body.idToken };
@@ -29,7 +30,7 @@ async function call(name, user, data) {
     body: JSON.stringify({ data }),
   });
   const body = await response.json();
-  return body.error ? { error: body.error.status } : { result: body.result };
+  return body.error ? { error: body.error.status, message: body.error.message } : { result: body.result };
 }
 
 async function points(uid) {
@@ -117,7 +118,7 @@ test('shop: expired coupons cannot be marked as used', async () => {
   assert.equal((await call('markCouponUsed', alice, { couponId: expired.id })).error, 'FAILED_PRECONDITION');
 });
 
-test('shop: partner scan redeems a coupon once and reports expired coupons', async () => {
+test('shop: the coupon link now leads to the partner cabinet and redeems nothing', async () => {
   const active = await db.collection(`${ROOT}/purchases`).add({
     userId: alice.uid,
     rewardId: 'coffee',
@@ -126,21 +127,10 @@ test('shop: partner scan redeems a coupon once and reports expired coupons', asy
     code: 'SCAN2345',
     status: 'ACTIVE',
   });
-  const scan = (id, code) => fetch(`${FUNCTIONS_URL}/scanCoupon?id=${id}&code=${code}`);
-  assert.equal((await scan(active.id, 'WRONG234')).status, 404);
-  assert.equal((await scan(active.id, 'SCAN2345')).status, 200);
-  assert.equal((await db.doc(`${ROOT}/purchases/${active.id}`).get()).get('status'), 'USED');
-  assert.equal((await scan(active.id, 'SCAN2345')).status, 409);
-  const expired = await db.collection(`${ROOT}/purchases`).add({
-    userId: alice.uid,
-    rewardId: 'coffee',
-    redeemedAtEpochMillis: 1,
-    expiresAtEpochMillis: 2,
-    code: 'OLD23456',
-    status: 'ACTIVE',
-  });
-  assert.equal((await scan(expired.id, 'OLD23456')).status, 410);
-  assert.equal((await db.doc(`${ROOT}/purchases/${expired.id}`).get()).get('status'), 'EXPIRED');
+  const response = await fetch(`${FUNCTIONS_URL}/scanCoupon?id=${active.id}&code=SCAN2345`, { redirect: 'manual' });
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get('location'), `https://greenpassport-admin.web.app/redeem?id=${active.id}&code=SCAN2345`);
+  assert.equal((await db.doc(`${ROOT}/purchases/${active.id}`).get()).get('status'), 'ACTIVE');
 });
 
 test('photo review: only moderators, approval awards points', async () => {
@@ -218,4 +208,162 @@ test('games: catalog games use their own point cap, inactive and unknown games a
   assert.equal((await call('recordGameResult', bob, { gameId: 'water_saver', score: 500 })).result.points, 20);
   assert.equal((await call('recordGameResult', bob, { gameId: 'retired', score: 10 })).error, 'INVALID_ARGUMENT');
   assert.equal((await call('recordGameResult', bob, { gameId: 'nope', score: 10 })).error, 'INVALID_ARGUMENT');
+});
+
+const DYNAMIC_WINDOW_MILLIS = 30_000;
+
+function dynamicCode(eventId, key, window) {
+  const signature = createHmac('sha256', Buffer.from(key, 'hex')).update(`${eventId}:${window}`).digest('hex').slice(0, 12);
+  return `greenpassport:event:${eventId}:d${window}.${signature}`;
+}
+
+let superAdmin;
+let editor;
+let cashier;
+let otherCashier;
+
+test('staff: the super admin grants roles by e-mail and cannot demote themselves', async () => {
+  superAdmin = await signUp('boss@example.com');
+  editor = await signUp('editor@example.com');
+  cashier = await signUp('cashier@example.com');
+  otherCashier = await signUp('other@example.com');
+  await db.doc(`${ROOT}/admins/${superAdmin.uid}`).set({ role: 'SUPER_ADMIN' });
+  await db.doc(`${ROOT}/partners/cafe`).set({ name: 'Кафе', isActive: true });
+  await db.doc(`${ROOT}/partners/bakery`).set({ name: 'Пекарня', isActive: true });
+
+  assert.equal((await call('adminSetStaffRole', moderator, { email: 'editor@example.com', role: 'EDITOR' })).error, 'PERMISSION_DENIED');
+  assert.equal((await call('adminSetStaffRole', superAdmin, { email: 'nobody@example.com', role: 'EDITOR' })).message, 'user_not_found');
+  assert.deepEqual((await call('adminSetStaffRole', superAdmin, { email: 'editor@example.com', role: 'EDITOR' })).result, {
+    uid: editor.uid,
+    email: 'editor@example.com',
+    role: 'EDITOR',
+    partnerId: null,
+  });
+  assert.equal((await call('adminSetStaffRole', superAdmin, { email: 'boss@example.com', role: null })).message, 'cannot_demote_self');
+  assert.equal((await call('adminSetPartnerUser', superAdmin, { email: 'cashier@example.com', partnerId: 'nope' })).message, 'partner_not_found');
+  assert.equal((await call('adminSetPartnerUser', superAdmin, { email: 'cashier@example.com', partnerId: 'cafe' })).result.partnerId, 'cafe');
+  await call('adminSetPartnerUser', superAdmin, { email: 'other@example.com', partnerId: 'bakery' });
+
+  const staff = (await call('adminListStaff', editor, {})).result;
+  assert.equal(staff.find((member) => member.uid === cashier.uid).email, 'cashier@example.com');
+  assert.equal(staff.find((member) => member.uid === moderator.uid).role, 'MODERATOR');
+  assert.equal((await call('adminListStaff', moderator, {})).error, 'PERMISSION_DENIED');
+});
+
+test('task QR: window and limit are enforced and rotation retires the old code', async () => {
+  await db.doc(`${ROOT}/tasks/qrLimited`).set({ verification: 'QR', rewardPoints: 10, rewardXp: 10, qrScanLimit: 2 });
+  await db.doc(`${ROOT}/tasks/qrLater`).set({ verification: 'QR', rewardPoints: 10, qrActiveFromEpochMillis: Date.now() + 60_000 });
+  await db.doc(`${ROOT}/tasks/selfOnly`).set({ verification: 'SELF', rewardPoints: 10 });
+  await db.doc(`${ROOT}/taskSecrets/selfOnly`).set({ code: 'secret' });
+
+  assert.equal((await call('adminEnsureQrSecret', moderator, { kind: 'task', id: 'qrLimited' })).error, 'PERMISSION_DENIED');
+  assert.equal((await call('adminEnsureQrSecret', editor, { kind: 'task', id: 'missing' })).message, 'content_not_found');
+  const first = (await call('adminEnsureQrSecret', editor, { kind: 'task', id: 'qrLimited' })).result;
+  assert.equal(first.version, 1);
+  assert.deepEqual((await call('adminEnsureQrSecret', editor, { kind: 'task', id: 'qrLimited' })).result, first);
+  const later = (await call('adminEnsureQrSecret', editor, { kind: 'task', id: 'qrLater' })).result;
+
+  const carol = await signUp();
+  assert.equal((await call('redeemTaskCode', alice, { code: first.payload })).result.points, 10);
+  assert.equal((await call('redeemTaskCode', bob, { code: first.payload })).result.points, 10);
+  assert.equal((await call('redeemTaskCode', carol, { code: first.payload })).message, 'qr_limit_reached');
+  assert.equal((await call('redeemTaskCode', carol, { code: later.payload })).message, 'qr_not_active');
+  assert.equal((await call('redeemTaskCode', carol, { code: 'greenpassport:task:selfOnly:secret' })).error, 'NOT_FOUND');
+
+  const rotated = (await call('adminRotateQrSecret', editor, { kind: 'task', id: 'qrLimited' })).result;
+  assert.equal(rotated.version, 2);
+  assert.equal(rotated.scanCount, 0);
+  assert.equal((await call('redeemTaskCode', carol, { code: first.payload })).error, 'NOT_FOUND');
+  assert.equal((await call('redeemTaskCode', carol, { code: rotated.payload })).result.points, 10);
+
+  const batch = (await call('adminGetQrPayloads', editor, { kind: 'task', ids: ['qrLimited', 'qrLater', 'missing'] })).result;
+  assert.deepEqual(batch.map((payload) => payload.id).sort(), ['qrLater', 'qrLimited']);
+  assert.equal(batch.find((payload) => payload.id === 'qrLimited').scanCount, 1);
+});
+
+test('dynamic event QR: the live code works, old and static codes do not', async () => {
+  await db.doc(`${ROOT}/events/live`).set({ title: 'Live', startAtEpochMillis: Date.now(), rewardPoints: 25, qrMode: 'DYNAMIC' });
+  const { key } = (await call('adminGetEventDynamicKey', editor, { eventId: 'live' })).result;
+  assert.match(key, /^[0-9a-f]{64}$/);
+  assert.equal((await call('adminGetEventDynamicKey', editor, { eventId: 'live' })).result.key, key);
+  const staticCode = (await call('adminEnsureQrSecret', editor, { kind: 'event', id: 'live' })).result.payload;
+
+  const window = Math.floor(Date.now() / DYNAMIC_WINDOW_MILLIS);
+  const carol = await signUp();
+  assert.equal((await call('checkInEvent', carol, { code: staticCode })).error, 'NOT_FOUND');
+  assert.equal((await call('checkInEvent', carol, { code: dynamicCode('live', key, window - 2) })).error, 'NOT_FOUND');
+  assert.equal((await call('checkInEvent', carol, { code: dynamicCode('soon', key, window) })).error, 'NOT_FOUND');
+  assert.equal((await call('checkInEvent', carol, { code: dynamicCode('live', key, window) })).result.points, 25);
+});
+
+test('code pool and stock: pool codes are issued until they run out', async () => {
+  await db.doc(`${ROOT}/shopItems/pastry`).set({ title: 'Круассан', pointsCost: 0, partnerId: 'cafe', codeSource: 'POOL' });
+  await db.doc(`${ROOT}/shopItems/limited`).set({ title: 'Скидка', pointsCost: 0, partnerId: 'bakery', stockLimit: 1 });
+  await db.doc(`${ROOT}/shopItems/hidden`).set({ title: 'Архив', pointsCost: 0, isActive: false });
+
+  assert.equal((await call('adminImportCouponCodes', otherCashier, { rewardId: 'pastry', codes: ['X'] })).error, 'PERMISSION_DENIED');
+  assert.deepEqual((await call('adminImportCouponCodes', cashier, { rewardId: 'pastry', codes: ['P-1', 'P-2', 'P-1', 'bad code', ''] })).result, {
+    added: 2,
+    duplicates: 1,
+    invalid: 2,
+  });
+  assert.deepEqual((await call('adminImportCouponCodes', editor, { rewardId: 'pastry', codes: ['P-2', 'P-3'] })).result, {
+    added: 1,
+    duplicates: 1,
+    invalid: 0,
+  });
+  assert.equal((await db.doc(`${ROOT}/shopItems/pastry`).get()).get('poolAvailableCount'), 3);
+
+  const codes = [];
+  for (let index = 0; index < 3; index += 1) codes.push((await call('redeemReward', bob, { rewardId: 'pastry' })).result.code);
+  assert.deepEqual(codes.sort(), ['P-1', 'P-2', 'P-3']);
+  assert.equal((await call('redeemReward', bob, { rewardId: 'pastry' })).message, 'reward_sold_out');
+  const pastry = await db.doc(`${ROOT}/shopItems/pastry`).get();
+  assert.equal(pastry.get('issuedCount'), 3);
+  assert.equal(pastry.get('poolAvailableCount'), 0);
+
+  assert.ok((await call('redeemReward', bob, { rewardId: 'limited' })).result.couponId);
+  assert.equal((await call('redeemReward', bob, { rewardId: 'limited' })).message, 'reward_sold_out');
+  assert.equal((await call('redeemReward', bob, { rewardId: 'hidden' })).error, 'NOT_FOUND');
+});
+
+test('partner cabinet: previews and redeems only own coupons, history marks self-marked ones', async () => {
+  await db.doc(`${ROOT}/shopItems/tea`).set({ title: 'Чай', pointsCost: 0, partnerId: 'cafe' });
+  const purchase = (await call('redeemReward', alice, { rewardId: 'tea' })).result;
+  const second = (await call('redeemReward', alice, { rewardId: 'tea' })).result;
+
+  assert.equal((await call('partnerPreviewCoupon', alice, { code: purchase.code })).message, 'Partners only');
+  assert.equal((await call('partnerPreviewCoupon', otherCashier, { couponId: purchase.couponId, code: purchase.code })).message, 'foreign_coupon');
+  assert.equal((await call('partnerPreviewCoupon', cashier, { couponId: purchase.couponId, code: 'WRONG234' })).result.state, 'notFound');
+  const preview = (await call('partnerPreviewCoupon', cashier, { code: purchase.code })).result;
+  assert.equal(preview.state, 'active');
+  assert.equal(preview.rewardTitle, 'Чай');
+  assert.equal(preview.partnerName, 'Кафе');
+
+  assert.equal((await call('partnerRedeemCoupon', otherCashier, { couponId: purchase.couponId, code: purchase.code })).message, 'foreign_coupon');
+  assert.ok((await call('partnerRedeemCoupon', cashier, { couponId: purchase.couponId, code: purchase.code })).result.usedAtEpochMillis);
+  assert.equal((await call('partnerRedeemCoupon', cashier, { couponId: purchase.couponId, code: purchase.code })).message, 'coupon_used');
+  assert.equal((await call('partnerPreviewCoupon', cashier, { couponId: purchase.couponId, code: purchase.code })).result.state, 'used');
+  assert.ok((await call('markCouponUsed', alice, { couponId: second.couponId })).result.usedAtEpochMillis);
+
+  const tea = await db.doc(`${ROOT}/shopItems/tea`).get();
+  assert.equal(tea.get('usedCount'), 2);
+  assert.equal(tea.get('selfMarkedCount'), 1);
+  const history = (await call('partnerListRedemptions', cashier, {})).result;
+  assert.deepEqual(
+    history.filter((item) => item.rewardId === 'tea').map((item) => [item.couponId, item.isSelfMarked]).sort(),
+    [[purchase.couponId, false], [second.couponId, true]].sort(),
+  );
+  assert.equal((await call('partnerListRedemptions', superAdmin, { partnerId: 'cafe' })).result.length, history.length);
+});
+
+test('audit log: content writes are logged with their author, counters are not', async () => {
+  await db.doc(`${ROOT}/tasks/audited`).set({ title: 'Было', updatedBy: editor.uid, updatedAtEpochMillis: 1 });
+  await db.doc(`${ROOT}/tasks/audited`).set({ title: 'Стало', updatedBy: superAdmin.uid, updatedAtEpochMillis: 2 });
+  await db.doc(`${ROOT}/shopItems/tea`).update({ issuedCount: 99 });
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  const entries = await db.collection(`${ROOT}/auditLog`).where('docId', '==', 'audited').get();
+  const actions = entries.docs.map((entry) => [entry.get('action'), entry.get('by'), entry.get('changedFields')]);
+  assert.deepEqual(actions.sort(), [['create', editor.uid, ['title']], ['update', superAdmin.uid, ['title']]].sort());
+  assert.equal((await db.collection(`${ROOT}/auditLog`).where('docId', '==', 'tea').where('action', '==', 'update').get()).size, 0);
 });

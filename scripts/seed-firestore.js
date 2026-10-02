@@ -18,6 +18,8 @@ const onlyArg = args.find((arg) => arg.startsWith('--only='));
 const onlyCollections = onlyArg ? onlyArg.slice('--only='.length).split(',') : null;
 const adminArg = args.find((arg) => arg.startsWith('--admin='));
 const adminUid = adminArg ? adminArg.slice('--admin='.length) : null;
+const isOnlyMissing = args.includes('--only-missing');
+const SEED_AUTHOR = 'system';
 const QR_OUTPUT_DIR = path.join(__dirname, 'qr');
 const QR_SECRET_BYTES = 16;
 
@@ -27,6 +29,10 @@ initializeApp({
 
 const db = getFirestore();
 const root = db.collection('apps').doc('greenpassport');
+
+function stamped(document) {
+  return { ...document, updatedBy: SEED_AUTHOR, updatedAtEpochMillis: Date.now() };
+}
 
 function isSelected(collectionName) {
   return !onlyCollections || onlyCollections.includes(collectionName);
@@ -41,18 +47,25 @@ async function upsert(collectionName, items, matchKey, toDocument) {
   const idByKey = new Map(existing.docs.map((doc) => [matchKey(doc.data()), doc.id]));
   const batch = db.batch();
   let updated = 0;
-  const written = items.map(({ id, ...content }) => {
+  let skipped = 0;
+  const written = items.flatMap(({ id, ...content }) => {
     const document = toDocument(content, id);
     const existingId = idByKey.get(matchKey(document));
+    if (existingId && isOnlyMissing) {
+      skipped += 1;
+      return [];
+    }
     if (existingId) {
       updated += 1;
     }
     const docRef = collectionRef.doc(existingId ?? id);
-    batch.set(docRef, document);
-    return { id: docRef.id, doc: document };
+    batch.set(docRef, stamped(document), { merge: true });
+    return [{ id: docRef.id, doc: document }];
   });
   await batch.commit();
-  console.log(`${collectionName}: ${items.length} documents written, ${updated} updated in place`);
+  console.log(
+    `${collectionName}: ${written.length} documents written, ${updated} updated in place, ${skipped} kept as edited`,
+  );
   return written;
 }
 
@@ -160,23 +173,27 @@ async function seedGames() {
   if (!isSelected('games')) {
     return;
   }
+  const gamesRef = root.collection('games');
+  const existingIds = new Set((await gamesRef.get()).docs.map((doc) => doc.id));
   const batch = db.batch();
-  for (const { id, ...game } of games) {
-    batch.set(root.collection('games').doc(id), game);
+  const newGames = games.filter(({ id }) => !isOnlyMissing || !existingIds.has(id));
+  for (const { id, ...game } of newGames) {
+    batch.set(gamesRef.doc(id), stamped(game), { merge: true });
   }
-  for (const id of retiredGameIds) {
-    batch.set(root.collection('games').doc(id), { isActive: false }, { merge: true });
+  const retired = isOnlyMissing ? [] : retiredGameIds;
+  for (const id of retired) {
+    batch.set(gamesRef.doc(id), stamped({ isActive: false }), { merge: true });
   }
   await batch.commit();
-  console.log(`games: ${games.length} documents written, ${retiredGameIds.length} retired`);
+  console.log(`games: ${newGames.length} documents written, ${retired.length} retired`);
 }
 
 async function seedAdmin() {
   if (!adminUid) {
     return;
   }
-  await root.collection('admins').doc(adminUid).set({ grantedAt: Date.now() });
-  console.log(`admins: ${adminUid} is now a moderator`);
+  await root.collection('admins').doc(adminUid).set({ role: 'SUPER_ADMIN', grantedAt: Date.now() }, { merge: true });
+  console.log(`admins: ${adminUid} is now a super admin`);
 }
 
 async function main() {

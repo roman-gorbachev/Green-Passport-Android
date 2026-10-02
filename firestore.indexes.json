@@ -1,4 +1,83 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "auditLog",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "collection",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "atEpochMillis",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditLog",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "by",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "atEpochMillis",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "auditLog",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "collection",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "by",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "atEpochMillis",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "purchases",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "partnerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "usedAtEpochMillis",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "purchases",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "expiresAtEpochMillis",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }

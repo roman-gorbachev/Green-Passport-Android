@@ -25,3 +25,16 @@ export const EVENT_CHECK_IN_CLOSES_AFTER_MILLIS = 6 * 60 * 60 * 1000;
 
 export const TASK_CODE_PREFIX = 'greenpassport:task:';
 export const SUBMISSIONS_STORAGE_PREFIX = 'greenpassport/submissions/';
+
+export const ADMIN_REDEEM_URL = 'https://greenpassport-admin.web.app/redeem';
+export const QR_SECRET_BYTES = 16;
+export const DYNAMIC_KEY_BYTES = 32;
+export const DYNAMIC_WINDOW_MILLIS = 30_000;
+export const DYNAMIC_ACCEPTED_PAST_WINDOWS = 1;
+export const DYNAMIC_SIGNATURE_LENGTH = 12;
+export const MAX_QR_PAYLOADS_PER_CALL = 200;
+export const MAX_IMPORTED_CODES_PER_CALL = 5000;
+export const MAX_PARTNER_CODE_LENGTH = 64;
+export const MAX_BATCH_WRITES = 450;
+export const PARTNER_HISTORY_LIMIT = 200;
+export const COUPON_LOOKUP_LIMIT = 20;
