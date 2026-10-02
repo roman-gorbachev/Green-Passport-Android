@@ -8,11 +8,11 @@ import com.smartcity.greenpassport.core.datasource.remote.localizedText
 import com.smartcity.greenpassport.core.model.EcoTip
 import com.smartcity.greenpassport.core.model.EcoTipCategory
 import com.smartcity.greenpassport.core.model.EcoTipsRepository
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 private const val FIELD_CATEGORY = "category"
 private const val FIELD_TITLE = "title"

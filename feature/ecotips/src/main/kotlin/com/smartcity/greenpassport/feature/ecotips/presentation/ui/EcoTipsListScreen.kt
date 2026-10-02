@@ -30,7 +30,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.common.articlePreview
 import com.smartcity.greenpassport.core.common.articleReadMinutes
 import com.smartcity.greenpassport.core.designsystem.component.ChoiceCapsule
@@ -46,6 +45,7 @@ import com.smartcity.greenpassport.core.model.EcoTipCategory
 import com.smartcity.greenpassport.feature.ecotips.R
 import com.smartcity.greenpassport.feature.ecotips.presentation.state.EcoTipsListUiState
 import com.smartcity.greenpassport.feature.ecotips.presentation.viewmodels.EcoTipsListViewModel
+import com.smartcity.greenpassport.core.R as CoreR
 
 private const val PREVIEW_LINES = 2
 private const val META_SEPARATOR = " · "
@@ -168,7 +168,11 @@ private fun TipRow(
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingCompact),
-            modifier = Modifier.padding(start = Dimens.CardPadding, top = Dimens.SpacingCompact, bottom = Dimens.SpacingCompact),
+            modifier = Modifier.padding(
+                start = Dimens.CardPadding,
+                top = Dimens.SpacingCompact,
+                bottom = Dimens.SpacingCompact
+            ),
         ) {
             ArticleCover(
                 tip = tip,

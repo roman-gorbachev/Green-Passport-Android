@@ -30,7 +30,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.common.articleReadMinutes
 import com.smartcity.greenpassport.core.designsystem.component.ArticleText
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
@@ -42,6 +41,7 @@ import com.smartcity.greenpassport.core.model.EcoTip
 import com.smartcity.greenpassport.core.model.EcoTipCategory
 import com.smartcity.greenpassport.feature.ecotips.R
 import com.smartcity.greenpassport.feature.ecotips.presentation.viewmodels.EcoTipDetailViewModel
+import com.smartcity.greenpassport.core.R as CoreR
 
 private const val META_SEPARATOR = " · "
 

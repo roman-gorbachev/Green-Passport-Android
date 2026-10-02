@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpListRow
 import com.smartcity.greenpassport.core.designsystem.component.ListSection
@@ -44,6 +43,7 @@ import com.smartcity.greenpassport.core.model.Reward
 import com.smartcity.greenpassport.feature.shop.R
 import com.smartcity.greenpassport.feature.shop.presentation.state.ShopUiState
 import com.smartcity.greenpassport.feature.shop.presentation.viewmodels.ShopViewModel
+import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun ShopScreen(
@@ -82,7 +82,11 @@ fun ShopScreen(
         AlertDialog(
             onDismissRequest = { pendingReward = null },
             title = { Text(stringResource(R.string.shop_purchase_button)) },
-            text = { Text(stringResource(R.string.exchange_points_for_reward_msg, reward.pointsCost, reward.title.localized())) },
+            text = {
+                Text(
+                    stringResource(R.string.exchange_points_for_reward_msg, reward.pointsCost, reward.title.localized())
+                )
+            },
             confirmButton = {
                 TextButton(
                     onClick = {

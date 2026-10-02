@@ -6,10 +6,10 @@ import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
 import com.smartcity.greenpassport.core.datasource.remote.cacheFirstSnapshots
 import com.smartcity.greenpassport.core.model.games.Game
 import com.smartcity.greenpassport.core.model.games.GamesRepository
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 private const val FIELD_TITLES = "titles"
 private const val FIELD_PATH = "path"

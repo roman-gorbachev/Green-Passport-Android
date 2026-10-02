@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.common.formatEventDate
 import com.smartcity.greenpassport.core.common.formatEventTime
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
@@ -30,6 +29,7 @@ import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.feature.calendar.R
 import com.smartcity.greenpassport.feature.calendar.presentation.viewmodels.CalendarViewModel
 import java.time.format.DateTimeFormatter
+import com.smartcity.greenpassport.core.R as CoreR
 
 private const val MONTH_KEY = "month"
 private const val DAY_TITLE_KEY = "day_title"

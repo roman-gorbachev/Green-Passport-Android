@@ -28,7 +28,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.GpTextField
 import com.smartcity.greenpassport.core.designsystem.component.ListRowContent
@@ -42,6 +41,7 @@ import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.CommunityGroup
 import com.smartcity.greenpassport.feature.community.R
 import com.smartcity.greenpassport.feature.community.presentation.viewmodels.GroupsViewModel
+import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun GroupsScreen(

@@ -7,12 +7,12 @@ import com.smartcity.greenpassport.core.datasource.remote.cacheFirstSnapshots
 import com.smartcity.greenpassport.core.datasource.remote.localizedText
 import com.smartcity.greenpassport.core.model.EcoEvent
 import com.smartcity.greenpassport.core.model.EventsRepository
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
 private const val FIELD_TITLE = "title"
 private const val FIELD_DESCRIPTION = "description"

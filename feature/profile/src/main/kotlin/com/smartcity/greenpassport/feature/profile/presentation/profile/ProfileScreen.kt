@@ -41,7 +41,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.ListSection
 import com.smartcity.greenpassport.core.designsystem.component.ListSectionRow
@@ -60,6 +59,7 @@ import com.smartcity.greenpassport.core.model.settings.AppLanguage
 import com.smartcity.greenpassport.core.model.settings.AppTheme
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.profile.R
+import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun ProfileScreen(

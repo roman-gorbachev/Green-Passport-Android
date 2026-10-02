@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpCloseButton
@@ -45,6 +45,7 @@ import com.smartcity.greenpassport.feature.games.presentation.web.state.GameWebU
 import com.smartcity.greenpassport.feature.games.presentation.web.state.gameUrl
 import com.smartcity.greenpassport.feature.games.presentation.web.viewmodels.GameWebViewModel
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 import com.smartcity.greenpassport.core.R as CoreR
 
 private const val BANNER_VISIBLE_MILLIS = 2_000L
@@ -123,7 +124,7 @@ private fun RewardBanner(
     LaunchedEffect(uiState.rewardCount) {
         if (uiState.rewardCount == 0) return@LaunchedEffect
         isVisible = true
-        delay(BANNER_VISIBLE_MILLIS)
+        delay(BANNER_VISIBLE_MILLIS.milliseconds)
         isVisible = false
     }
     if (!isVisible) return

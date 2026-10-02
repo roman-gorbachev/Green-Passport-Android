@@ -32,7 +32,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.common.formatEventDate
 import com.smartcity.greenpassport.core.common.formatEventTime
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
@@ -46,6 +45,7 @@ import com.smartcity.greenpassport.feature.calendar.R
 import com.smartcity.greenpassport.feature.calendar.presentation.state.EventDetailUiState
 import com.smartcity.greenpassport.feature.calendar.presentation.state.checkInFailureMessageRes
 import com.smartcity.greenpassport.feature.calendar.presentation.viewmodels.EventDetailViewModel
+import com.smartcity.greenpassport.core.R as CoreR
 
 private const val EVENT_IMAGE_ASPECT_RATIO = 1.5f
 

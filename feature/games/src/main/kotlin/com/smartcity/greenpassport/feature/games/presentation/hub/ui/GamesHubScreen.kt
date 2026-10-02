@@ -14,7 +14,6 @@ import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
@@ -22,6 +21,7 @@ import com.smartcity.greenpassport.core.designsystem.layout.plus
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.feature.games.R
 import com.smartcity.greenpassport.feature.games.presentation.hub.viewmodels.GamesHubViewModel
+import com.smartcity.greenpassport.core.R as CoreR
 
 private const val COLUMN_COUNT = 2
 

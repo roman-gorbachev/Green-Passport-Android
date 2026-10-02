@@ -24,7 +24,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
@@ -42,6 +41,7 @@ import com.smartcity.greenpassport.feature.shop.presentation.state.couponStatusT
 import com.smartcity.greenpassport.feature.shop.presentation.state.couponsEmptyMessageRes
 import com.smartcity.greenpassport.feature.shop.presentation.state.couponsTabLabelRes
 import com.smartcity.greenpassport.feature.shop.presentation.viewmodels.CouponsViewModel
+import com.smartcity.greenpassport.core.R as CoreR
 
 private const val TITLE_MAX_LINES = 2
 

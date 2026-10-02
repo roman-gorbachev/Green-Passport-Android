@@ -8,11 +8,11 @@ import com.smartcity.greenpassport.core.datasource.remote.localizedText
 import com.smartcity.greenpassport.core.model.Coupon
 import com.smartcity.greenpassport.core.model.Reward
 import com.smartcity.greenpassport.core.model.ShopRepository
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 private const val FIELD_TITLE = "title"
 private const val FIELD_PARTNER_NAME = "partnerName"

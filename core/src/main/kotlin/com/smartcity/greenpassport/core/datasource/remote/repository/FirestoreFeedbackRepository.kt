@@ -7,8 +7,8 @@ import com.smartcity.greenpassport.core.datasource.remote.localizedText
 import com.smartcity.greenpassport.core.datasource.remote.localizedTextList
 import com.smartcity.greenpassport.core.model.FeedbackRepository
 import com.smartcity.greenpassport.core.model.SurveyQuestion
-import javax.inject.Inject
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
 private const val SURVEY_QUERY_LIMIT = 1L
 
@@ -39,6 +39,8 @@ class FirestoreFeedbackRepository @Inject constructor(
 
 private fun DocumentSnapshot.toSurveyQuestion(): SurveyQuestion? {
     val question = localizedText(FIELD_QUESTION, FIELD_QUESTIONS) ?: return null
-    val options = localizedTextList(FIELD_OPTIONS, FIELD_OPTION_LISTS)?.takeIf { it.fallback.isNotEmpty() } ?: return null
+    val options = localizedTextList(FIELD_OPTIONS, FIELD_OPTION_LISTS)
+        ?.takeIf { it.fallback.isNotEmpty() }
+        ?: return null
     return SurveyQuestion(id = id, question = question, options = options)
 }

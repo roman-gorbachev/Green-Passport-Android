@@ -8,9 +8,6 @@ import com.smartcity.greenpassport.feature.calendar.domain.ObserveEventsUseCase
 import com.smartcity.greenpassport.feature.calendar.presentation.state.CalendarSelection
 import com.smartcity.greenpassport.feature.calendar.presentation.state.CalendarUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDate
-import java.time.YearMonth
-import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +20,9 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import java.time.LocalDate
+import java.time.YearMonth
+import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel

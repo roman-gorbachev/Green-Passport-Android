@@ -9,11 +9,11 @@ import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.core.model.TaskCategory
 import com.smartcity.greenpassport.core.model.TasksRepository
 import com.smartcity.greenpassport.core.model.verification.TaskVerification
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 private const val FIELD_TITLE = "title"
 private const val FIELD_DESCRIPTION = "description"

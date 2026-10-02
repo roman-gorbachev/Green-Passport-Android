@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.ListRowContent
@@ -24,6 +23,7 @@ import com.smartcity.greenpassport.core.model.HistoryEntry
 import com.smartcity.greenpassport.feature.profile.R
 import java.text.DateFormat
 import java.util.Date
+import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun HistoryScreen(

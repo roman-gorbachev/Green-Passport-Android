@@ -46,7 +46,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.common.resolveForDeviceLanguage
 import com.smartcity.greenpassport.core.designsystem.component.ChoiceCapsule
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
@@ -67,6 +66,7 @@ import com.smartcity.greenpassport.feature.map.MapKitInitializer
 import com.smartcity.greenpassport.feature.map.R
 import com.smartcity.greenpassport.feature.map.presentation.state.MapUiState
 import com.smartcity.greenpassport.feature.map.presentation.viewmodels.MapViewModel
+import com.smartcity.greenpassport.core.R as CoreR
 
 @Composable
 fun MapScreen(

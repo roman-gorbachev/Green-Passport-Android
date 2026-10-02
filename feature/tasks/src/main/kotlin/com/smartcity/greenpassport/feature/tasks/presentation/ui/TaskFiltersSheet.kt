@@ -230,7 +230,9 @@ private fun CityRow(
 
 @Composable
 fun cityLabel(city: TaskCityFilter, profileCity: String?): String = when (city) {
-    TaskCityFilter.ProfileCity -> profileCity?.takeIf { it.isNotBlank() }?.let { cityName(it) } ?: stringResource(R.string.my_city)
+    TaskCityFilter.ProfileCity -> profileCity?.takeIf {
+        it.isNotBlank()
+    }?.let { cityName(it) } ?: stringResource(R.string.my_city)
     TaskCityFilter.All -> stringResource(R.string.all_cities)
     is TaskCityFilter.City -> cityName(city.name)
 }
