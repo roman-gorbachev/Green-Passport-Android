@@ -104,10 +104,8 @@ fun YandexMap(
             FilledTonalIconButton(
                 onClick = {
                     val target = userLocationLayer.cameraPosition()?.target
-                        ?: focus?.point?.let { Point(it.latitude, it.longitude) }
-                    if (target != null) {
-                        mapView.mapWindow.map.move(CameraPosition(target, USER_ZOOM, DEFAULT_AZIMUTH, DEFAULT_TILT))
-                    }
+                        ?: focus.point.let { Point(it.latitude, it.longitude) }
+                    mapView.mapWindow.map.move(CameraPosition(target, USER_ZOOM, DEFAULT_AZIMUTH, DEFAULT_TILT))
                 },
                 colors = IconButtonDefaults.filledTonalIconButtonColors(
                     containerColor = MaterialTheme.colorScheme.surface,
