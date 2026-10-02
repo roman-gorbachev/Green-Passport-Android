@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Star
@@ -30,6 +31,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import com.smartcity.greenpassport.core.R
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
@@ -37,6 +39,7 @@ import com.smartcity.greenpassport.core.model.Level
 
 private const val TRACK_ALPHA = 0.22f
 private const val CAPTION_ALPHA = 0.8f
+private val BUBBLE_MIN_FONT_SIZE = 9.sp
 
 @Composable
 fun ProgressHeroCard(
@@ -195,6 +198,11 @@ private fun SpeechBubble(
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface,
         textAlign = TextAlign.Center,
+        maxLines = 1,
+        autoSize = TextAutoSize.StepBased(
+            minFontSize = BUBBLE_MIN_FONT_SIZE,
+            maxFontSize = MaterialTheme.typography.labelSmall.fontSize,
+        ),
         modifier = modifier
             .widthIn(max = Dimens.SpeechBubbleMaxWidth)
             .background(

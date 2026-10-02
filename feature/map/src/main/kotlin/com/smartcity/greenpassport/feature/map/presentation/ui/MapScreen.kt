@@ -42,7 +42,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,7 +55,6 @@ import com.smartcity.greenpassport.core.designsystem.component.GpSearchField
 import com.smartcity.greenpassport.core.designsystem.component.GpSheetScaffold
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.ScreenHeader
-import com.smartcity.greenpassport.core.designsystem.component.SheetDialogProperties
 import com.smartcity.greenpassport.core.designsystem.component.SymbolTile
 import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
@@ -270,52 +268,50 @@ private fun MapPointSheet(
     onToggleSaved: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    Dialog(onDismissRequest = onDismiss, properties = SheetDialogProperties) {
-        GpSheetScaffold(onDismiss = onDismiss) {
-            Text(
-                text = point.name.localized(),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface,
+    GpSheetScaffold(onDismiss = onDismiss) {
+        Text(
+            text = point.name.localized(),
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+            text = stringResource(mapPointTypeLabelRes(point.type)),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(top = Dimens.SpacingExtraSmall),
+        )
+        Text(
+            text = point.address.localized(),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = Dimens.SpacingSmall),
+        )
+        val context = LocalContext.current
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingCompact),
+            modifier = Modifier.padding(top = Dimens.SpacingLarge),
+        ) {
+            GpPrimaryButton(
+                text = stringResource(R.string.build_route),
+                onClick = { openRoute(context, point) },
+                modifier = Modifier.weight(1f),
             )
-            Text(
-                text = stringResource(mapPointTypeLabelRes(point.type)),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(top = Dimens.SpacingExtraSmall),
-            )
-            Text(
-                text = point.address.localized(),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = Dimens.SpacingSmall),
-            )
-            val context = LocalContext.current
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingCompact),
-                modifier = Modifier.padding(top = Dimens.SpacingLarge),
+            FilledTonalButton(
+                onClick = onToggleSaved,
+                shape = RoundedCornerShape(Dimens.CornerRadiusPill),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(Dimens.PrimaryButtonHeight),
             ) {
-                GpPrimaryButton(
-                    text = stringResource(R.string.build_route),
-                    onClick = { openRoute(context, point) },
-                    modifier = Modifier.weight(1f),
+                Icon(
+                    imageVector = if (isSaved) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = Dimens.SpacingSmall),
                 )
-                FilledTonalButton(
-                    onClick = onToggleSaved,
-                    shape = RoundedCornerShape(Dimens.CornerRadiusPill),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(Dimens.PrimaryButtonHeight),
-                ) {
-                    Icon(
-                        imageVector = if (isSaved) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = Dimens.SpacingSmall),
-                    )
-                    Text(
-                        text = stringResource(if (isSaved) R.string.saved else R.string.save),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                }
+                Text(
+                    text = stringResource(if (isSaved) R.string.saved else R.string.save),
+                    style = MaterialTheme.typography.labelLarge,
+                )
             }
         }
     }

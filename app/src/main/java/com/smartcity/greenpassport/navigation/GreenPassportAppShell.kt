@@ -1,20 +1,14 @@
 package com.smartcity.greenpassport.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.smartcity.greenpassport.core.designsystem.component.GpBottomBar
-import com.smartcity.greenpassport.core.designsystem.theme.Dimens
+import com.smartcity.greenpassport.core.designsystem.component.GlassBottomBarLayout
 import com.smartcity.greenpassport.core.navigation.TopLevelDestination
 
 @Composable
@@ -26,18 +20,13 @@ fun GreenPassportAppShell(modifier: Modifier = Modifier) {
     }
     val visibleTab = currentTab ?: previousTabUnderDialog(navController)
 
-    Box(modifier = modifier.fillMaxSize()) {
+    GlassBottomBarLayout(
+        selected = visibleTab,
+        onSelect = { tab -> navController.navigateToTopLevel(tab) },
+        modifier = modifier,
+        isOpaque = visibleTab == TopLevelDestination.MAP,
+    ) {
         AppNavHost(navController = navController)
-        if (visibleTab != null) {
-            GpBottomBar(
-                selected = visibleTab,
-                onSelect = { tab -> navController.navigateToTopLevel(tab) },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-                    .padding(Dimens.BottomBarOuterPadding),
-            )
-        }
     }
 }
 

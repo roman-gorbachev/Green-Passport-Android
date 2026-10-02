@@ -64,9 +64,10 @@ fun TaskFiltersSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        dragHandle = null,
         containerColor = MaterialTheme.colorScheme.background,
     ) {
-        Column {
+        Column(modifier = Modifier.padding(top = Dimens.SpacingMedium)) {
             SheetHeader(canReset = draft != TaskFilters(), onReset = { draft = TaskFilters() })
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(Dimens.SpacingLarge),

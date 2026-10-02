@@ -22,10 +22,9 @@ object Dimens {
     val IconSizeLarge = 40.dp
     val IconSizeExtraLarge = 48.dp
 
-    val BottomBarHeight = 60.dp
+    val BottomBarHeight = 64.dp
     val BottomBarOuterPadding = 12.dp
-    val BottomBarElevation = 12.dp
-    val BottomBarSelectedSize = 44.dp
+    val BottomBarElevation = 8.dp
     val BottomBarReservedHeight = BottomBarHeight + BottomBarOuterPadding + SpacingSmall
     val CardElevation = 2.dp
     val ButtonElevation = 2.dp
@@ -67,9 +66,6 @@ object Dimens {
     val HeroMascotSize = 200.dp
     val PrimaryButtonHeight = 50.dp
     val SheetContentPadding = 20.dp
-    val SheetHandleWidth = 36.dp
-    val SheetHandleHeight = 4.dp
-    val SheetDragZoneHeight = 28.dp
 
     val CornerRadiusExtraSmall = 8.dp
     val CornerRadiusSmall = 10.dp
