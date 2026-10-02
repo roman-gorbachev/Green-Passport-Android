@@ -2,6 +2,5 @@
     <string name="games_best_score_format">Best: %1$d</string>
     <string name="no_internet_for_points_msg">You need an internet connection to get points</string>
     <string name="streak_bonus_msg">+%1$d pts for your streak</string>
-    <string name="close">Close</string>
     <string name="something_went_wrong_msg">Something went wrong. Please try again</string>
 </resources>

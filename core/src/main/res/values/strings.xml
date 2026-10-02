@@ -11,6 +11,7 @@
     <string name="error_generic_message">Не удалось загрузить данные. Проверьте соединение и попробуйте снова</string>
     <string name="retry_button">Повторить</string>
     <string name="back">Назад</string>
+    <string name="close">Закрыть</string>
     <string name="home">Главная</string>
     <string name="shop">Магазин</string>
     <string name="map">Карта</string>

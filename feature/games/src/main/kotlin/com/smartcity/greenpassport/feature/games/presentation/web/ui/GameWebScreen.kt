@@ -4,19 +4,19 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +35,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
+import com.smartcity.greenpassport.core.designsystem.component.GpCloseButton
 import com.smartcity.greenpassport.core.designsystem.component.PointsChip
+import com.smartcity.greenpassport.core.designsystem.component.ScreenHeader
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.rewards.RewardFailure
 import com.smartcity.greenpassport.feature.games.R
@@ -69,45 +71,44 @@ fun GameWebScreen(
             .background(MaterialTheme.colorScheme.background),
     ) {
         val game = uiState.game
-        when {
-            hasPageError || uiState.isGameMissing && game == null -> ErrorContent(
-                message = stringResource(CoreR.string.error_generic_message),
-                retryLabel = stringResource(CoreR.string.retry_button),
-                onRetry = {
-                    hasPageError = false
-                    reloadId++
-                },
+        Column(modifier = Modifier.fillMaxSize()) {
+            ScreenHeader(
+                title = game?.title(language).orEmpty(),
+                navigationButton = { GpCloseButton(onClick = onClose) },
             )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
+                    ),
+            ) {
+                when {
+                    hasPageError || uiState.isGameMissing && game == null -> ErrorContent(
+                        message = stringResource(CoreR.string.error_generic_message),
+                        retryLabel = stringResource(CoreR.string.retry_button),
+                        onRetry = {
+                            hasPageError = false
+                            reloadId++
+                        },
+                    )
 
-            game != null -> key(reloadId) {
-                GameWebView(
-                    url = gameUrl(game, language, isDark),
-                    onFinish = viewModel::onFinish,
-                    onClose = onClose,
-                    onLoadingChange = { isPageLoading = it },
-                    onFailure = { hasPageError = true },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .safeDrawingPadding(),
-                )
+                    game != null -> key(reloadId) {
+                        GameWebView(
+                            url = gameUrl(game, language, isDark),
+                            onFinish = viewModel::onFinish,
+                            onClose = onClose,
+                            onLoadingChange = { isPageLoading = it },
+                            onFailure = { hasPageError = true },
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
+                }
+                if (isPageLoading && !hasPageError) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
             }
-        }
-        if (isPageLoading && !hasPageError) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
-        FilledTonalIconButton(
-            onClick = onClose,
-            colors = IconButtonDefaults.filledTonalIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-            ),
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .statusBarsPadding()
-                .padding(Dimens.SpacingSmall)
-                .size(Dimens.BackButtonSize),
-        ) {
-            Icon(imageVector = Icons.Filled.Close, contentDescription = stringResource(R.string.close))
         }
         RewardBanner(uiState = uiState, modifier = Modifier.align(Alignment.TopCenter))
     }

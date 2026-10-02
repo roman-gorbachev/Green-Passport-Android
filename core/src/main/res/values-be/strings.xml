@@ -11,6 +11,7 @@
     <string name="error_generic_message">Не ўдалося загрузіць даныя. Праверце злучэнне і паспрабуйце зноў</string>
     <string name="retry_button">Паўтарыць</string>
     <string name="back">Назад</string>
+    <string name="close">Закрыць</string>
     <string name="home">Галоўная</string>
     <string name="shop">Крама</string>
     <string name="map">Карта</string>

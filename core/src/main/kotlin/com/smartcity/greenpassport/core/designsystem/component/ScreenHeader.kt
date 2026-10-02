@@ -26,6 +26,7 @@ fun ScreenHeader(
     title: String,
     modifier: Modifier = Modifier,
     onNavigateBack: (() -> Unit)? = null,
+    navigationButton: @Composable () -> Unit = { onNavigateBack?.let { GpBackButton(onClick = it) } },
     actions: @Composable () -> Unit = {},
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -42,9 +43,7 @@ fun ScreenHeader(
                 ),
         ) {
             Box(modifier = Modifier.size(Dimens.BackButtonSize)) {
-                if (onNavigateBack != null) {
-                    GpBackButton(onClick = onNavigateBack)
-                }
+                navigationButton()
             }
             Text(
                 text = title,
