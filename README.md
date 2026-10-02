@@ -4,10 +4,13 @@ A mobile app that turns everyday eco-friendly actions into points and real rewar
 
 Users complete eco tasks (recycling, cleanups, giving up single-use items), join local events, read eco tips, and play themed mini-games — earning points and XP along the way. Points are redeemed for discounts and coupons from partners.
 
+Content, moderation, QR codes and partner coupons are managed in the [web admin panel](https://github.com/roman-gorbachev/greenpassport-admin); the [iOS app](https://github.com/roman-gorbachev/Green-Passport-iOS) shares the same backend and UX. This repository also holds that backend: security rules, indexes and Cloud Functions.
+
 ## Stack
 
 - **Kotlin + Jetpack Compose**, Material 3
-- **Firebase**: Auth, Cloud Firestore, Storage, Cloud Messaging
+- **Firebase**: Auth, Cloud Firestore, Storage, Cloud Messaging, Hosting
+- **Cloud Functions** (TypeScript, `functions/`) — everything that changes points, QR codes, coupons and staff roles
 - **Hilt** (DI), **KSP** (annotation processing — kapt is not used)
 - **Room** — for data that genuinely doesn't belong in Firestore (e.g. local mini-game progress)
 - **Jetpack Navigation Compose** with type-safe routes (`kotlinx.serialization`)
@@ -15,7 +18,7 @@ Users complete eco tasks (recycling, cleanups, giving up single-use items), join
 
 ## Features
 
-Tasks · Rewards shop · Event calendar · Map of recycling points · Community (forum, groups) · Eco tips · Mini-games (waste sorting, maze, quiz, memory match) · Profile (achievements, card collection, history, favorites) · Feedback and surveys
+Tasks (self-reported, photo or QR) · Rewards shop and coupons · Event calendar with QR check-in · Map of recycling points · Community (forum, groups) · Eco tips · Web mini-games (`games/`, ten HTML5 games in a WebView) · Profile (achievements, history, favorites) · Feedback and surveys · Moderation
 
 ## Build & run
 
@@ -46,8 +49,11 @@ On Windows PowerShell, use `gradlew.bat` instead of `./gradlew` — it wraps the
 :feature:community       — forum and groups
 :feature:ecotips         — eco tips
 :feature:feedback        — reviews and surveys
-:feature:games           — mini-games
+:feature:games           — web mini-games
+:feature:moderation      — task photos and reported posts
 ```
+
+Outside the Gradle build: `functions/` (Cloud Functions), `rules-tests/` (security rules tests), `scripts/` (seed and maintenance scripts), `games/` (the web games served by Firebase Hosting).
 
 `:core` doesn't depend on any feature; every `:feature:<name>` depends only on `:core`. Inside each module, code is split into `domain` (use cases) and `presentation` (Compose screens and ViewModels) packages.
 
@@ -79,11 +85,27 @@ The app talks to the Firebase project `chatroom-85fb8` (see `.firebaserc`). Unti
 
    Points are awarded and spent only by Cloud Functions (`functions/`, region `europe-central2`); the rules forbid the app
    from writing `availablePoints`/`lifetimeXp`.
-5. Make yourself a moderator: `node scripts/seed-firestore.js --only=none --admin=<your uid>` (uid from Authentication).
-   Moderators see "Moderation" in the profile: the task photo queue and reported posts.
-6. Seed the demo data: `cd scripts && npm install && node seed-firestore.js` (see `scripts/README.md`).
+5. Make yourself a super admin: `cd scripts && npm install && node seed-firestore.js --only=none --admin=<your uid>` (uid from Authentication).
+   Other staff roles and partner accounts are then granted in the web admin panel. Every staff member also sees "Moderation" in the app profile.
+6. Seed the demo data: `node seed-firestore.js` from `scripts/` (see `scripts/README.md`). Once content is edited in the admin panel, seed only with `--only-missing`, otherwise the edits are overwritten.
+
+Tests for the backend:
+
+```bash
+cd functions && npm test && cd ..
+firebase emulators:exec --only firestore,storage "npm --prefix rules-tests test"
+firebase emulators:exec --only auth,firestore,functions,storage "npm --prefix functions run test:integration"
+```
 
 ## Known limitations of the pilot
 
-- **Map** uses Yandex MapKit. Put `YANDEX_MAPKIT_API_KEY=<key>` into `local.properties` (key from the Yandex developer console, product "MapKit Mobile SDK"). Without a key the Map tab falls back to a list of points. **Route building** isn't implemented.
+- **Map** uses Yandex MapKit. Put `YANDEX_MAPKIT_API_KEY=<key>` into `local.properties` (key from the Yandex developer console, product "MapKit Mobile SDK"). Without a key the Map tab falls back to a list of points. "Route" opens the system maps app.
 - Firestore demo data (tasks, rewards, map points, events, eco tips) can be seeded with `scripts/seed-firestore.js` — see `scripts/README.md`.
+
+## License
+
+Proprietary. Copyright (c) 2026 Roman Gorbachev. All rights reserved. See [LICENSE](LICENSE).
+
+## Author
+
+Roman Gorbachev
