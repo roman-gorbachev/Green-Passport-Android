@@ -12,4 +12,8 @@
     <string name="profile">Профіль</string>
     <string name="date_time_place">%1$s · %2$s · %3$s</string>
     <string name="all">Усе →</string>
+    <string name="streak_today_counted">Сёння ўжо залічаны</string>
+    <string name="streak_today_pending">Зрабіце адно эка-дзеянне сёння, каб не страціць серыю</string>
+    <string name="streak_bonus_today">Сёння — бонус +35 за 7-ы дзень</string>
+    <string name="streak_rule">Першая актыўнасць дня дае +5 ачкоў, кожны 7-ы дзень запар — яшчэ +35</string>
 </resources>

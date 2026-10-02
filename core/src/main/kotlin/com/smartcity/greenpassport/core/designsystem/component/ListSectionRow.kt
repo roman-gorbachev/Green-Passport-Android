@@ -7,6 +7,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 
@@ -16,6 +17,7 @@ fun ListSectionRow(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
+    titleColor: Color = Color.Unspecified,
     leading: (@Composable () -> Unit)? = null,
     trailing: @Composable () -> Unit = { ListRowChevron() },
     showDivider: Boolean = false,
@@ -23,6 +25,7 @@ fun ListSectionRow(
     Column(modifier = modifier) {
         ListRowContent(
             title = title,
+            titleColor = titleColor,
             subtitle = subtitle,
             leading = leading,
             trailing = trailing,

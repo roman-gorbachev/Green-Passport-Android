@@ -12,4 +12,8 @@
     <string name="profile">Профиль</string>
     <string name="date_time_place">%1$s · %2$s · %3$s</string>
     <string name="all">Все →</string>
+    <string name="streak_today_counted">Сегодня уже засчитан</string>
+    <string name="streak_today_pending">Сделайте одно эко-действие сегодня, чтобы не потерять серию</string>
+    <string name="streak_bonus_today">Сегодня — бонус +35 за 7-й день</string>
+    <string name="streak_rule">Первая активность дня даёт +5 очков, каждый 7-й день подряд — ещё +35</string>
 </resources>

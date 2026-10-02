@@ -166,6 +166,7 @@ private fun ProfileContent(
             ListSection {
                 ListSectionRow(
                     title = stringResource(R.string.profile_sign_out),
+                    titleColor = MaterialTheme.colorScheme.error,
                     leading = {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout,

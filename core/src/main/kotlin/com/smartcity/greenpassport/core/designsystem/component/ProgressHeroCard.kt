@@ -24,7 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.smartcity.greenpassport.core.R
@@ -41,10 +44,12 @@ fun ProgressHeroCard(
     modifier: Modifier = Modifier,
     level: Level? = null,
     streakDays: Int = 0,
+    onClick: (() -> Unit)? = null,
 ) {
     val onPrimary = MaterialTheme.colorScheme.onPrimary
 
     GpSurfaceCard(
+        onClick = onClick,
         color = MaterialTheme.colorScheme.primary,
         modifier = modifier
             .fillMaxWidth()
@@ -145,11 +150,6 @@ private fun ProgressSummary(
                     .padding(top = Dimens.SpacingSmall)
                     .height(Dimens.ProgressBarHeight),
             )
-            Text(
-                text = stringResource(R.string.xp_progress, level.currentXp, level.xpForNextLevel),
-                style = MaterialTheme.typography.labelSmall,
-                color = onPrimary.copy(alpha = CAPTION_ALPHA),
-            )
         }
     }
 }
@@ -162,10 +162,12 @@ private fun StreakCapsule(
     days: Int,
     modifier: Modifier = Modifier,
 ) {
+    val description = pluralStringResource(R.plurals.streak_days_in_row, days, days)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
         modifier = modifier
+            .semantics(mergeDescendants = true) { contentDescription = description }
             .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(Dimens.CornerRadiusPill))
             .padding(horizontal = Dimens.SpacingSmall, vertical = Dimens.SpacingHairline),
     ) {
@@ -176,7 +178,7 @@ private fun StreakCapsule(
             modifier = Modifier.size(Dimens.IconSizeExtraSmall),
         )
         Text(
-            text = stringResource(R.string.streak_days, days),
+            text = days.toString(),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSecondary,
         )

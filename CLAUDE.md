@@ -35,7 +35,7 @@ Module graph: `:app` → `:core` + every `:feature:<name>`; each `:feature:<name
 - `datasource/remote/FirestoreCollections.kt`: the single source of collection paths. Every collection lives under `apps/greenpassport/…`, not at the Firestore root.
 - `datasource/local/`: the Room DB (`GreenPassportDatabase`), DAOs, entities and `Room*Repository`.
 - `di/`: Hilt modules. Bind each new repository implementation to its interface here (`RemoteDataSourceModule`, `FirestoreModule`, `LocalModule`, etc.).
-- `auth/`: `AuthRepository` / `AuthSession` (Firebase Auth wrapper). `messaging/`: FCM, notification workers (WorkManager). `datastore/`: DataStore preferences.
+- `auth/`: `AuthRepository` / `AuthSession` (Firebase Auth wrapper). `messaging/`: FCM, notification workers (WorkManager). Event and coupon workers log to the notification log when they fire; `StreakReminderWorker` (unique work `streak_reminder`, 20:00 Europe/Minsk) does not, because `UpdateStreakReminderUseCase` in `:feature:home` re-plans or cancels it on every streak update. `datastore/`: DataStore preferences.
 - `navigation/Destination.kt`: **all** type-safe routes (`@Serializable` objects and data classes in one sealed interface). `NotificationDeepLink` maps pushes to destinations.
 - `designsystem/`: theme and shared Compose components. `common/`: the `Result`/`resultOf`, `UiState` and `DispatcherProvider` helpers.
 

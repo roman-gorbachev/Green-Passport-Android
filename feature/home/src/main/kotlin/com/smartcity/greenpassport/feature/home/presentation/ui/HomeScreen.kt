@@ -22,7 +22,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLocale
@@ -32,6 +35,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.common.formatEventDate
 import com.smartcity.greenpassport.core.common.formatEventTime
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
@@ -51,6 +55,7 @@ import com.smartcity.greenpassport.core.designsystem.text.cityName
 import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.EcoEvent
+import com.smartcity.greenpassport.core.model.Streak
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.home.R
@@ -59,8 +64,8 @@ import com.smartcity.greenpassport.feature.home.presentation.state.HomeUiState
 import com.smartcity.greenpassport.feature.home.presentation.viewmodels.HomeViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.temporal.WeekFields
 import java.util.Locale
-import com.smartcity.greenpassport.core.R as CoreR
 
 private const val TODAY_PATTERN = "EEEE, d MMM"
 private const val TASK_PLACEHOLDER_COUNT = 3
@@ -107,6 +112,14 @@ private fun HomeContent(
     modifier: Modifier = Modifier,
 ) {
     val systemBars = WindowInsets.systemBars.asPaddingValues()
+    val locale = LocalLocale.current.platformLocale
+    var isStreakSheetOpen by rememberSaveable { mutableStateOf(false) }
+    if (isStreakSheetOpen) {
+        StreakSheet(
+            summary = Streak.summary(uiState.streak, System.currentTimeMillis(), WeekFields.of(locale).firstDayOfWeek),
+            onDismiss = { isStreakSheetOpen = false },
+        )
+    }
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -135,6 +148,7 @@ private fun HomeContent(
                     points = uiState.points,
                     level = uiState.level,
                     streakDays = uiState.streakDays,
+                    onClick = { isStreakSheetOpen = true },
                     modifier = Modifier.screenPadding(),
                 )
             }

@@ -2,6 +2,7 @@ package com.smartcity.greenpassport.feature.home.presentation.state
 
 import com.smartcity.greenpassport.core.model.EcoEvent
 import com.smartcity.greenpassport.core.model.Level
+import com.smartcity.greenpassport.core.model.Streak
 import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 
@@ -14,5 +15,8 @@ data class HomeUiState(
     val level: Level? = null,
     val upcomingEvent: EcoEvent? = null,
     val tasks: List<Task> = emptyList(),
-    val streakDays: Int = 0,
-)
+    val streak: Streak? = null,
+) {
+    val streakDays: Int
+        get() = streak?.currentCount(System.currentTimeMillis()) ?: 0
+}

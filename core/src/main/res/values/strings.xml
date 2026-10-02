@@ -16,13 +16,11 @@
     <string name="shop">Магазин</string>
     <string name="map">Карта</string>
     <string name="favorites">Избранное</string>
-    <string name="xp_progress">%1$d / %2$d оч.</string>
     <string name="points_reward">+%1$d оч.</string>
     <string name="level">Уровень %1$d</string>
     <string name="your_balance">Твой баланс</string>
     <string name="points_count">%1$d оч.</string>
     <string name="xp_left_to_level">Ещё %1$d оч. до ур. %2$d</string>
-    <string name="streak_days">%1$d дн. подряд</string>
     <string name="cancel">Отмена</string>
     <string name="coupon_expires_soon">Купон скоро истечёт</string>
     <string name="coupon_valid_until_tomorrow_msg">«%1$s» действует до завтра</string>
@@ -40,4 +38,18 @@
     <string name="city_mozyr">Мозырь</string>
     <string name="watch_video">Смотреть видео</string>
     <string name="read_minutes_format">%1$d мин чтения</string>
+    <string name="streak_reminder_title">Серия под угрозой 🔥</string>
+    <string name="streak_reminder_body">Серия: %1$d дн. подряд. Сделайте одно эко-действие до конца дня</string>
+    <plurals name="streak_days_in_row">
+        <item quantity="one">%d день подряд</item>
+        <item quantity="few">%d дня подряд</item>
+        <item quantity="many">%d дней подряд</item>
+        <item quantity="other">%d дня подряд</item>
+    </plurals>
+    <plurals name="streak_bonus_in_days">
+        <item quantity="one">До бонуса +35 — %d день</item>
+        <item quantity="few">До бонуса +35 — %d дня</item>
+        <item quantity="many">До бонуса +35 — %d дней</item>
+        <item quantity="other">До бонуса +35 — %d дня</item>
+    </plurals>
 </resources>

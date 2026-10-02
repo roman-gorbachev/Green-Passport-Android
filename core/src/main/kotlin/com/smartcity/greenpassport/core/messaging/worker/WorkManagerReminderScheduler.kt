@@ -52,9 +52,27 @@ class WorkManagerReminderScheduler @Inject constructor(
         )
     }
 
+    override fun scheduleStreakReminder(streakDays: Int, triggerAtEpochMillis: Long) {
+        val delayMillis = triggerAtEpochMillis - System.currentTimeMillis()
+        if (delayMillis <= 0) {
+            cancelStreakReminder()
+            return
+        }
+        val request = OneTimeWorkRequestBuilder<StreakReminderWorker>()
+            .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
+            .setInputData(workDataOf(StreakReminderWorker.KEY_STREAK_DAYS to streakDays))
+            .build()
+        WorkManager.getInstance(context).enqueueUniqueWork(STREAK_WORK_NAME, ExistingWorkPolicy.REPLACE, request)
+    }
+
+    override fun cancelStreakReminder() {
+        WorkManager.getInstance(context).cancelUniqueWork(STREAK_WORK_NAME)
+    }
+
     companion object {
         private const val COUPON_REMINDER_LEAD_MILLIS = 24 * 60 * 60 * 1000L
         private const val COUPON_WORK_PREFIX = "coupon_expiring_"
+        private const val STREAK_WORK_NAME = "streak_reminder"
     }
 }
 

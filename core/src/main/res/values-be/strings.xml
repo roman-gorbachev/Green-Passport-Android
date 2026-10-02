@@ -16,13 +16,11 @@
     <string name="shop">Крама</string>
     <string name="map">Карта</string>
     <string name="favorites">Абранае</string>
-    <string name="xp_progress">%1$d / %2$d ач.</string>
     <string name="points_reward">+%1$d ач.</string>
     <string name="level">Узровень %1$d</string>
     <string name="your_balance">Твой баланс</string>
     <string name="points_count">%1$d ач.</string>
     <string name="xp_left_to_level">Яшчэ %1$d ач. да ўзр. %2$d</string>
-    <string name="streak_days">%1$d дз. запар</string>
     <string name="cancel">Скасаваць</string>
     <string name="coupon_expires_soon">Купон хутка скончыцца</string>
     <string name="coupon_valid_until_tomorrow_msg">«%1$s» дзейнічае да заўтра</string>
@@ -40,4 +38,18 @@
     <string name="city_mozyr">Мазыр</string>
     <string name="watch_video">Глядзець відэа</string>
     <string name="read_minutes_format">%1$d хв чытання</string>
+    <string name="streak_reminder_title">Серыя пад пагрозай 🔥</string>
+    <string name="streak_reminder_body">Серыя: %1$d дз. запар. Зрабіце адно эка-дзеянне да канца дня</string>
+    <plurals name="streak_days_in_row">
+        <item quantity="one">%d дзень запар</item>
+        <item quantity="few">%d дні запар</item>
+        <item quantity="many">%d дзён запар</item>
+        <item quantity="other">%d дня запар</item>
+    </plurals>
+    <plurals name="streak_bonus_in_days">
+        <item quantity="one">Да бонусу +35 — %d дзень</item>
+        <item quantity="few">Да бонусу +35 — %d дні</item>
+        <item quantity="many">Да бонусу +35 — %d дзён</item>
+        <item quantity="other">Да бонусу +35 — %d дня</item>
+    </plurals>
 </resources>

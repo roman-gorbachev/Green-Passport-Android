@@ -12,4 +12,8 @@
     <string name="profile">Profile</string>
     <string name="date_time_place">%1$s · %2$s · %3$s</string>
     <string name="all">All →</string>
+    <string name="streak_today_counted">Today already counts</string>
+    <string name="streak_today_pending">Do one eco action today to keep your streak</string>
+    <string name="streak_bonus_today">Today you get +35 for the 7th day</string>
+    <string name="streak_rule">The first activity of the day gives +5 points, every 7th day in a row gives another +35</string>
 </resources>

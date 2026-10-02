@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.auth.AuthSession
 import com.smartcity.greenpassport.core.model.EcoEvent
 import com.smartcity.greenpassport.core.model.Level
+import com.smartcity.greenpassport.core.model.Streak
 import com.smartcity.greenpassport.core.model.Task
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import com.smartcity.greenpassport.core.model.profile.UserProfile
@@ -16,8 +17,10 @@ import com.smartcity.greenpassport.feature.home.domain.ObservePointsBalanceUseCa
 import com.smartcity.greenpassport.feature.home.domain.ObserveStreakUseCase
 import com.smartcity.greenpassport.feature.home.domain.ObserveUpcomingEventUseCase
 import com.smartcity.greenpassport.feature.home.domain.ObserveUserProfileUseCase
+import com.smartcity.greenpassport.feature.home.domain.UpdateStreakReminderUseCase
 import com.smartcity.greenpassport.feature.home.presentation.state.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -29,9 +32,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
-import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -43,6 +46,7 @@ class HomeViewModel @Inject constructor(
     private val observePointsBalance: ObservePointsBalanceUseCase,
     private val observeUserProfile: ObserveUserProfileUseCase,
     private val observeStreak: ObserveStreakUseCase,
+    private val updateStreakReminder: UpdateStreakReminderUseCase,
 ) : ViewModel() {
 
     private val retryRequests = MutableSharedFlow<Unit>(
@@ -89,12 +93,12 @@ class HomeViewModel @Inject constructor(
         val event = observeUpcomingEvent()
             .onStart { emit(null) }
             .catch { emit(null) }
-        val streakDays = observeStreak(session.userId)
-            .map { it?.currentCount(System.currentTimeMillis()) ?: 0 }
-            .onStart { emit(0) }
-            .catch { emit(0) }
-        val progress = combine(points, level, streakDays) { currentPoints, currentLevel, days ->
-            HomeProgress(points = currentPoints, level = currentLevel, streakDays = days)
+        val streak = observeStreak(session.userId)
+            .onEach { updateStreakReminder(it, System.currentTimeMillis()) }
+            .onStart { emit(null) }
+            .catch { emit(null) }
+        val progress = combine(points, level, streak) { currentPoints, currentLevel, currentStreak ->
+            HomeProgress(points = currentPoints, level = currentLevel, streak = currentStreak)
         }
         return combine(profile, tasks, progress, event) { currentProfile, tasksLoad, currentProgress, upcoming ->
             homeUiState(session, currentProfile, tasksLoad, currentProgress, upcoming)
@@ -114,7 +118,7 @@ class HomeViewModel @Inject constructor(
         avatar = profile?.avatar ?: AvatarStyle.LIME,
         points = progress.points ?: 0,
         level = progress.level,
-        streakDays = progress.streakDays,
+        streak = progress.streak,
         upcomingEvent = upcomingEvent,
         tasks = (tasks as? TasksLoad.Loaded)?.tasks.orEmpty(),
     )
@@ -122,7 +126,7 @@ class HomeViewModel @Inject constructor(
     private data class HomeProgress(
         val points: Int?,
         val level: Level?,
-        val streakDays: Int,
+        val streak: Streak?,
     )
 
     private sealed interface TasksLoad {

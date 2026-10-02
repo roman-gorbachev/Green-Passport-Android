@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.style.TextOverflow
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 
@@ -21,6 +23,7 @@ fun ListRowContent(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
+    titleColor: Color = Color.Unspecified,
     leading: (@Composable () -> Unit)? = null,
     trailing: @Composable () -> Unit = { ListRowChevron() },
 ) {
@@ -46,7 +49,7 @@ fun ListRowContent(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = titleColor.takeOrElse { MaterialTheme.colorScheme.onSurface },
                 maxLines = TITLE_MAX_LINES,
                 overflow = TextOverflow.Ellipsis,
             )
