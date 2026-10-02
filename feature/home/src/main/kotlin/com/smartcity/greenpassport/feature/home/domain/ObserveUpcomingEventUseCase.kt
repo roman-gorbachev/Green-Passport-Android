@@ -11,6 +11,6 @@ class ObserveUpcomingEventUseCase @Inject constructor(
 ) {
     operator fun invoke(): Flow<EcoEvent?> = eventsRepository.observeEvents().map { events ->
         val now = System.currentTimeMillis()
-        events.filter { it.startAtEpochMillis > now }.minByOrNull { it.startAtEpochMillis }
+        events.filter { it.isActive && it.startAtEpochMillis > now }.minByOrNull { it.startAtEpochMillis }
     }
 }

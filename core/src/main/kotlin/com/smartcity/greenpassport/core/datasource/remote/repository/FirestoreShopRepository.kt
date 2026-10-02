@@ -19,6 +19,8 @@ private const val FIELD_PARTNER_NAME = "partnerName"
 private const val FIELD_TITLES = "titles"
 private const val FIELD_PARTNER_NAMES = "partnerNames"
 private const val FIELD_POINTS_COST = "pointsCost"
+private const val FIELD_IMAGE_URL = "imageUrl"
+private const val FIELD_IS_ACTIVE = "isActive"
 
 private const val FIELD_USER_ID = "userId"
 private const val FIELD_REWARD_ID = "rewardId"
@@ -57,7 +59,14 @@ private fun DocumentSnapshot.toReward(): Reward? {
     val title = localizedText(FIELD_TITLE, FIELD_TITLES) ?: return null
     val partnerName = localizedText(FIELD_PARTNER_NAME, FIELD_PARTNER_NAMES) ?: return null
     val pointsCost = getLong(FIELD_POINTS_COST)?.toInt() ?: return null
-    return Reward(id = id, title = title, partnerName = partnerName, pointsCost = pointsCost)
+    return Reward(
+        id = id,
+        title = title,
+        partnerName = partnerName,
+        pointsCost = pointsCost,
+        imageUrl = getString(FIELD_IMAGE_URL),
+        isActive = getBoolean(FIELD_IS_ACTIVE) ?: true,
+    )
 }
 
 private fun DocumentSnapshot.toCoupon(): Coupon? {

@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.common.eventDay
 import com.smartcity.greenpassport.core.model.EcoEvent
-import com.smartcity.greenpassport.feature.calendar.domain.ObserveEventsUseCase
+import com.smartcity.greenpassport.feature.calendar.domain.ObserveActiveEventsUseCase
 import com.smartcity.greenpassport.feature.calendar.presentation.state.CalendarSelection
 import com.smartcity.greenpassport.feature.calendar.presentation.state.CalendarUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +27,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
-    private val observeEvents: ObserveEventsUseCase,
+    private val observeEvents: ObserveActiveEventsUseCase,
 ) : ViewModel() {
 
     private val retryRequests = MutableSharedFlow<Unit>(

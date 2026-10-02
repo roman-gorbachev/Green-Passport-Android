@@ -25,6 +25,7 @@ private const val FIELD_REWARD_POINTS = "rewardPoints"
 private const val FIELD_REWARD_XP = "rewardXp"
 private const val FIELD_IMAGE_URL = "imageUrl"
 private const val FIELD_VERIFICATION = "verification"
+private const val FIELD_IS_ACTIVE = "isActive"
 
 private const val FIELD_USER_ID = "userId"
 private const val FIELD_TASK_ID = "taskId"
@@ -69,5 +70,6 @@ private fun DocumentSnapshot.toTask(): Task? {
         imageUrl = getString(FIELD_IMAGE_URL),
         verification = TaskVerification.entries.firstOrNull { it.name == getString(FIELD_VERIFICATION) }
             ?: TaskVerification.SELF,
+        isActive = getBoolean(FIELD_IS_ACTIVE) ?: true,
     )
 }

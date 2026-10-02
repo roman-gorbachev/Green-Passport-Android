@@ -21,6 +21,7 @@ data class Task(
     val rewardXp: Int,
     val imageUrl: String?,
     val verification: TaskVerification = TaskVerification.SELF,
+    val isActive: Boolean = true,
 )
 
 interface TasksRepository {

@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.auth.AuthSession
 import com.smartcity.greenpassport.core.model.Coupon
 import com.smartcity.greenpassport.core.model.Reward
+import com.smartcity.greenpassport.core.model.rewards.RewardFailure
+import com.smartcity.greenpassport.core.model.rewards.RewardFailureException
 import com.smartcity.greenpassport.feature.shop.domain.ObservePurchasesUseCase
-import com.smartcity.greenpassport.feature.shop.domain.ObserveRewardsUseCase
+import com.smartcity.greenpassport.feature.shop.domain.ObserveRewardCatalogUseCase
 import com.smartcity.greenpassport.feature.shop.domain.ObserveShopPointsBalanceUseCase
 import com.smartcity.greenpassport.feature.shop.domain.ObserveShopSessionUseCase
 import com.smartcity.greenpassport.feature.shop.domain.PurchaseRewardUseCase
@@ -32,7 +34,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ShopViewModel @Inject constructor(
-    private val observeRewards: ObserveRewardsUseCase,
+    private val observeRewardCatalog: ObserveRewardCatalogUseCase,
     private val observePurchases: ObservePurchasesUseCase,
     private val observePointsBalance: ObserveShopPointsBalanceUseCase,
     private val purchaseReward: PurchaseRewardUseCase,
@@ -61,16 +63,17 @@ class ShopViewModel @Inject constructor(
     fun onPurchase(reward: Reward) {
         if (currentUserId == null || actions.value.purchasingRewardId != null) return
         if (uiState.value.points < reward.pointsCost) {
-            actions.update { it.copy(hasInsufficientPoints = true) }
+            actions.update { it.copy(purchaseFailure = RewardFailure.NOT_ENOUGH_POINTS) }
             return
         }
         viewModelScope.launch {
-            actions.update { it.copy(purchasingRewardId = reward.id, hasInsufficientPoints = false) }
+            actions.update { it.copy(purchasingRewardId = reward.id, purchaseFailure = null) }
             runCatching { purchaseReward(reward) }
                 .onSuccess { coupon -> actions.update { it.copy(purchasedCouponId = coupon.id) } }
                 .onFailure { error ->
                     Log.w(TAG, "Failed to purchase reward", error)
-                    actions.update { it.copy(hasInsufficientPoints = true) }
+                    val failure = (error as? RewardFailureException)?.failure ?: RewardFailure.UNKNOWN
+                    actions.update { it.copy(purchaseFailure = failure) }
                 }
             actions.update { it.copy(purchasingRewardId = null) }
         }
@@ -89,7 +92,7 @@ class ShopViewModel @Inject constructor(
         return combine(data, actions) { shopData, currentActions ->
             shopData.copy(
                 purchasingRewardId = currentActions.purchasingRewardId,
-                hasInsufficientPoints = currentActions.hasInsufficientPoints,
+                purchaseFailure = currentActions.purchaseFailure,
                 purchasedCouponId = currentActions.purchasedCouponId,
             )
         }
@@ -98,7 +101,7 @@ class ShopViewModel @Inject constructor(
     private fun observeShopData(userId: String?): Flow<ShopUiState> {
         val points = userId?.let { observePointsBalance(it).catch { emit(0) } } ?: flowOf(0)
         val purchases = userId?.let { observePurchases(it).catch { emit(emptyList<Coupon>()) } } ?: flowOf(emptyList())
-        return combine(observeRewards(), points, purchases) { rewards, currentPoints, currentPurchases ->
+        return combine(observeRewardCatalog(), points, purchases) { rewards, currentPoints, currentPurchases ->
             ShopUiState(
                 points = currentPoints,
                 rewards = rewards,
@@ -112,7 +115,7 @@ class ShopViewModel @Inject constructor(
 
     private data class ShopActions(
         val purchasingRewardId: String? = null,
-        val hasInsufficientPoints: Boolean = false,
+        val purchaseFailure: RewardFailure? = null,
         val purchasedCouponId: String? = null,
     )
 

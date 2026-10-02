@@ -29,4 +29,5 @@
     <string name="no_expired_coupons">Пратэрмінаваных купонаў няма</string>
     <string name="no_internet_connection">Няма падключэння да інтэрнэту</string>
     <string name="something_went_wrong_msg">Нешта пайшло не так. Паспрабуй яшчэ раз</string>
+    <string name="reward_sold_out">Купоны гэтай акцыі скончыліся</string>
 </resources>

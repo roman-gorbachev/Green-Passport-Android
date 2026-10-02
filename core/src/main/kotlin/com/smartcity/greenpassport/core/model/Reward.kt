@@ -7,6 +7,8 @@ data class Reward(
     val title: LocalizedText,
     val partnerName: LocalizedText,
     val pointsCost: Int,
+    val imageUrl: String? = null,
+    val isActive: Boolean = true,
 )
 
 data class Coupon(

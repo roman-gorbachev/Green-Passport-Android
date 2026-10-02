@@ -12,6 +12,6 @@ class GetBookmarkedTipsUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(userId: String): List<EcoTip> {
         val bookmarkedIds = favoritesRepository.observeBookmarkedTipIds(userId).first()
-        return ecoTipsRepository.getTips().filter { bookmarkedIds.contains(it.id) }
+        return ecoTipsRepository.getTips().filter { it.isActive && bookmarkedIds.contains(it.id) }
     }
 }

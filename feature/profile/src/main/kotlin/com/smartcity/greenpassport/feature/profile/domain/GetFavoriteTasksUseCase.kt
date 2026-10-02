@@ -12,6 +12,6 @@ class GetFavoriteTasksUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(userId: String): List<Task> {
         val favoriteIds = favoritesRepository.observeFavoriteTaskIds(userId).first()
-        return tasksRepository.getTasks().filter { favoriteIds.contains(it.id) }
+        return tasksRepository.getTasks().filter { it.isActive && favoriteIds.contains(it.id) }
     }
 }

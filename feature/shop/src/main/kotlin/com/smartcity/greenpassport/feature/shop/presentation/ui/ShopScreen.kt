@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,6 +35,7 @@ import com.smartcity.greenpassport.core.designsystem.component.ListSection
 import com.smartcity.greenpassport.core.designsystem.component.ListSectionDivider
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.LoadingLabel
+import com.smartcity.greenpassport.core.designsystem.component.NetworkImage
 import com.smartcity.greenpassport.core.designsystem.component.ProgressHeroCard
 import com.smartcity.greenpassport.core.designsystem.component.SectionHeader
 import com.smartcity.greenpassport.core.designsystem.component.SymbolTile
@@ -40,8 +43,10 @@ import com.smartcity.greenpassport.core.designsystem.layout.plus
 import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.Reward
+import com.smartcity.greenpassport.core.model.rewards.RewardFailure
 import com.smartcity.greenpassport.feature.shop.R
 import com.smartcity.greenpassport.feature.shop.presentation.state.ShopUiState
+import com.smartcity.greenpassport.feature.shop.presentation.state.purchaseFailureMessageRes
 import com.smartcity.greenpassport.feature.shop.presentation.viewmodels.ShopViewModel
 import com.smartcity.greenpassport.core.R as CoreR
 
@@ -131,7 +136,7 @@ private fun ShopContent(
         verticalArrangement = Arrangement.spacedBy(Dimens.SpacingLarge),
     ) {
         item {
-            BalanceCard(points = uiState.points, hasInsufficientPoints = uiState.hasInsufficientPoints)
+            BalanceCard(points = uiState.points, purchaseFailure = uiState.purchaseFailure)
         }
 
         item {
@@ -174,14 +179,14 @@ private fun ShopContent(
 @Composable
 private fun BalanceCard(
     points: Int,
-    hasInsufficientPoints: Boolean,
+    purchaseFailure: RewardFailure?,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         ProgressHeroCard(points = points)
-        if (hasInsufficientPoints) {
+        if (purchaseFailure != null) {
             Text(
-                text = stringResource(R.string.shop_insufficient_points),
+                text = stringResource(purchaseFailureMessageRes(purchaseFailure)),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = Dimens.SpacingSmall),
@@ -203,6 +208,16 @@ private fun RewardRow(
             .fillMaxWidth()
             .padding(horizontal = Dimens.CardPadding, vertical = Dimens.SpacingCompact),
     ) {
+        reward.imageUrl?.let { url ->
+            NetworkImage(
+                url = url,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(end = Dimens.SpacingCompact)
+                    .size(Dimens.RewardThumbnailSize)
+                    .clip(RoundedCornerShape(Dimens.CornerRadiusMedium)),
+            )
+        }
         Column(
             verticalArrangement = Arrangement.spacedBy(Dimens.SpacingHairline),
             modifier = Modifier.weight(1f),

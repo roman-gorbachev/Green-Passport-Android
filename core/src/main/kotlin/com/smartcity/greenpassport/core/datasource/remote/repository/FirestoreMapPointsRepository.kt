@@ -22,6 +22,7 @@ private const val FIELD_ADDRESSES = "addresses"
 private const val FIELD_CITY = "city"
 private const val FIELD_LATITUDE = "latitude"
 private const val FIELD_LONGITUDE = "longitude"
+private const val FIELD_IS_ACTIVE = "isActive"
 
 class FirestoreMapPointsRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
@@ -53,5 +54,6 @@ private fun DocumentSnapshot.toMapPoint(): MapPoint? {
         city = city,
         latitude = latitude,
         longitude = longitude,
+        isActive = getBoolean(FIELD_IS_ACTIVE) ?: true,
     )
 }

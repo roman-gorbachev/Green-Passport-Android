@@ -45,4 +45,6 @@
     <string name="take_photo">Снять фото</string>
     <string name="choose_from_library">Выбрать из галереи</string>
     <string name="streak_bonus_msg">+%1$d оч. за серию дней</string>
+    <string name="qr_code_not_active_msg">QR-код сейчас не действует. Проверь сроки задания</string>
+    <string name="qr_code_limit_reached_msg">Этот QR-код уже отсканировали максимальное число раз</string>
 </resources>

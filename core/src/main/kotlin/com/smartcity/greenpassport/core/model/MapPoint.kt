@@ -16,6 +16,7 @@ data class MapPoint(
     val city: String,
     val latitude: Double,
     val longitude: Double,
+    val isActive: Boolean = true,
 )
 
 interface MapPointsRepository {

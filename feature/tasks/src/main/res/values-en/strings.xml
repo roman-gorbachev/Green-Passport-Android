@@ -45,4 +45,6 @@
     <string name="take_photo">Take photo</string>
     <string name="choose_from_library">Choose from library</string>
     <string name="streak_bonus_msg">+%1$d pts for your streak</string>
+    <string name="qr_code_not_active_msg">This QR code is not active right now. Check the task dates</string>
+    <string name="qr_code_limit_reached_msg">This QR code has already been scanned the maximum number of times</string>
 </resources>

@@ -11,6 +11,7 @@ data class EcoEvent(
     val startAtEpochMillis: Long,
     val imageUrl: String?,
     val rewardPoints: Int,
+    val isActive: Boolean = true,
 )
 
 interface EventsRepository {

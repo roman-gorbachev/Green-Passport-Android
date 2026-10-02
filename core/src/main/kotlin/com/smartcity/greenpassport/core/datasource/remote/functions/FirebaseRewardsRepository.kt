@@ -119,6 +119,9 @@ class FirebaseRewardsRepository @Inject constructor(
 internal fun Throwable.toRewardFailure(): RewardFailure = when {
     this is FirebaseNetworkException -> RewardFailure.NETWORK
     this !is FirebaseFunctionsException -> RewardFailure.UNKNOWN
+    message.orEmpty().contains(QR_NOT_ACTIVE) -> RewardFailure.QR_CODE_NOT_ACTIVE
+    message.orEmpty().contains(QR_LIMIT_REACHED) -> RewardFailure.QR_CODE_LIMIT_REACHED
+    message.orEmpty().contains(REWARD_SOLD_OUT) -> RewardFailure.REWARD_SOLD_OUT
     code == FirebaseFunctionsException.Code.RESOURCE_EXHAUSTED -> RewardFailure.DAILY_LIMIT_REACHED
     code == FirebaseFunctionsException.Code.ALREADY_EXISTS -> RewardFailure.ALREADY_COMPLETED
     code == FirebaseFunctionsException.Code.NOT_FOUND -> RewardFailure.INVALID_CODE
@@ -130,3 +133,6 @@ internal fun Throwable.toRewardFailure(): RewardFailure = when {
 }
 
 private const val NOT_ENOUGH_POINTS = "Not enough points"
+private const val QR_NOT_ACTIVE = "qr_not_active"
+private const val QR_LIMIT_REACHED = "qr_limit_reached"
+private const val REWARD_SOLD_OUT = "reward_sold_out"

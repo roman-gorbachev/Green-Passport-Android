@@ -15,7 +15,7 @@ class ObservePendingTasksUseCase @Inject constructor(
         tasksRepository.observeCompletedTaskIds(userId),
     ) { tasks, completedIds ->
         tasks
-            .filterNot { it.id in completedIds }
+            .filter { it.isActive && it.id !in completedIds }
             .sortedWith(
                 compareByDescending<Task> { it.city == profile?.city }
                     .thenByDescending { profile != null && it.category in profile.interests },

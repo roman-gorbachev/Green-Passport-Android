@@ -28,4 +28,5 @@
     <string name="no_expired_coupons">No expired coupons</string>
     <string name="no_internet_connection">No internet connection</string>
     <string name="something_went_wrong_msg">Something went wrong. Please try again</string>
+    <string name="reward_sold_out">This reward is sold out</string>
 </resources>

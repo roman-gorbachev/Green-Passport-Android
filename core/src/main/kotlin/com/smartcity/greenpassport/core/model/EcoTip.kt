@@ -18,6 +18,7 @@ data class EcoTip(
     val isDailyTip: Boolean,
     val rewardPoints: Int,
     val rewardXp: Int,
+    val isActive: Boolean = true,
 )
 
 interface EcoTipsRepository {

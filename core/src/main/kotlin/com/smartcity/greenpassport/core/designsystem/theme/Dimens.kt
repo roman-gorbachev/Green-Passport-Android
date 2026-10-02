@@ -35,6 +35,7 @@ object Dimens {
     val CalendarBadgeMinSize = 16.dp
     val ArticleCoverHeight = 220.dp
     val ArticleThumbnailSize = 64.dp
+    val RewardThumbnailSize = 56.dp
     val AchievementCardMinHeight = 196.dp
     val QuickActionWidth = 76.dp
     val TileSize = 32.dp

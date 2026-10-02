@@ -24,6 +24,7 @@ private const val FIELD_BODIES = "bodies"
 private const val FIELD_IS_DAILY_TIP = "isDailyTip"
 private const val FIELD_REWARD_POINTS = "rewardPoints"
 private const val FIELD_REWARD_XP = "rewardXp"
+private const val FIELD_IS_ACTIVE = "isActive"
 
 private const val FIELD_USER_ID = "userId"
 private const val FIELD_TIP_ID = "tipId"
@@ -66,5 +67,6 @@ private fun DocumentSnapshot.toEcoTip(): EcoTip? {
         isDailyTip = getBoolean(FIELD_IS_DAILY_TIP) ?: false,
         rewardPoints = getLong(FIELD_REWARD_POINTS)?.toInt() ?: 0,
         rewardXp = getLong(FIELD_REWARD_XP)?.toInt() ?: 0,
+        isActive = getBoolean(FIELD_IS_ACTIVE) ?: true,
     )
 }
