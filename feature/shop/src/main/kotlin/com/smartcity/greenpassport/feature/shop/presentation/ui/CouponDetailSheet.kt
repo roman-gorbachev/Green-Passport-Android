@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -44,6 +45,8 @@ import com.smartcity.greenpassport.core.R as CoreR
 
 private const val INACTIVE_ALPHA = 0.4f
 private const val CODE_LETTER_SPACING_SP = 4
+private const val SECONDARY_ON_CARD_ALPHA = 0.8f
+private const val CARD_GRADIENT_END_ALPHA = 0.7f
 
 @Composable
 fun CouponDetailSheet(
@@ -166,10 +169,19 @@ private fun CouponCodeBlock(
     code: String?,
     modifier: Modifier = Modifier,
 ) {
+    val cardGradient = Brush.linearGradient(
+        listOf(
+            MaterialTheme.colorScheme.primary,
+            MaterialTheme.colorScheme.primary.copy(alpha = CARD_GRADIENT_END_ALPHA),
+        ),
+    )
+    val onCardColor = MaterialTheme.colorScheme.onPrimary
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Dimens.SpacingCompact),
-        modifier = modifier,
+        modifier = modifier
+            .background(cardGradient, RoundedCornerShape(Dimens.CornerRadiusLarge))
+            .padding(Dimens.SpacingLarge),
     ) {
         payload?.let { payload ->
             QrCodeImage(
@@ -185,7 +197,7 @@ private fun CouponCodeBlock(
             Text(
                 text = stringResource(R.string.coupon_code),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = onCardColor.copy(alpha = SECONDARY_ON_CARD_ALPHA),
             )
             SelectionContainer {
                 Text(
@@ -194,13 +206,14 @@ private fun CouponCodeBlock(
                         fontFamily = FontFamily.Monospace,
                         letterSpacing = CODE_LETTER_SPACING_SP.sp,
                     ),
+                    color = onCardColor,
                 )
             }
         }
         Text(
             text = stringResource(R.string.partner_scans_qr_msg),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = onCardColor.copy(alpha = SECONDARY_ON_CARD_ALPHA),
             textAlign = TextAlign.Center,
         )
     }

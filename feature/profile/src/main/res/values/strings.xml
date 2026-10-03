@@ -32,10 +32,17 @@
     <string name="notifications_empty">Уведомлений пока не было</string>
 
     <string name="favorites_empty">Пока нет избранных заданий — отметьте сердечком на экране заданий</string>
-    <string name="bookmarks_empty">Пока нет закладок — отметьте совет закладкой на экране эко-советов</string>
+    <string name="bookmarks_empty">Пока нет избранных советов — отметьте совет сердечком на экране эко-советов</string>
+    <string name="saved_places_empty">Пока нет сохранённых мест — отметьте сердечком точку на карте</string>
     <string name="points_balance">%1$d оч. на счету</string>
     <string name="tasks">Задания</string>
     <string name="tips">Советы</string>
+    <string name="places">Места</string>
+    <string name="saved">Сохранено</string>
+    <string name="build_route">Маршрут</string>
+    <string name="map_type_eco_shop">Эко-магазины</string>
+    <string name="map_type_recycling_point">Пункты переработки</string>
+    <string name="map_type_eco_event">Эко-события</string>
     <string name="edit_profile">Редактировать профиль</string>
     <string name="city_and_points">%1$s · %2$d оч.</string>
     <string name="moderation">Модерация</string>

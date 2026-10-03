@@ -27,6 +27,8 @@ const LEAF_LOW_OFFSET = 34;
 const INVULNERABLE_SECONDS = 1.2;
 const GAME_OVER_DELAY_MS = 700;
 const OBSTACLES = ['🗑️', '🛢️', '🛞', '📦'];
+const BARREL_GLYPH = '🛢️';
+const BARREL_LEAF_CHANCE = 0.5;
 const TRASH_COLORS = ['#8E7CF0', '#FF9F43', '#4DA3FF', '#9aa5a0'];
 const LEAF_COLORS = ['#34C77B', '#7ED957', '#C3EE5A'];
 
@@ -101,16 +103,21 @@ function jump() {
 }
 
 function spawnObstacle() {
-  obstacles.push({ x: stage.width + OBSTACLE_SIZE * unit, glyph: GP.randomItem(OBSTACLES), wobble: Math.random() * Math.PI });
+  const x = stage.width + OBSTACLE_SIZE * unit;
+  const glyph = GP.randomItem(OBSTACLES);
+  obstacles.push({ x, glyph, wobble: Math.random() * Math.PI });
+  if (glyph === BARREL_GLYPH && Math.random() < BARREL_LEAF_CHANCE) {
+    spawnLeaves(x + OBSTACLE_SIZE * unit);
+  }
 }
 
-function spawnLeaves() {
+function spawnLeaves(originX = stage.width + LEAF_SIZE * unit) {
   const isHigh = Math.random() < 0.45;
   const count = 3 + Math.floor(Math.random() * 3);
   const baseY = ground - (isHigh ? LEAF_HIGH_OFFSET : LEAF_LOW_OFFSET) * unit;
   for (let index = 0; index < count; index += 1) {
     const arc = isHigh ? Math.sin((index / (count - 1)) * Math.PI) * 30 * unit : 0;
-    leaves.push({ x: stage.width + index * 40 * unit + LEAF_SIZE * unit, y: baseY - arc, phase: Math.random() * Math.PI * 2 });
+    leaves.push({ x: originX + index * 40 * unit, y: baseY - arc, phase: Math.random() * Math.PI * 2 });
   }
 }
 

@@ -1,5 +1,14 @@
 package com.smartcity.greenpassport.feature.profile.presentation.profile
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,12 +42,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.app.ActivityCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
@@ -69,6 +81,11 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var hasRequestedNotificationPermission by rememberSaveable { mutableStateOf(false) }
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted -> viewModel.onNotificationsToggle(granted) }
 
     if (uiState.hasError) {
         ErrorContent(
@@ -87,13 +104,34 @@ fun ProfileScreen(
 
     ProfileContent(
         uiState = uiState,
-        onNotificationsToggle = viewModel::onNotificationsToggle,
+        onNotificationsToggle = { enabled ->
+            val needsRuntimePermission = enabled &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                !viewModel.hasNotificationPermission()
+            when {
+                !needsRuntimePermission -> viewModel.onNotificationsToggle(enabled)
+                hasRequestedNotificationPermission && !(context as? Activity).canShowNotificationPermissionRationale() ->
+                    openAppNotificationSettings(context)
+                else -> {
+                    hasRequestedNotificationPermission = true
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        },
         onThemeSelected = viewModel::onThemeSelected,
         onSignOut = viewModel::onSignOut,
         onMenuEntrySelected = onMenuEntrySelected,
         contentPadding = contentPadding,
         modifier = modifier,
     )
+}
+
+private fun Activity?.canShowNotificationPermissionRationale(): Boolean =
+    this != null && ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)
+
+private fun openAppNotificationSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
+    runCatching { context.startActivity(intent) }
 }
 
 private data class ProfileMenuEntry(

@@ -7,13 +7,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.launch
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.common.formatEventDate
@@ -35,6 +38,7 @@ private const val MONTH_KEY = "month"
 private const val DAY_TITLE_KEY = "day_title"
 private const val NO_EVENTS_KEY = "no_events"
 private const val DAY_TITLE_PATTERN = "EEEE, d MMMM"
+private const val DAY_TITLE_ITEM_INDEX = 1
 
 @Composable
 fun CalendarScreen(
@@ -45,6 +49,8 @@ fun CalendarScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val locale = LocalLocale.current.platformLocale
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
 
     when {
         uiState.isLoading -> LoadingContent(modifier = modifier.padding(contentPadding))
@@ -60,6 +66,7 @@ fun CalendarScreen(
         )
 
         else -> LazyColumn(
+            state = listState,
             modifier = modifier.fillMaxSize(),
             contentPadding = contentPadding + PaddingValues(
                 horizontal = Dimens.ScreenHorizontalPadding,
@@ -74,7 +81,10 @@ fun CalendarScreen(
                         selectedDay = uiState.selectedDay,
                         eventCounts = uiState.eventCounts,
                         onMonthChange = viewModel::onMonthChange,
-                        onDaySelected = viewModel::onDaySelected,
+                        onDaySelected = { day ->
+                            viewModel.onDaySelected(day)
+                            coroutineScope.launch { listState.animateScrollToItem(DAY_TITLE_ITEM_INDEX) }
+                        },
                         modifier = Modifier.padding(Dimens.CardPadding),
                     )
                 }

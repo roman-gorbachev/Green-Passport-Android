@@ -173,13 +173,13 @@ private fun EventCountBadge(count: Int?) {
         modifier = Modifier
             .defaultMinSize(minWidth = Dimens.CalendarBadgeMinSize, minHeight = Dimens.CalendarBadgeMinSize)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.error)
             .padding(horizontal = Dimens.SpacingExtraSmall),
     ) {
         Text(
             text = count.toString(),
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onError,
         )
     }
 }

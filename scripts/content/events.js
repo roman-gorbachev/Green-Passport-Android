@@ -8,7 +8,7 @@ module.exports = [
       en: 'A joint clean-up of the park grounds; tools are provided.',
     },
     locations: { ru: 'Парк Горького, вход с пр-та Независимости', be: 'Парк Горкага, уваход з пр-та Незалежнасці', en: 'Gorky Park, entrance from Independence Ave' },
-    city: 'Минск', startAt: '2026-10-17T11:00:00+03:00', rewardPoints: 50,
+    city: 'Минск', startAt: '2026-10-17T11:00:00+03:00', rewardPoints: 90,
   },
   {
     id: 'conscious_consumption_talk',
@@ -19,7 +19,7 @@ module.exports = [
       en: 'An open talk on how to cut household waste.',
     },
     locations: { ru: 'Национальная библиотека Беларуси', be: 'Нацыянальная бібліятэка Беларусі', en: 'National Library of Belarus' },
-    city: 'Минск', startAt: '2026-10-24T19:00:00+03:00', rewardPoints: 20,
+    city: 'Минск', startAt: '2026-10-24T19:00:00+03:00', rewardPoints: 60,
   },
   {
     id: 'recycling_day_loshitsa',
@@ -30,7 +30,7 @@ module.exports = [
       en: 'Collection of paper, plastic and glass for recycling.',
     },
     locations: { ru: 'Лошицкий парк, главный вход', be: 'Лошыцкі парк, галоўны ўваход', en: 'Loshitsa Park, main entrance' },
-    city: 'Минск', startAt: '2026-11-07T12:00:00+03:00', rewardPoints: 30,
+    city: 'Минск', startAt: '2026-11-07T12:00:00+03:00', rewardPoints: 70,
   },
   {
     id: 'clean_air_bike_ride',
@@ -41,7 +41,7 @@ module.exports = [
       en: 'A mass bike ride through the city centre in support of clean air.',
     },
     locations: { ru: 'Старт у стелы «Минск — город-герой»', be: 'Старт каля стэлы «Мінск — горад-герой»', en: 'Start at the “Minsk — Hero City” obelisk' },
-    city: 'Минск', startAt: '2026-11-21T10:00:00+03:00', rewardPoints: 40,
+    city: 'Минск', startAt: '2026-11-21T10:00:00+03:00', rewardPoints: 80,
   },
   {
     id: 'gomel_park_cleanup',
@@ -52,7 +52,7 @@ module.exports = [
       en: 'Clearing fallen leaves and litter along the embankment. Gloves and bags are handed out on site.',
     },
     locations: { ru: 'Набережная реки Сож', be: 'Набярэжная ракі Сож', en: 'Sozh River embankment' },
-    city: 'Гомель', startAt: '2026-10-17T10:00:00+03:00', rewardPoints: 50,
+    city: 'Гомель', startAt: '2026-10-17T10:00:00+03:00', rewardPoints: 90,
   },
   {
     id: 'grodno_tree_planting',
@@ -63,7 +63,7 @@ module.exports = [
       en: 'Plant young trees together with the city’s landscapers. Saplings and spades are provided.',
     },
     locations: { ru: 'Коложский парк', be: 'Каложскі парк', en: 'Kalozha Park' },
-    city: 'Гродно', startAt: '2026-10-17T12:00:00+03:00', rewardPoints: 60,
+    city: 'Гродно', startAt: '2026-10-17T12:00:00+03:00', rewardPoints: 100,
   },
   {
     id: 'brest_swap_party',
@@ -74,7 +74,7 @@ module.exports = [
       en: 'Bring clothes and books you no longer need and swap them for something new to you.',
     },
     locations: { ru: 'Брест, бульвар Шевченко', be: 'Брэст, бульвар Шаўчэнкі', en: 'Brest, Shevchenko Boulevard' },
-    city: 'Брест', startAt: '2026-11-07T15:00:00+03:00', rewardPoints: 30,
+    city: 'Брест', startAt: '2026-11-07T15:00:00+03:00', rewardPoints: 70,
   },
   {
     id: 'vitebsk_battery_drive',
@@ -85,7 +85,7 @@ module.exports = [
       en: 'A city-wide drive to collect used batteries and small electronics.',
     },
     locations: { ru: 'Витебск, площадь Победы', be: 'Віцебск, плошча Перамогі', en: 'Vitebsk, Victory Square' },
-    city: 'Витебск', startAt: '2026-11-14T11:00:00+03:00', rewardPoints: 30,
+    city: 'Витебск', startAt: '2026-11-14T11:00:00+03:00', rewardPoints: 70,
   },
   {
     id: 'mogilev_energy_talk',
@@ -96,7 +96,7 @@ module.exports = [
       en: 'How to cut electricity and heating bills without losing comfort.',
     },
     locations: { ru: 'Могилёвская областная библиотека', be: 'Магілёўская абласная бібліятэка', en: 'Mogilev Regional Library' },
-    city: 'Могилёв', startAt: '2026-11-28T18:00:00+03:00', rewardPoints: 20,
+    city: 'Могилёв', startAt: '2026-11-28T18:00:00+03:00', rewardPoints: 60,
   },
   {
     id: 'minsk_eco_fair',
@@ -107,7 +107,7 @@ module.exports = [
       en: 'Plastic-free gifts, fabric gift-wrapping workshops and a Christmas ornament swap.',
     },
     locations: { ru: 'Минск, Верхний город', be: 'Мінск, Верхні горад', en: 'Minsk, Upper Town' },
-    city: 'Минск', startAt: '2026-12-19T12:00:00+03:00', rewardPoints: 30,
+    city: 'Минск', startAt: '2026-12-19T12:00:00+03:00', rewardPoints: 70,
   },
   {
     id: 'christmas_tree_recycling',
@@ -118,7 +118,7 @@ module.exports = [
       en: 'Bring your real Christmas tree after the holidays — it will be chipped for park paths.',
     },
     locations: { ru: 'Парк Челюскинцев, главный вход', be: 'Парк Чалюскінцаў, галоўны ўваход', en: 'Chelyuskintsev Park, main entrance' },
-    city: 'Минск', startAt: '2027-01-10T11:00:00+03:00', rewardPoints: 40,
+    city: 'Минск', startAt: '2027-01-10T11:00:00+03:00', rewardPoints: 80,
   },
   {
     id: 'pinsk_bird_feeders',
@@ -129,6 +129,6 @@ module.exports = [
       en: 'Build wooden bird feeders and hang them in the park to help birds through the winter.',
     },
     locations: { ru: 'Пинск, парк культуры и отдыха', be: 'Пінск, парк культуры і адпачынку', en: 'Pinsk, Park of Culture and Leisure' },
-    city: 'Пинск', startAt: '2027-01-23T12:00:00+03:00', rewardPoints: 40,
+    city: 'Пинск', startAt: '2027-01-23T12:00:00+03:00', rewardPoints: 80,
   },
 ];

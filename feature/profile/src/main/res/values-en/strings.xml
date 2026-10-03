@@ -32,10 +32,17 @@
     <string name="notifications_empty">No notifications yet</string>
 
     <string name="favorites_empty">No favorite tasks yet — tap the heart on the tasks screen</string>
-    <string name="bookmarks_empty">No bookmarks yet — bookmark a tip on the eco tips screen</string>
+    <string name="bookmarks_empty">No favorite tips yet — tap the heart on the eco tips screen</string>
+    <string name="saved_places_empty">No saved places yet — tap the heart on a point on the map</string>
     <string name="points_balance">%1$d pt. available</string>
     <string name="tasks">Tasks</string>
     <string name="tips">Tips</string>
+    <string name="places">Places</string>
+    <string name="saved">Saved</string>
+    <string name="build_route">Directions</string>
+    <string name="map_type_eco_shop">Eco shops</string>
+    <string name="map_type_recycling_point">Recycling points</string>
+    <string name="map_type_eco_event">Eco events</string>
     <string name="edit_profile">Edit profile</string>
     <string name="city_and_points">%1$s · %2$d pts</string>
     <string name="moderation">Moderation</string>
