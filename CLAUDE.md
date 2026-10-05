@@ -76,6 +76,7 @@ Mini-games are HTML5 pages in `games/` (plain HTML/CSS/JS, no build step), serve
 - Content archived in the web admin panel has `isActive: false` (missing means active). Models carry `isActive`; repositories return everything because coupons, history, moderation and detail screens resolve documents by id; only catalog use cases (`ObserveTasksUseCase`, `ObserveActiveEventsUseCase`, `ObserveRewardCatalogUseCase`, …) hide archived items. Plan: `claude/admin-apps-plan.ru.md`.
 - Screens have to survive Firestore failures (e.g. `PERMISSION_DENIED` while Auth isn't enabled). ViewModels wrap repository calls in `runCatching`/`resultOf` and surface an error state rather than crashing.
 - Firestore security rules and indexes are in `firestore.rules`, `firestore.indexes.json` and `storage.rules` (project config in `firebase.json` / `.firebaserc`).
+- **`storage.rules` is shared with OurMemory** (`~/Personal/OurMemory-80`, `~/Personal/ourmemory-admin`): the Storage bucket of `chatroom-85fb8` has one rules file, and `firebase deploy --only storage` from this repo replaces the rules of both apps. Never delete or rewrite the `// ===== OurMemory =====` section, keep Green Passport helpers prefixed (`isGreenPassport*`) so names don't clash, and copy every change to `~/Personal/OurMemory-80/firebase/storage.rules` (the files must stay identical).
 
 ## Known limitations
 

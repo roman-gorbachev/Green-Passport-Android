@@ -75,6 +75,8 @@ The app talks to the Firebase project `chatroom-85fb8` (see `.firebaserc`). Unti
    firebase deploy --only storage --project chatroom-85fb8
    ```
 
+   > **`storage.rules` is shared with the OurMemory apps** (same bucket). It contains both the Green Passport and the OurMemory sections; deploying it replaces the rules for both, so never remove the OurMemory part. A copy lives in `OurMemory-80/firebase/storage.rules` — keep the two identical.
+
    Or paste the contents of `firestore.rules` into Firestore → Rules (and `storage.rules` into Storage → Rules) in the console and press Publish. The app doesn't read from Storage yet, so the storage step can be skipped if the console asks for the Blaze plan.
 4. Switch the project to the **Blaze** plan, enable the **Cloud Vision API** in Google Cloud, then deploy the backend:
 
