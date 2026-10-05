@@ -27,12 +27,12 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
-import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.StreakSummary
 import com.smartcity.greenpassport.core.model.StreakWeekDay
 import com.smartcity.greenpassport.feature.home.R
 import java.time.format.TextStyle
+import com.smartcity.greenpassport.core.R as CoreR
 
 private const val FLAME_FRACTION = 0.45f
 

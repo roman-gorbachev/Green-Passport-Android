@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.auth.AuthSession
-import com.smartcity.greenpassport.core.messaging.repository.INotificationsRepository
 import com.smartcity.greenpassport.core.model.settings.AppTheme
 import com.smartcity.greenpassport.feature.profile.domain.ObserveAppThemeUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveIsModeratorUseCase
@@ -42,7 +41,6 @@ class ProfileViewModel @Inject constructor(
     private val setNotificationsEnabled: SetNotificationsEnabledUseCase,
     private val setAppTheme: SetAppThemeUseCase,
     private val signOutUseCase: SignOutUseCase,
-    private val notificationsRepository: INotificationsRepository,
 ) : ViewModel() {
 
     private val retryRequests = MutableSharedFlow<Unit>(
@@ -59,8 +57,6 @@ class ProfileViewModel @Inject constructor(
     fun refresh() {
         retryRequests.tryEmit(Unit)
     }
-
-    fun hasNotificationPermission(): Boolean = notificationsRepository.hasNotificationPermission()
 
     fun onNotificationsToggle(enabled: Boolean) {
         viewModelScope.launch {
@@ -85,7 +81,6 @@ class ProfileViewModel @Inject constructor(
 
     private fun observeProfileUiState(sessions: Flow<AuthSession?>): Flow<ProfileUiState> {
         val settings = combine(observeNotificationsEnabled(), observeAppTheme()) { enabled, theme -> enabled to theme }
-            .onStart { reconcileNotificationsPermission() }
         val account = combine(sessions, retryRequests.onStart { emit(Unit) }) { session, _ -> session }
             .flatMapLatest { session ->
                 if (session == null) {
@@ -98,12 +93,6 @@ class ProfileViewModel @Inject constructor(
             }
         return combine(account, settings) { state, (enabled, theme) ->
             state.copy(notificationsEnabled = enabled, theme = theme)
-        }
-    }
-
-    private suspend fun reconcileNotificationsPermission() {
-        if (!notificationsRepository.hasNotificationPermission()) {
-            runCatching { setNotificationsEnabled(false) }
         }
     }
 

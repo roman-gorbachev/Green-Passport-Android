@@ -20,7 +20,6 @@ import com.smartcity.greenpassport.feature.home.domain.ObserveUserProfileUseCase
 import com.smartcity.greenpassport.feature.home.domain.UpdateStreakReminderUseCase
 import com.smartcity.greenpassport.feature.home.presentation.state.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +34,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel

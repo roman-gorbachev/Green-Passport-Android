@@ -30,7 +30,7 @@ Requires JDK 17+ and the Android SDK (`compileSdk 36`, `minSdk 26`).
 ./gradlew installDebug            # install on a connected device/emulator
 ./gradlew test                    # unit tests
 ./gradlew connectedAndroidTest     # instrumented tests (needs a device)
-```
+```   
 
 On Windows PowerShell, use `gradlew.bat` instead of `./gradlew` — it wraps the same Gradle wrapper.
 

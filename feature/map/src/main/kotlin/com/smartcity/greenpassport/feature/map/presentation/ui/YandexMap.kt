@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -53,7 +54,16 @@ fun YandexMap(
     val context = LocalContext.current
     val mapView = remember { MapView(context) }
     val pinRenderer = remember { MapPinRenderer(context) }
-    val userLocationLayer = remember { MapKitFactory.getInstance().createUserLocationLayer(mapView.mapWindow) }
+    val dotColor = MaterialTheme.colorScheme.primary.toArgb()
+    val userLocationListener = remember {
+        UserLocationDotListener(UserLocationDotRenderer(context).render(dotColor))
+    }
+    val userLocationLayer = remember {
+        MapKitFactory.getInstance().createUserLocationLayer(mapView.mapWindow).apply {
+            isHeadingModeActive = false
+            setObjectListener(WeakReference(userLocationListener))
+        }
+    }
     val state = remember { YandexMapState() }
     val currentOnPointClick by rememberUpdatedState(onPointClick)
     val showsUserLocation = focus is MapFocus.UserLocation

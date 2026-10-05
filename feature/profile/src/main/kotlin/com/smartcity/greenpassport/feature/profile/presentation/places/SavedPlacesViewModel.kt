@@ -1,5 +1,6 @@
 package com.smartcity.greenpassport.feature.profile.presentation.places
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.model.MapPoint
@@ -44,13 +45,16 @@ class SavedPlacesViewModel @Inject constructor(
 
     private suspend fun loadPlaces() {
         _uiState.update { it.copy(isLoading = true, hasError = false) }
-        try {
-            val places = getSavedPlaces()
-            _uiState.update { it.copy(places = places, isLoading = false) }
-        } catch (error: CancellationException) {
-            throw error
-        } catch (error: Exception) {
-            _uiState.update { it.copy(isLoading = false, hasError = true) }
-        }
+        runCatching { getSavedPlaces() }
+            .onSuccess { places -> _uiState.update { it.copy(places = places, isLoading = false) } }
+            .onFailure { error ->
+                if (error is CancellationException) throw error
+                Log.w(TAG, "Failed to load saved places", error)
+                _uiState.update { it.copy(isLoading = false, hasError = true) }
+            }
+    }
+
+    companion object {
+        private const val TAG = "SavedPlacesViewModel"
     }
 }

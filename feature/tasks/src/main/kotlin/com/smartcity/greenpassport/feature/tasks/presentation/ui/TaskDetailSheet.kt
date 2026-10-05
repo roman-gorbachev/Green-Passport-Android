@@ -7,11 +7,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -23,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -33,6 +40,7 @@ import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSheetScaffold
 import com.smartcity.greenpassport.core.designsystem.component.MascotWidget
+import com.smartcity.greenpassport.core.designsystem.component.NetworkImage
 import com.smartcity.greenpassport.core.designsystem.component.PointsChip
 import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
@@ -50,6 +58,7 @@ import com.smartcity.greenpassport.core.R as CoreR
 
 private const val UNSAFE_PHOTO_REASON = "unsafe_photo"
 private const val INVALID_PHOTO_REASON = "invalid_photo"
+private const val TASK_IMAGE_ASPECT_RATIO = 1.5f
 
 @Composable
 fun TaskDetailSheet(
@@ -102,6 +111,7 @@ fun TaskDetailSheet(
                 onCompleteTask = viewModel::onCompleteTask,
                 onScanCode = { viewModel.onScanCode(context) },
                 onPickPhoto = { isPhotoSourceVisible = true },
+                onToggleFavorite = viewModel::onToggleFavorite,
             )
         }
     }
@@ -142,15 +152,31 @@ private fun TaskDetailContent(
     onCompleteTask: () -> Unit,
     onScanCode: () -> Unit,
     onPickPhoto: () -> Unit,
+    onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
     ) {
         Column {
+            task.imageUrl?.let { url ->
+                NetworkImage(
+                    url = url,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(bottom = Dimens.SpacingLarge)
+                        .fillMaxWidth()
+                        .aspectRatio(TASK_IMAGE_ASPECT_RATIO)
+                        .clip(MaterialTheme.shapes.large),
+                )
+            }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 MascotWidget(size = Dimens.SheetMascotSize)
-                Column(modifier = Modifier.padding(start = Dimens.SpacingMedium)) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = Dimens.SpacingMedium),
+                ) {
                     Text(
                         text = task.title.localized(),
                         style = MaterialTheme.typography.titleLarge,
@@ -168,6 +194,17 @@ private fun TaskDetailContent(
                             modifier = Modifier.padding(start = Dimens.SpacingSmall),
                         )
                     }
+                }
+                IconButton(onClick = onToggleFavorite) {
+                    Icon(
+                        imageVector = if (uiState.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                        contentDescription = stringResource(CoreR.string.favorites),
+                        tint = if (uiState.isFavorite) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                    )
                 }
             }
 

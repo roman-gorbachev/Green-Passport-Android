@@ -7,6 +7,7 @@ import com.smartcity.greenpassport.core.model.verification.TaskSubmission
 data class TaskDetailUiState(
     val task: Task? = null,
     val isCompleted: Boolean = false,
+    val isFavorite: Boolean = false,
     val submission: TaskSubmission? = null,
     val isLoading: Boolean = true,
     val isSubmitting: Boolean = false,

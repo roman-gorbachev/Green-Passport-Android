@@ -6,6 +6,7 @@ import com.google.firebase.messaging.messaging
 import com.smartcity.greenpassport.core.messaging.helpers.AndroidRewardNotifier
 import com.smartcity.greenpassport.core.messaging.helpers.ReminderScheduler
 import com.smartcity.greenpassport.core.messaging.helpers.RewardNotifier
+import com.smartcity.greenpassport.core.messaging.repository.INotificationsRepository
 import com.smartcity.greenpassport.core.messaging.repository.NotificationsRepository
 import com.smartcity.greenpassport.core.messaging.worker.WorkManagerReminderScheduler
 import dagger.Binds
@@ -20,7 +21,7 @@ import javax.inject.Singleton
 abstract class MessagingModule {
 
     @Binds
-    abstract fun bindNotificationsRepository(impl: NotificationsRepository): NotificationsRepository
+    abstract fun bindNotificationsRepository(impl: NotificationsRepository): INotificationsRepository
 
     @Binds
     abstract fun bindReminderScheduler(impl: WorkManagerReminderScheduler): ReminderScheduler

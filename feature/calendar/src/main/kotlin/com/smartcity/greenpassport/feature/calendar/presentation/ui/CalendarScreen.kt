@@ -16,7 +16,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
-import kotlinx.coroutines.launch
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.common.formatEventDate
@@ -31,6 +30,7 @@ import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.feature.calendar.R
 import com.smartcity.greenpassport.feature.calendar.presentation.viewmodels.CalendarViewModel
+import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import com.smartcity.greenpassport.core.R as CoreR
 
@@ -79,7 +79,7 @@ fun CalendarScreen(
                     MonthCalendar(
                         month = uiState.visibleMonth,
                         selectedDay = uiState.selectedDay,
-                        eventCounts = uiState.eventCounts,
+                        dayCounts = uiState.dayCounts,
                         onMonthChange = viewModel::onMonthChange,
                         onDaySelected = { day ->
                             viewModel.onDaySelected(day)

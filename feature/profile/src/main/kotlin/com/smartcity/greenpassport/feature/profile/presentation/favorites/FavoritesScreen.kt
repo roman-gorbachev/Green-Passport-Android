@@ -2,11 +2,18 @@ package com.smartcity.greenpassport.feature.profile.presentation.favorites
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -60,7 +67,18 @@ fun FavoritesScreen(
                     title = task.title.localized(),
                     subtitle = cityName(task.city),
                     leading = { MascotWidget(size = Dimens.ListRowMascotSize) },
-                    trailing = { PointsChip(points = task.rewardPoints) },
+                    trailing = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            PointsChip(points = task.rewardPoints)
+                            IconButton(onClick = { viewModel.onRemoveTask(task.id) }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = stringResource(CoreR.string.favorites),
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            }
+                        }
+                    },
                     modifier = Modifier.clickable(role = Role.Button) { onTaskSelected(task.id) },
                 )
             }

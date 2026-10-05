@@ -25,8 +25,10 @@ import com.smartcity.greenpassport.feature.community.presentation.ui.GroupsScree
 import com.smartcity.greenpassport.feature.community.presentation.ui.JoinByCodeButton
 import com.smartcity.greenpassport.feature.community.presentation.viewmodels.GroupDetailViewModel
 import com.smartcity.greenpassport.feature.community.presentation.viewmodels.GroupsViewModel
+import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipBookmarkButton
 import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipDetailScreen
 import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipsListScreen
+import com.smartcity.greenpassport.feature.ecotips.presentation.viewmodels.EcoTipDetailViewModel
 import com.smartcity.greenpassport.feature.feedback.presentation.FeedbackScreen
 import com.smartcity.greenpassport.feature.games.presentation.hub.ui.GamesHubScreen
 import com.smartcity.greenpassport.feature.games.presentation.web.ui.GameWebScreen
@@ -281,11 +283,18 @@ private fun NavGraphBuilder.contentRoutes(navController: NavHostController) {
         }
     }
     composable<Destination.EcoTipDetail> {
+        val viewModel: EcoTipDetailViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         FeatureScaffold(
             title = stringResource(R.string.ecotip_detail_title),
             onNavigateBack = navController::popBackStack,
+            actions = {
+                if (uiState.tip != null) {
+                    EcoTipBookmarkButton(isBookmarked = uiState.isBookmarked, onClick = viewModel::onToggleBookmark)
+                }
+            },
         ) { innerPadding ->
-            EcoTipDetailScreen(contentPadding = innerPadding)
+            EcoTipDetailScreen(contentPadding = innerPadding, viewModel = viewModel)
         }
     }
 }

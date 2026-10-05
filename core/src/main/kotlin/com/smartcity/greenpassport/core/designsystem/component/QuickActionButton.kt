@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 
-private const val QUICK_ACTION_ICON_FRACTION = 0.28f
+private const val QUICK_ACTION_ICON_FRACTION = 0.5f
 
 @Composable
 fun QuickActionButton(

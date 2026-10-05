@@ -35,7 +35,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.smartcity.greenpassport.core.R as CoreR
 import com.smartcity.greenpassport.core.common.formatEventDate
 import com.smartcity.greenpassport.core.common.formatEventTime
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
@@ -66,6 +65,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
 import java.util.Locale
+import com.smartcity.greenpassport.core.R as CoreR
 
 private const val TODAY_PATTERN = "EEEE, d MMM"
 private const val TASK_PLACEHOLDER_COUNT = 3

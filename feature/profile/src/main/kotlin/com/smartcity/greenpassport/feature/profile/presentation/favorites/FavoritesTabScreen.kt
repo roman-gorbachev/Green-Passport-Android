@@ -36,7 +36,11 @@ fun FavoritesTabScreen(
             .padding(top = contentPadding.calculateTopPadding()),
     ) {
         SegmentedControl(
-            options = listOf(stringResource(R.string.tasks), stringResource(R.string.tips), stringResource(R.string.places)),
+            options = listOf(
+                stringResource(R.string.tasks),
+                stringResource(R.string.tips),
+                stringResource(R.string.places)
+            ),
             selectedIndex = selectedSegment,
             onSelect = { selectedSegment = it },
             modifier = Modifier.padding(horizontal = Dimens.ScreenHorizontalPadding, vertical = Dimens.SpacingSmall),

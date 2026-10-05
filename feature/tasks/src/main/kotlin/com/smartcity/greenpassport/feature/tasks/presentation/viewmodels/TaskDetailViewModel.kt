@@ -11,12 +11,13 @@ import com.smartcity.greenpassport.core.model.rewards.RewardFailureException
 import com.smartcity.greenpassport.core.model.rewards.RewardResult
 import com.smartcity.greenpassport.core.model.verification.SubmissionStatus
 import com.smartcity.greenpassport.feature.tasks.domain.CompleteTaskUseCase
-import com.smartcity.greenpassport.feature.tasks.domain.GetCompletedTaskIdsUseCase
-import com.smartcity.greenpassport.feature.tasks.domain.GetTasksUseCase
+import com.smartcity.greenpassport.feature.tasks.domain.GetTaskProgressUseCase
+import com.smartcity.greenpassport.feature.tasks.domain.ObserveFavoriteTaskIdsUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.ObserveTaskSubmissionsUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.ObserveTasksSessionUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.ScanTaskCodeUseCase
 import com.smartcity.greenpassport.feature.tasks.domain.SubmitTaskPhotoUseCase
+import com.smartcity.greenpassport.feature.tasks.domain.ToggleTaskFavoriteUseCase
 import com.smartcity.greenpassport.feature.tasks.presentation.state.TaskDetailUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -33,12 +34,13 @@ import javax.inject.Inject
 @HiltViewModel
 class TaskDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getTasks: GetTasksUseCase,
+    private val getTaskProgress: GetTaskProgressUseCase,
     private val completeTaskUseCase: CompleteTaskUseCase,
-    private val getCompletedTaskIds: GetCompletedTaskIdsUseCase,
     private val scanTaskCode: ScanTaskCodeUseCase,
     private val submitTaskPhoto: SubmitTaskPhotoUseCase,
     private val observeTaskSubmissions: ObserveTaskSubmissionsUseCase,
+    private val observeFavoriteTaskIds: ObserveFavoriteTaskIdsUseCase,
+    private val toggleTaskFavorite: ToggleTaskFavoriteUseCase,
     observeSession: ObserveTasksSessionUseCase,
 ) : ViewModel() {
 
@@ -67,6 +69,34 @@ class TaskDetailViewModel @Inject constructor(
                         }
                 }
             }
+        }
+    }
+
+    init {
+        viewModelScope.launch {
+            observeSession().collectLatest { session ->
+                if (session == null) {
+                    _uiState.update { it.copy(isFavorite = false) }
+                    return@collectLatest
+                }
+                observeFavoriteTaskIds(session.userId)
+                    .catch { error -> Log.w(TAG, "Failed to observe favorites", error) }
+                    .collect { favoriteIds -> _uiState.update { it.copy(isFavorite = taskId in favoriteIds) } }
+            }
+        }
+    }
+
+    fun onToggleFavorite() {
+        val userId = currentUserId ?: return
+        val isFavorite = !_uiState.value.isFavorite
+        _uiState.update { it.copy(isFavorite = isFavorite) }
+        viewModelScope.launch {
+            runCatching { toggleTaskFavorite(userId, taskId, isFavorite) }
+                .onFailure { error ->
+                    if (error is CancellationException) throw error
+                    Log.w(TAG, "Failed to toggle favorite", error)
+                    _uiState.update { it.copy(isFavorite = !isFavorite) }
+                }
         }
     }
 
@@ -138,9 +168,8 @@ class TaskDetailViewModel @Inject constructor(
     private suspend fun loadTask() {
         _uiState.update { it.copy(isLoading = true, hasError = false) }
         runCatching {
-            val task = getTasks().firstOrNull { it.id == taskId }
-            val completed = currentUserId?.let { getCompletedTaskIds(it) }?.contains(taskId) ?: false
-            _uiState.update { it.copy(task = task, isCompleted = completed, isLoading = false) }
+            val progress = getTaskProgress(taskId, currentUserId)
+            _uiState.update { it.copy(task = progress.task, isCompleted = progress.isCompleted, isLoading = false) }
         }.onFailure { error ->
             if (error is CancellationException) throw error
             _uiState.update { it.copy(isLoading = false, hasError = true) }

@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -51,6 +52,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
@@ -105,13 +107,12 @@ fun ProfileScreen(
     ProfileContent(
         uiState = uiState,
         onNotificationsToggle = { enabled ->
-            val needsRuntimePermission = enabled &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                !viewModel.hasNotificationPermission()
+            val needsRuntimePermission = enabled && !context.hasNotificationPermission()
+            val isPermissionBlocked = hasRequestedNotificationPermission &&
+                !(context as? Activity).canShowNotificationPermissionRationale()
             when {
                 !needsRuntimePermission -> viewModel.onNotificationsToggle(enabled)
-                hasRequestedNotificationPermission && !(context as? Activity).canShowNotificationPermissionRationale() ->
-                    openAppNotificationSettings(context)
+                isPermissionBlocked -> openAppNotificationSettings(context)
                 else -> {
                     hasRequestedNotificationPermission = true
                     notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -126,11 +127,17 @@ fun ProfileScreen(
     )
 }
 
+private fun Context.hasNotificationPermission(): Boolean =
+    Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+        ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+        PackageManager.PERMISSION_GRANTED
+
 private fun Activity?.canShowNotificationPermissionRationale(): Boolean =
     this != null && ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)
 
 private fun openAppNotificationSettings(context: Context) {
-    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
+    val intent =
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
     runCatching { context.startActivity(intent) }
 }
 

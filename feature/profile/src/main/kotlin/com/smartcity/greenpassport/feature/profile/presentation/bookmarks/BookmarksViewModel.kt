@@ -1,9 +1,11 @@
 package com.smartcity.greenpassport.feature.profile.presentation.bookmarks
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.feature.profile.domain.GetBookmarkedTipsUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveProfileSessionUseCase
+import com.smartcity.greenpassport.feature.profile.domain.RemoveTipBookmarkUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BookmarksViewModel @Inject constructor(
     private val getBookmarkedTips: GetBookmarkedTipsUseCase,
+    private val removeTipBookmark: RemoveTipBookmarkUseCase,
     observeSession: ObserveProfileSessionUseCase,
 ) : ViewModel() {
 
@@ -38,6 +41,22 @@ class BookmarksViewModel @Inject constructor(
         }
     }
 
+    fun onRemoveTip(tipId: String) {
+        val userId = currentUserId ?: return
+        val removed = _uiState.value.tips
+        _uiState.update { state -> state.copy(tips = state.tips.filterNot { it.id == tipId }) }
+        viewModelScope.launch {
+            try {
+                removeTipBookmark(userId, tipId)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Log.w(TAG, "Failed to remove from favorites", error)
+                _uiState.update { it.copy(tips = removed) }
+            }
+        }
+    }
+
     fun retry() {
         val userId = currentUserId ?: return
         viewModelScope.launch { loadBookmarks(userId) }
@@ -53,5 +72,9 @@ class BookmarksViewModel @Inject constructor(
         } catch (error: Exception) {
             _uiState.update { it.copy(isLoading = false, hasError = true) }
         }
+    }
+
+    companion object {
+        private const val TAG = "BookmarksViewModel"
     }
 }

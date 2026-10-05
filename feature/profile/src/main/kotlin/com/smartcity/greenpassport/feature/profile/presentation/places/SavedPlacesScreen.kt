@@ -72,7 +72,10 @@ fun SavedPlacesScreen(
                     trailing = {
                         Row {
                             IconButton(onClick = { openRoute(context, point) }) {
-                                Icon(imageVector = Icons.Filled.Directions, contentDescription = stringResource(R.string.build_route))
+                                Icon(
+                                    imageVector = Icons.Filled.Directions,
+                                    contentDescription = stringResource(R.string.build_route)
+                                )
                             }
                             IconButton(onClick = { viewModel.onToggleSaved(point) }) {
                                 Icon(

@@ -5,6 +5,7 @@ import com.smartcity.greenpassport.core.model.EcoTip
 data class EcoTipDetailUiState(
     val tip: EcoTip? = null,
     val isRead: Boolean = false,
+    val isBookmarked: Boolean = false,
     val isLoading: Boolean = true,
     val isSubmitting: Boolean = false,
     val hasError: Boolean = false,

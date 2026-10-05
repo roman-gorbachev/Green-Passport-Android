@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.common.eventDay
 import com.smartcity.greenpassport.core.model.EcoEvent
 import com.smartcity.greenpassport.feature.calendar.domain.ObserveActiveEventsUseCase
+import com.smartcity.greenpassport.feature.calendar.domain.ObserveCalendarSessionUseCase
+import com.smartcity.greenpassport.feature.calendar.domain.ObserveRegisteredEventIdsUseCase
 import com.smartcity.greenpassport.feature.calendar.presentation.state.CalendarSelection
 import com.smartcity.greenpassport.feature.calendar.presentation.state.CalendarUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -28,6 +31,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
     private val observeEvents: ObserveActiveEventsUseCase,
+    private val observeSession: ObserveCalendarSessionUseCase,
+    private val observeRegisteredEventIds: ObserveRegisteredEventIdsUseCase,
 ) : ViewModel() {
 
     private val retryRequests = MutableSharedFlow<Unit>(
@@ -37,12 +42,12 @@ class CalendarViewModel @Inject constructor(
 
     private val selection = MutableStateFlow<CalendarSelection?>(null)
 
-    val uiState = combine(observeCalendarUiState(), selection) { state, chosen ->
+    val uiState = combine(observeCalendarUiState(), observeRegistrations(), selection) { state, registeredIds, chosen ->
         if (state.isLoading || state.hasError) {
             state
         } else {
             val current = chosen ?: initialSelection(state.events)
-            state.copy(selectedDay = current.day, visibleMonth = current.month)
+            state.copy(registeredEventIds = registeredIds, selectedDay = current.day, visibleMonth = current.month)
         }
     }.stateIn(
         viewModelScope,
@@ -87,6 +92,18 @@ class CalendarViewModel @Inject constructor(
                     .onStart { emit(CalendarUiState(isLoading = true)) }
                     .catch { emit(CalendarUiState(isLoading = false, hasError = true)) }
             }
+    }
+
+    private fun observeRegistrations(): Flow<Set<String>> {
+        return observeSession()
+            .flatMapLatest { session ->
+                if (session == null) {
+                    flowOf(emptySet())
+                } else {
+                    observeRegisteredEventIds(session.userId).catch { emit(emptySet()) }
+                }
+            }
+            .onStart { emit(emptySet()) }
     }
 
     companion object {

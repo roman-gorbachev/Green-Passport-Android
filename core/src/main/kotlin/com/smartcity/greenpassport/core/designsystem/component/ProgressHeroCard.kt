@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +40,7 @@ import com.smartcity.greenpassport.core.model.Level
 private const val TRACK_ALPHA = 0.22f
 private const val CAPTION_ALPHA = 0.8f
 private val BUBBLE_MIN_FONT_SIZE = 9.sp
+private val POINTS_MIN_FONT_SIZE = 16.sp
 
 @Composable
 fun ProgressHeroCard(
@@ -129,7 +130,7 @@ private fun ProgressSummary(
             horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
         ) {
             Icon(
-                imageVector = Icons.Filled.Star,
+                imageVector = Icons.Filled.Bolt,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.size(Dimens.IconSizeMedium),
@@ -138,6 +139,11 @@ private fun ProgressSummary(
                 text = stringResource(R.string.points_count, points),
                 style = MaterialTheme.typography.headlineLarge,
                 color = onPrimary,
+                maxLines = 1,
+                autoSize = TextAutoSize.StepBased(
+                    minFontSize = POINTS_MIN_FONT_SIZE,
+                    maxFontSize = MaterialTheme.typography.headlineLarge.fontSize,
+                ),
             )
         }
         if (level != null) {

@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.feature.calendar.R
+import com.smartcity.greenpassport.feature.calendar.presentation.state.DayEventCounts
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -51,7 +52,7 @@ private const val MONTH_TITLE_PATTERN = "LLLL yyyy"
 fun MonthCalendar(
     month: YearMonth,
     selectedDay: LocalDate,
-    eventCounts: Map<LocalDate, Int>,
+    dayCounts: Map<LocalDate, DayEventCounts>,
     onMonthChange: (YearMonth) -> Unit,
     onDaySelected: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
@@ -73,7 +74,7 @@ fun MonthCalendar(
                                 day = day,
                                 isSelected = day == selectedDay,
                                 isToday = day == today,
-                                count = eventCounts[day],
+                                counts = dayCounts[day],
                                 onClick = { onDaySelected(day) },
                             )
                         }
@@ -129,7 +130,13 @@ private fun WeekdayRow(firstDayOfWeek: DayOfWeek, locale: Locale) {
 }
 
 @Composable
-private fun DayCell(day: LocalDate, isSelected: Boolean, isToday: Boolean, count: Int?, onClick: () -> Unit) {
+private fun DayCell(
+    day: LocalDate,
+    isSelected: Boolean,
+    isToday: Boolean,
+    counts: DayEventCounts?,
+    onClick: () -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(Dimens.SpacingHairline),
@@ -158,28 +165,48 @@ private fun DayCell(day: LocalDate, isSelected: Boolean, isToday: Boolean, count
                 color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
             )
         }
-        EventCountBadge(count)
+        EventCountBadges(counts)
     }
 }
 
 @Composable
-private fun EventCountBadge(count: Int?) {
-    if (count == null) {
+private fun EventCountBadges(counts: DayEventCounts?) {
+    if (counts == null) {
         Spacer(modifier = Modifier.height(Dimens.CalendarBadgeMinSize))
         return
     }
+    Row(horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingHairline)) {
+        if (counts.open > 0) {
+            EventCountBadge(
+                count = counts.open,
+                color = MaterialTheme.colorScheme.error,
+                contentColor = MaterialTheme.colorScheme.onError,
+            )
+        }
+        if (counts.registered > 0) {
+            EventCountBadge(
+                count = counts.registered,
+                color = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            )
+        }
+    }
+}
+
+@Composable
+private fun EventCountBadge(count: Int, color: Color, contentColor: Color) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .defaultMinSize(minWidth = Dimens.CalendarBadgeMinSize, minHeight = Dimens.CalendarBadgeMinSize)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.error)
+            .background(color)
             .padding(horizontal = Dimens.SpacingExtraSmall),
     ) {
         Text(
             text = count.toString(),
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onError,
+            color = contentColor,
         )
     }
 }
@@ -199,7 +226,10 @@ private fun MonthCalendarPreview() {
         MonthCalendar(
             month = YearMonth.from(today),
             selectedDay = today,
-            eventCounts = mapOf(today to 1, today.plusDays(2) to 3),
+            dayCounts = mapOf(
+                today to DayEventCounts(open = 1, registered = 0),
+                today.plusDays(2) to DayEventCounts(open = 2, registered = 1)
+            ),
             onMonthChange = {},
             onDaySelected = {},
         )
