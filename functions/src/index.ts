@@ -13,6 +13,7 @@ export { adminImportCouponCodes, partnerListRedemptions, partnerPreviewCoupon, p
 export { expireCoupons } from './admin/expireCoupons';
 export { adminEnsureQrSecret, adminGetEventDynamicKey, adminGetQrPayloads, adminRotateQrSecret } from './admin/qrSecrets';
 export { adminListStaff, adminSetPartnerUser, adminSetStaffRole } from './admin/staff';
+export { notifyForumPost, notifyGroupMessage, onChatMessageUpdated, onForumPostUpdated } from './community/triggers';
 export { checkInEvent } from './events';
 export { submitFeedback, submitSurveyAnswer } from './feedback';
 export { countContentReport, moderateContent, screenForumPost, screenSubmissionPhoto } from './moderation/triggers';

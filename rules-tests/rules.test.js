@@ -7,6 +7,7 @@ const {
   arrayUnion,
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getDoc,
   getDocs,
@@ -283,4 +284,62 @@ test('storage: content images are public to users, uploads need an editor', asyn
   await assertFails(getBytes(ref(env.unauthenticatedContext().storage(), path)));
   await assertFails(uploadBytes(ref(env.authenticatedContext(ALICE).storage(), path), image, { contentType: 'image/jpeg' }));
   await assertFails(uploadBytes(ref(env.authenticatedContext(ADMIN).storage(), path), image, { contentType: 'image/jpeg' }));
+});
+
+test('authors edit and delete their own forum posts and chat messages only', async () => {
+  const post = (uid) => doc(firestoreOf(uid), `${ROOT}/posts/post1`);
+  const message = (uid) => doc(firestoreOf(uid), `${ROOT}/chats/group1/messages/m1`);
+  for (const target of [post, message]) {
+    await assertFails(updateDoc(target(CAROL), { text: 'Чужое', editedAtEpochMillis: 2 }));
+    await assertFails(updateDoc(target(BOB), { text: 'ну ты и пиздюк', editedAtEpochMillis: 2 }));
+    await assertFails(updateDoc(target(BOB), { text: 'Без отметки' }));
+    await assertFails(updateDoc(target(BOB), { text: 'Привет', editedAtEpochMillis: 2, hidden: false }));
+    await assertSucceeds(updateDoc(target(BOB), { text: 'Привет всем', editedAtEpochMillis: 2 }));
+    await assertFails(updateDoc(target(CAROL), { text: '', deleted: true }));
+    await assertFails(updateDoc(target(BOB), { text: 'не пусто', deleted: true }));
+    await assertSucceeds(updateDoc(target(BOB), { text: '', deleted: true, replyTo: deleteField() }));
+    await assertFails(updateDoc(target(BOB), { text: 'Ожило', editedAtEpochMillis: 3 }));
+    await assertFails(deleteDoc(target(BOB)));
+  }
+});
+
+test('replies and forwards are validated, server fields cannot be set on create', async () => {
+  const db = firestoreOf(ALICE);
+  const post = { authorId: ALICE, text: 'Ответ', createdAtEpochMillis: 1 };
+  const replyTo = { messageId: 'post1', senderName: 'Боб', text: 'Привет' };
+  await assertSucceeds(setDoc(doc(db, `${ROOT}/posts/reply`), { ...post, replyTo }));
+  await assertSucceeds(setDoc(doc(db, `${ROOT}/posts/forward`), { ...post, forwardedFrom: { senderName: 'Боб' } }));
+  await assertFails(setDoc(doc(db, `${ROOT}/posts/longQuote`), { ...post, replyTo: { ...replyTo, text: 'а'.repeat(201) } }));
+  await assertFails(setDoc(doc(db, `${ROOT}/posts/extraQuote`), { ...post, replyTo: { ...replyTo, hidden: true } }));
+  await assertFails(setDoc(doc(db, `${ROOT}/posts/dirtyForward`), { ...post, forwardedFrom: { senderName: 'Бляди' } }));
+  await assertFails(setDoc(doc(db, `${ROOT}/posts/selfHidden`), { ...post, hidden: false }));
+  await assertFails(setDoc(doc(db, `${ROOT}/posts/selfCounted`), { ...post, reportCount: 0 }));
+  await assertFails(setDoc(doc(db, `${ROOT}/posts/preDeleted`), { ...post, deleted: true }));
+  const messages = collection(firestoreOf(CAROL), `${ROOT}/chats/group1/messages`);
+  const message = { senderId: CAROL, text: 'Ответ', createdAtEpochMillis: 2 };
+  await assertSucceeds(setDoc(doc(messages, 'reply'), { ...message, replyTo: { messageId: 'm1', senderName: null, text: 'Привет' } }));
+  await assertFails(setDoc(doc(messages, 'preEdited'), { ...message, editedAtEpochMillis: 2 }));
+});
+
+test('chat settings and devices are private to their owner', async () => {
+  const settings = { userId: ALICE, chatId: 'forum', pinned: true, archived: false, muted: false, updatedAtEpochMillis: 1 };
+  const aliceSettings = doc(firestoreOf(ALICE), `${ROOT}/chatSettings/${ALICE}_forum`);
+  await assertSucceeds(setDoc(aliceSettings, settings));
+  await assertSucceeds(getDoc(aliceSettings));
+  await assertSucceeds(updateDoc(aliceSettings, { archived: true, updatedAtEpochMillis: 2 }));
+  await assertFails(getDoc(doc(firestoreOf(BOB), `${ROOT}/chatSettings/${ALICE}_forum`)));
+  await assertFails(setDoc(doc(firestoreOf(BOB), `${ROOT}/chatSettings/${ALICE}_forum`), { ...settings, userId: BOB }));
+  await assertFails(setDoc(doc(firestoreOf(ALICE), `${ROOT}/chatSettings/${ALICE}_group1`), settings));
+  await assertFails(setDoc(doc(firestoreOf(ALICE), `${ROOT}/chatSettings/${ALICE}_x`), { ...settings, chatId: 'x', muted: 'yes' }));
+  await assertSucceeds(getDocs(query(collection(firestoreOf(ALICE), `${ROOT}/chatSettings`), where('userId', '==', ALICE))));
+  await assertFails(getDocs(collection(firestoreOf(ALICE), `${ROOT}/chatSettings`)));
+
+  const device = { userId: ALICE, platform: 'ANDROID', updatedAtEpochMillis: 1 };
+  const aliceDevice = doc(firestoreOf(ALICE), `${ROOT}/userDevices/token1`);
+  await assertSucceeds(setDoc(aliceDevice, device));
+  await assertSucceeds(getDoc(aliceDevice));
+  await assertFails(getDoc(doc(firestoreOf(BOB), `${ROOT}/userDevices/token1`)));
+  await assertFails(setDoc(doc(firestoreOf(ALICE), `${ROOT}/userDevices/token2`), { ...device, userId: BOB }));
+  await assertFails(setDoc(doc(firestoreOf(ALICE), `${ROOT}/userDevices/token3`), { ...device, platform: 'WEB' }));
+  await assertSucceeds(deleteDoc(aliceDevice));
 });
