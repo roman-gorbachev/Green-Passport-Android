@@ -1,5 +1,8 @@
 package com.smartcity.greenpassport.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -12,8 +15,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import com.smartcity.greenpassport.R
+import com.smartcity.greenpassport.core.designsystem.component.SearchBarContent
 import com.smartcity.greenpassport.core.designsystem.component.SheetDialogProperties
 import com.smartcity.greenpassport.core.navigation.Destination
+import com.smartcity.greenpassport.core.navigation.TopLevelDestination
 import com.smartcity.greenpassport.core.navigation.destination
 import com.smartcity.greenpassport.feature.auth.presentation.profilesetup.ui.ProfileSetupScreen
 import com.smartcity.greenpassport.feature.calendar.presentation.ui.CalendarScreen
@@ -32,8 +37,10 @@ import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipBookmar
 import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipDetailScreen
 import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipsListScreen
 import com.smartcity.greenpassport.feature.ecotips.presentation.viewmodels.EcoTipDetailViewModel
+import com.smartcity.greenpassport.feature.ecotips.presentation.viewmodels.EcoTipsListViewModel
 import com.smartcity.greenpassport.feature.feedback.presentation.FeedbackScreen
 import com.smartcity.greenpassport.feature.games.presentation.hub.ui.GamesHubScreen
+import com.smartcity.greenpassport.feature.games.presentation.hub.viewmodels.GamesHubViewModel
 import com.smartcity.greenpassport.feature.games.presentation.web.ui.GameWebScreen
 import com.smartcity.greenpassport.feature.home.presentation.ui.HomeScreen
 import com.smartcity.greenpassport.feature.map.presentation.ui.MapScreen
@@ -51,9 +58,12 @@ import com.smartcity.greenpassport.feature.tasks.presentation.ui.TasksFilterButt
 import com.smartcity.greenpassport.feature.tasks.presentation.ui.TasksListScreen
 import com.smartcity.greenpassport.feature.tasks.presentation.viewmodels.TasksListViewModel
 import com.smartcity.greenpassport.feature.community.R as CommunityR
+import com.smartcity.greenpassport.feature.ecotips.R as EcoTipsR
+import com.smartcity.greenpassport.feature.games.R as GamesR
 import com.smartcity.greenpassport.feature.moderation.R as ModerationR
 import com.smartcity.greenpassport.feature.profile.R as ProfileR
 import com.smartcity.greenpassport.feature.shop.R as ShopR
+import com.smartcity.greenpassport.feature.tasks.R as TasksR
 
 @Composable
 fun AppNavHost(
@@ -63,6 +73,16 @@ fun AppNavHost(
     NavHost(
         navController = navController,
         startDestination = Destination.Home,
+        enterTransition = {
+            if (isTabSwitch()) EnterTransition.None else slideIntoContainer(SlideDirection.Start)
+        },
+        exitTransition = {
+            if (isTabSwitch()) ExitTransition.None else ExitTransition.KeepUntilTransitionsFinished
+        },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = {
+            if (isTabSwitch()) ExitTransition.None else slideOutOfContainer(SlideDirection.End)
+        },
         modifier = modifier,
     ) {
         mainRoutes(navController)
@@ -77,20 +97,28 @@ fun AppNavHost(
 
 private fun NavGraphBuilder.mainRoutes(navController: NavHostController) {
     composable<Destination.Home> {
-        HomeScreen(
-            onProfileClick = { navController.navigate(Destination.Profile) },
-            onEventSelected = { eventId -> navController.navigate(Destination.EventDetail(eventId)) },
-            onTaskSelected = { taskId -> navController.navigate(Destination.TaskDetail(taskId)) },
-            onAllTasksClick = { navController.navigate(Destination.Tasks) },
-            onDestinationSelected = { destination -> navController.navigate(destination) },
-        )
+        TopLevelScreen(tab = TopLevelDestination.HOME, navController = navController) {
+            HomeScreen(
+                onProfileClick = { navController.navigate(Destination.Profile) },
+                onEventSelected = { eventId -> navController.navigate(Destination.EventDetail(eventId)) },
+                onTaskSelected = { taskId -> navController.navigate(Destination.TaskDetail(taskId)) },
+                onAllTasksClick = { navController.navigate(Destination.Tasks) },
+                onDestinationSelected = { destination -> navController.navigate(destination) },
+            )
+        }
     }
     composable<Destination.Tasks> {
         val viewModel: TasksListViewModel = hiltViewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val query by viewModel.query.collectAsStateWithLifecycle()
         FeatureScaffold(
             title = stringResource(destinationTitleRes(Destination.Tasks)),
             onNavigateBack = navController::popBackStack,
+            search = SearchBarContent(
+                query = query,
+                onQueryChange = viewModel::onQueryChanged,
+                placeholder = stringResource(TasksR.string.search_tasks_placeholder),
+            ),
             actions = {
                 TasksFilterButton(
                     activeCount = uiState.filters.activeCount,
@@ -112,30 +140,36 @@ private fun NavGraphBuilder.mainRoutes(navController: NavHostController) {
         EventDetailSheet(onDismiss = navController::popBackStack)
     }
     composable<Destination.Favorites> {
-        FeatureScaffold(
-            title = stringResource(ProfileR.string.favorites_screen_title),
-            onNavigateBack = null,
-        ) { innerPadding ->
-            FavoritesTabScreen(
-                onTaskSelected = { taskId -> navController.navigate(Destination.TaskDetail(taskId)) },
-                onTipSelected = { tipId -> navController.navigate(Destination.EcoTipDetail(tipId)) },
-                contentPadding = innerPadding,
-            )
+        TopLevelScreen(tab = TopLevelDestination.FAVORITES, navController = navController) {
+            FeatureScaffold(
+                title = stringResource(ProfileR.string.favorites_screen_title),
+                onNavigateBack = null,
+            ) { innerPadding ->
+                FavoritesTabScreen(
+                    onTaskSelected = { taskId -> navController.navigate(Destination.TaskDetail(taskId)) },
+                    onTipSelected = { tipId -> navController.navigate(Destination.EcoTipDetail(tipId)) },
+                    contentPadding = innerPadding,
+                )
+            }
         }
     }
     composable<Destination.Map> {
-        MapScreen()
+        TopLevelScreen(tab = TopLevelDestination.MAP, navController = navController) {
+            MapScreen()
+        }
     }
     composable<Destination.Shop> {
-        FeatureScaffold(
-            title = stringResource(destinationTitleRes(Destination.Shop)),
-            onNavigateBack = null,
-        ) { innerPadding ->
-            ShopScreen(
-                onCouponsClick = { navController.navigate(Destination.Coupons) },
-                onCouponSelected = { couponId -> navController.navigate(Destination.CouponDetail(couponId)) },
-                contentPadding = innerPadding,
-            )
+        TopLevelScreen(tab = TopLevelDestination.SHOP, navController = navController) {
+            FeatureScaffold(
+                title = stringResource(destinationTitleRes(Destination.Shop)),
+                onNavigateBack = null,
+            ) { innerPadding ->
+                ShopScreen(
+                    onCouponsClick = { navController.navigate(Destination.Coupons) },
+                    onCouponSelected = { couponId -> navController.navigate(Destination.CouponDetail(couponId)) },
+                    contentPadding = innerPadding,
+                )
+            }
         }
     }
 }
@@ -257,6 +291,11 @@ private fun NavGraphBuilder.communityRoutes(navController: NavHostController) {
         FeatureScaffold(
             title = stringResource(destinationTitleRes(Destination.Community)),
             onNavigateBack = navController::popBackStack,
+            search = SearchBarContent(
+                query = uiState.query,
+                onQueryChange = viewModel::onQueryChanged,
+                placeholder = stringResource(CommunityR.string.search_groups_placeholder),
+            ),
             actions = {
                 if (uiState.currentUserId != null) {
                     CommunityAddButton(
@@ -297,13 +336,21 @@ private fun NavGraphBuilder.contentRoutes(navController: NavHostController) {
         }
     }
     composable<Destination.EcoTips> {
+        val viewModel: EcoTipsListViewModel = hiltViewModel()
+        val query by viewModel.query.collectAsStateWithLifecycle()
         FeatureScaffold(
             title = stringResource(destinationTitleRes(Destination.EcoTips)),
             onNavigateBack = navController::popBackStack,
+            search = SearchBarContent(
+                query = query,
+                onQueryChange = viewModel::onQueryChanged,
+                placeholder = stringResource(EcoTipsR.string.search_ecotips_placeholder),
+            ),
         ) { innerPadding ->
             EcoTipsListScreen(
                 onTipSelected = { tipId -> navController.navigate(Destination.EcoTipDetail(tipId)) },
                 contentPadding = innerPadding,
+                viewModel = viewModel,
             )
         }
     }
@@ -326,13 +373,21 @@ private fun NavGraphBuilder.contentRoutes(navController: NavHostController) {
 
 private fun NavGraphBuilder.gameRoutes(navController: NavHostController) {
     composable<Destination.Games> {
+        val viewModel: GamesHubViewModel = hiltViewModel()
+        val query by viewModel.query.collectAsStateWithLifecycle()
         FeatureScaffold(
             title = stringResource(destinationTitleRes(Destination.Games)),
             onNavigateBack = navController::popBackStack,
+            search = SearchBarContent(
+                query = query,
+                onQueryChange = viewModel::onQueryChanged,
+                placeholder = stringResource(GamesR.string.search_games_placeholder),
+            ),
         ) { innerPadding ->
             GamesHubScreen(
                 onGameSelected = { gameId -> navController.navigate(Destination.GameWeb(gameId)) },
                 contentPadding = innerPadding,
+                viewModel = viewModel,
             )
         }
     }

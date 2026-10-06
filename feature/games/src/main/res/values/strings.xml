@@ -3,4 +3,5 @@
     <string name="no_internet_for_points_msg">Нужен интернет, чтобы получить очки</string>
     <string name="streak_bonus_msg">+%1$d оч. за серию дней</string>
     <string name="something_went_wrong_msg">Что-то пошло не так. Попробуй ещё раз</string>
+    <string name="search_games_placeholder">Поиск игр</string>
 </resources>

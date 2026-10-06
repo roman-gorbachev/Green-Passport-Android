@@ -14,7 +14,7 @@ import dev.chrisbanes.haze.rememberHazeState
 
 @Composable
 fun GlassBottomBarLayout(
-    selected: TopLevelDestination?,
+    selected: TopLevelDestination,
     onSelect: (TopLevelDestination) -> Unit,
     modifier: Modifier = Modifier,
     isOpaque: Boolean = false,
@@ -29,16 +29,14 @@ fun GlassBottomBarLayout(
         ) {
             content()
         }
-        if (selected != null) {
-            GpBottomBar(
-                selected = selected,
-                onSelect = onSelect,
-                hazeState = if (isOpaque) null else hazeState,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-                    .padding(Dimens.BottomBarOuterPadding),
-            )
-        }
+        GpBottomBar(
+            selected = selected,
+            onSelect = onSelect,
+            hazeState = if (isOpaque) null else hazeState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(Dimens.BottomBarOuterPadding),
+        )
     }
 }

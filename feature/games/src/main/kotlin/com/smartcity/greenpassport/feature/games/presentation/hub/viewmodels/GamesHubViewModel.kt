@@ -10,7 +10,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -30,7 +32,10 @@ class GamesHubViewModel @Inject constructor(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
-    val uiState = observeGamesHubUiState().stateIn(
+    private val _query = MutableStateFlow("")
+    val query = _query.asStateFlow()
+
+    val uiState = combine(observeGamesHubUiState(), _query) { state, query -> state.copy(query = query) }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
         GamesHubUiState(),
@@ -38,6 +43,10 @@ class GamesHubViewModel @Inject constructor(
 
     fun retry() {
         retryRequests.tryEmit(Unit)
+    }
+
+    fun onQueryChanged(newQuery: String) {
+        _query.value = newQuery
     }
 
     private fun observeGamesHubUiState(): Flow<GamesHubUiState> {

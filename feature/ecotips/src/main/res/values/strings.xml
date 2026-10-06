@@ -8,4 +8,5 @@
     <string name="ecotip_detail_reward_format">Награда: %1$d баллов, %2$d опыта</string>
     <string name="ecotip_detail_mark_read_button">Отметить как изучено</string>
     <string name="ecotip_detail_read_label">Уже изучено</string>
+    <string name="search_ecotips_placeholder">Поиск советов</string>
 </resources>

@@ -106,7 +106,8 @@ private fun EcoTipsListContent(
             }
             if (uiState.visibleTips.isEmpty()) {
                 item {
-                    EmptyContent(message = stringResource(R.string.ecotips_empty))
+                    val emptyMessage = if (uiState.isSearching) CoreR.string.nothing_found else R.string.ecotips_empty
+                    EmptyContent(message = stringResource(emptyMessage))
                 }
             }
             items(uiState.visibleTips, key = { it.id }) { tip ->

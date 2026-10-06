@@ -4,21 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,7 +20,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -84,9 +75,6 @@ fun CommunityHubScreen(
             .fillMaxSize()
             .nestedScroll(archiveConnection),
     ) {
-        item(key = SEARCH_KEY) {
-            SearchField(query = uiState.query, onQueryChange = viewModel::onQueryChanged)
-        }
         if (uiState.isSearching) {
             item(key = RESULTS_KEY) {
                 SearchResults(uiState = uiState, onChatSelected = onChatSelected)
@@ -193,32 +181,6 @@ private fun SearchSection(titleRes: Int, results: List<GroupSearchResult>, onCha
 }
 
 @Composable
-private fun SearchField(query: String, onQueryChange: (String) -> Unit) {
-    TextField(
-        value = query,
-        onValueChange = onQueryChange,
-        placeholder = { Text(stringResource(R.string.search_groups_placeholder)) },
-        leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null) },
-        trailingIcon = {
-            if (query.isNotEmpty()) {
-                IconButton(onClick = { onQueryChange("") }) {
-                    Icon(imageVector = Icons.Filled.Close, contentDescription = null)
-                }
-            }
-        },
-        singleLine = true,
-        shape = RoundedCornerShape(Dimens.CornerRadiusLarge),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-        ),
-        modifier = Modifier.fillMaxWidth(),
-    )
-}
-
-@Composable
 private fun HubDialogs(uiState: CommunityHubUiState, viewModel: CommunityHubViewModel) {
     val bannedWords = stringResource(R.string.text_contains_banned_words)
     val notFound = stringResource(R.string.group_not_found_msg)
@@ -288,7 +250,6 @@ private fun rememberArchiveRevealConnection(
     }
 }
 
-private const val SEARCH_KEY = "search"
 private const val RESULTS_KEY = "results"
 private const val ARCHIVE_KEY = "archive"
 private const val FORUM_KEY = "forum"

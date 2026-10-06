@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -38,6 +39,9 @@ class EcoTipsListViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val selectedCategory = MutableStateFlow<EcoTipCategory?>(null)
+
+    private val _query = MutableStateFlow("")
+    val query = _query.asStateFlow()
 
     private val retryRequests = MutableSharedFlow<Unit>(
         extraBufferCapacity = 1,
@@ -60,6 +64,10 @@ class EcoTipsListViewModel @Inject constructor(
         selectedCategory.value = category
     }
 
+    fun onQueryChanged(newQuery: String) {
+        _query.value = newQuery
+    }
+
     fun onToggleBookmark(tipId: String) {
         val userId = currentUserId ?: return
         val isBookmarked = uiState.value.bookmarkedTipIds.contains(tipId)
@@ -75,7 +83,9 @@ class EcoTipsListViewModel @Inject constructor(
                 currentUserId = session?.userId
                 observeTipsData(session?.userId)
             }
-        return combine(data, selectedCategory) { tipsData, category -> tipsData.copy(selectedCategory = category) }
+        return combine(data, selectedCategory, _query) { tipsData, category, query ->
+            tipsData.copy(selectedCategory = category, query = query)
+        }
     }
 
     private fun observeTipsData(userId: String?): Flow<EcoTipsListUiState> {

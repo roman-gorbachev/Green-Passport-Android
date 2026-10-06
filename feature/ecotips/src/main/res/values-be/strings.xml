@@ -9,4 +9,5 @@
     <string name="ecotip_detail_reward_format">Узнагарода: %1$d балаў, %2$d вопыту</string>
     <string name="ecotip_detail_mark_read_button">Адзначыць як вывучанае</string>
     <string name="ecotip_detail_read_label">Ужо вывучана</string>
+    <string name="search_ecotips_placeholder">Пошук парад</string>
 </resources>

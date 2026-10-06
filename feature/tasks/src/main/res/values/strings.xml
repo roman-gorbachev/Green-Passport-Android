@@ -47,4 +47,5 @@
     <string name="streak_bonus_msg">+%1$d оч. за серию дней</string>
     <string name="qr_code_not_active_msg">QR-код сейчас не действует. Проверь сроки задания</string>
     <string name="qr_code_limit_reached_msg">Этот QR-код уже отсканировали максимальное число раз</string>
+    <string name="search_tasks_placeholder">Поиск заданий</string>
 </resources>

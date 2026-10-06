@@ -34,6 +34,7 @@ fun GamesHubScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val language = LocalLocale.current.platformLocale.language
+    val visibleGames = uiState.visibleGames(language)
 
     when {
         uiState.isLoading -> LoadingContent(modifier = modifier.padding(contentPadding))
@@ -47,6 +48,10 @@ fun GamesHubScreen(
             message = stringResource(CoreR.string.error_generic_message),
             modifier = modifier.padding(contentPadding),
         )
+        visibleGames.isEmpty() -> EmptyContent(
+            message = stringResource(CoreR.string.nothing_found),
+            modifier = modifier.padding(contentPadding),
+        )
 
         else -> LazyVerticalGrid(
             columns = GridCells.Fixed(COLUMN_COUNT),
@@ -58,7 +63,7 @@ fun GamesHubScreen(
                 vertical = Dimens.SpacingMedium,
             ),
         ) {
-            items(uiState.games, key = { it.id }) { game ->
+            items(visibleGames, key = { it.id }) { game ->
                 val bestScore = uiState.bestScores[game.id]
                 GameTile(
                     game = game,

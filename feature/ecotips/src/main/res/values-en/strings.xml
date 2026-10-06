@@ -8,4 +8,5 @@
     <string name="ecotip_detail_reward_format">Reward: %1$d points, %2$d XP</string>
     <string name="ecotip_detail_mark_read_button">Mark as read</string>
     <string name="ecotip_detail_read_label">Already read</string>
+    <string name="search_ecotips_placeholder">Search tips</string>
 </resources>

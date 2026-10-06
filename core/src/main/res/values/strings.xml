@@ -54,4 +54,5 @@
     </plurals>
     <string name="notification_channel_messages">Сообщения в чатах</string>
     <string name="community_forum_title">Форум</string>
+    <string name="nothing_found">Ничего не найдено</string>
 </resources>

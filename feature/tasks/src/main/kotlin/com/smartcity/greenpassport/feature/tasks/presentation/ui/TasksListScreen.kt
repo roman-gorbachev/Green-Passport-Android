@@ -123,7 +123,7 @@ private fun TasksListContent(
                 modifier = Modifier.padding(listPadding),
             )
             uiState.visibleTasks.isEmpty() -> EmptyContent(
-                message = stringResource(R.string.tasks_empty),
+                message = stringResource(if (uiState.isSearching) CoreR.string.nothing_found else R.string.tasks_empty),
                 modifier = Modifier.padding(listPadding),
             )
 

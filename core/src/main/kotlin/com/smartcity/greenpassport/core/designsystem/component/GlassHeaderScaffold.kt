@@ -3,8 +3,16 @@ package com.smartcity.greenpassport.core.designsystem.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -41,6 +49,7 @@ fun GlassHeaderScaffold(
     modifier: Modifier = Modifier,
     onNavigateBack: (() -> Unit)? = null,
     bottomPadding: Dp = Dimens.SpacingNone,
+    search: SearchBarContent? = null,
     actions: @Composable () -> Unit = {},
     content: @Composable (contentPadding: PaddingValues) -> Unit,
 ) {
@@ -50,6 +59,15 @@ fun GlassHeaderScaffold(
     val density = LocalDensity.current
     var headerHeight by remember { mutableStateOf(Dimens.SpacingNone) }
     val background = MaterialTheme.colorScheme.background
+    val keyboardPadding = WindowInsets.ime
+        .exclude(WindowInsets.navigationBars)
+        .asPaddingValues()
+        .calculateBottomPadding()
+    val contentBottomPadding = if (search == null) {
+        bottomPadding
+    } else {
+        bottomPadding + Dimens.SearchBarReservedHeight + keyboardPadding
+    }
 
     Box(
         modifier = modifier
@@ -62,7 +80,7 @@ fun GlassHeaderScaffold(
                 .fillMaxSize()
                 .hazeSource(hazeState),
         ) {
-            content(PaddingValues(top = headerHeight, bottom = bottomPadding))
+            content(PaddingValues(top = headerHeight, bottom = contentBottomPadding))
         }
         Box(
             modifier = Modifier
@@ -87,6 +105,16 @@ fun GlassHeaderScaffold(
                     modifier = Modifier.align(Alignment.BottomCenter),
                 )
             }
+        }
+        if (search != null) {
+            GlassSearchBar(
+                content = search,
+                hazeState = hazeState,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime))
+                    .padding(Dimens.BottomBarOuterPadding),
+            )
         }
     }
 }

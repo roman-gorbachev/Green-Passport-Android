@@ -26,6 +26,8 @@ object Dimens {
     val BottomBarOuterPadding = 12.dp
     val BottomBarElevation = 8.dp
     val BottomBarReservedHeight = BottomBarHeight + BottomBarOuterPadding + SpacingSmall
+    val SearchBarHeight = 44.dp
+    val SearchBarReservedHeight = SearchBarHeight + BottomBarOuterPadding + SpacingSmall
     val CardElevation = 2.dp
     val ButtonElevation = 2.dp
     val ChipElevation = 1.dp

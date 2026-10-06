@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -48,6 +49,9 @@ class TasksListViewModel @Inject constructor(
 
     private val filters = MutableStateFlow(FilterState())
 
+    private val _query = MutableStateFlow("")
+    val query = _query.asStateFlow()
+
     private val retryRequests = MutableSharedFlow<Unit>(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
@@ -69,6 +73,10 @@ class TasksListViewModel @Inject constructor(
         filters.update { it.copy(filters = newFilters, isSheetVisible = false) }
     }
 
+    fun onQueryChanged(newQuery: String) {
+        _query.value = newQuery
+    }
+
     fun onFilterSheetVisibilityChanged(isVisible: Boolean) {
         filters.update { it.copy(isSheetVisible = isVisible) }
     }
@@ -88,7 +96,7 @@ class TasksListViewModel @Inject constructor(
                 currentUserId = session?.userId
                 observeTasksData(session?.userId)
             }
-        return combine(data, filters) { tasksData, filterState ->
+        return combine(data, filters, _query) { tasksData, filterState, query ->
             TasksListUiState(
                 tasks = tasksData.tasks,
                 completedTaskIds = tasksData.completedIds,
@@ -96,6 +104,7 @@ class TasksListViewModel @Inject constructor(
                 pendingTaskIds = tasksData.pendingIds,
                 profile = tasksData.profile,
                 filters = filterState.filters,
+                query = query,
                 isFilterSheetVisible = filterState.isSheetVisible,
                 isLoading = tasksData.isLoading,
                 hasError = tasksData.hasError,
