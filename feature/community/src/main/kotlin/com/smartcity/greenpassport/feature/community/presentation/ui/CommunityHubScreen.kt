@@ -1,10 +1,5 @@
 package com.smartcity.greenpassport.feature.community.presentation.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -97,13 +92,9 @@ fun CommunityHubScreen(
                 SearchResults(uiState = uiState, onChatSelected = onChatSelected)
             }
         } else {
-            item(key = ARCHIVE_KEY) {
-                AnimatedVisibility(
-                    visible = isArchiveRevealed && uiState.archivedCount > 0,
-                    enter = expandVertically() + fadeIn(),
-                    exit = shrinkVertically() + fadeOut(),
-                ) {
-                    ListSection {
+            if (isArchiveRevealed && uiState.archivedCount > 0) {
+                item(key = ARCHIVE_KEY) {
+                    ListSection(modifier = Modifier.animateItem()) {
                         ListSectionRow(
                             title = stringResource(R.string.archived_chats),
                             subtitle = uiState.archivedCount.toString(),
@@ -114,7 +105,10 @@ fun CommunityHubScreen(
                 }
             }
             item(key = FORUM_KEY) {
-                ListSection(header = stringResource(R.string.community_forum_title)) {
+                ListSection(
+                    modifier = Modifier.animateItem(),
+                    header = stringResource(R.string.community_forum_title)
+                ) {
                     ChatListRow(
                         chat = uiState.forum,
                         onOpen = { onChatSelected(ChatId.Forum) },
@@ -125,7 +119,12 @@ fun CommunityHubScreen(
                 }
             }
             item(key = GROUPS_KEY) {
-                MyGroupsSection(uiState = uiState, onChatSelected = onChatSelected, viewModel = viewModel)
+                MyGroupsSection(
+                    modifier = Modifier.animateItem(),
+                    uiState = uiState,
+                    onChatSelected = onChatSelected,
+                    viewModel = viewModel
+                )
             }
         }
     }
@@ -136,8 +135,9 @@ private fun MyGroupsSection(
     uiState: CommunityHubUiState,
     onChatSelected: (ChatId) -> Unit,
     viewModel: CommunityHubViewModel,
+    modifier: Modifier = Modifier,
 ) {
-    ListSection(header = stringResource(R.string.my_groups)) {
+    ListSection(modifier = modifier, header = stringResource(R.string.my_groups)) {
         if (uiState.groups.isEmpty() && !uiState.isLoading) {
             Text(
                 text = stringResource(R.string.my_groups_empty_msg),
