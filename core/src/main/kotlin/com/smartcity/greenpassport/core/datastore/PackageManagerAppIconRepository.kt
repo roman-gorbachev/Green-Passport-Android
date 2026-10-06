@@ -7,19 +7,29 @@ import com.smartcity.greenpassport.core.model.settings.AppIcon
 import com.smartcity.greenpassport.core.model.settings.AppIconRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
 private const val ALIAS_PACKAGE = "com.smartcity.greenpassport"
 private const val ALIAS_PREFIX = "Icon"
 
+@Singleton
 class PackageManagerAppIconRepository @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : AppIconRepository {
 
+    @Volatile
+    private var pending: AppIcon? = null
+
     override val current: AppIcon
-        get() = AppIcon.entries.firstOrNull { isEnabled(it) } ?: AppIcon.STANDARD
+        get() = pending ?: enabledIcon()
 
     override fun set(icon: AppIcon) {
-        if (icon == current) return
+        pending = icon.takeIf { it != enabledIcon() }
+    }
+
+    override fun applyPending() {
+        val icon = pending ?: return
+        pending = null
         val packageManager = context.packageManager
         packageManager.setComponentEnabledSetting(
             componentName(icon),
@@ -34,6 +44,8 @@ class PackageManagerAppIconRepository @Inject constructor(
             )
         }
     }
+
+    private fun enabledIcon(): AppIcon = AppIcon.entries.firstOrNull { isEnabled(it) } ?: AppIcon.STANDARD
 
     private fun isEnabled(icon: AppIcon): Boolean =
         when (context.packageManager.getComponentEnabledSetting(componentName(icon))) {

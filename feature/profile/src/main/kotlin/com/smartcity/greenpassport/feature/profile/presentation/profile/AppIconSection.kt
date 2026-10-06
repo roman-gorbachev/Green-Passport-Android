@@ -57,6 +57,11 @@ fun AppIconSection(
                     }
                 }
             }
+            Text(
+                text = stringResource(R.string.app_icon_change_hint_msg),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

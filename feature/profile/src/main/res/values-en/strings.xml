@@ -67,4 +67,5 @@
     <string name="app_icon_night">Night</string>
     <string name="app_icon_ocean">Ocean</string>
     <string name="app_icon_lime">Lime</string>
+    <string name="app_icon_change_hint_msg">The icon changes when you leave the app</string>
 </resources>

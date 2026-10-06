@@ -63,4 +63,5 @@
     <string name="app_icon_night">Ноч</string>
     <string name="app_icon_ocean">Акіян</string>
     <string name="app_icon_lime">Лайм</string>
+    <string name="app_icon_change_hint_msg">Іконка зменіцца, калі вы згорнеце праграму</string>
 </resources>

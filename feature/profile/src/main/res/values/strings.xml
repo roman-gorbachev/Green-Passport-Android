@@ -70,4 +70,5 @@
     <string name="app_icon_night">Ночь</string>
     <string name="app_icon_ocean">Океан</string>
     <string name="app_icon_lime">Лайм</string>
+    <string name="app_icon_change_hint_msg">Иконка сменится, когда вы свернёте приложение</string>
 </resources>
