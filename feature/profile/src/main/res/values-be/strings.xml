@@ -56,4 +56,11 @@
     <string name="notifications_events">Падзеі</string>
     <string name="notifications_tasks">Заданні і ўзнагароды</string>
     <string name="notifications_messages">Паведамленні</string>
+    <string name="app_icon">Іконка праграмы</string>
+    <string name="app_icon_standard">Светлая</string>
+    <string name="app_icon_dark">Цёмная</string>
+    <string name="app_icon_sunset">Захад</string>
+    <string name="app_icon_night">Ноч</string>
+    <string name="app_icon_ocean">Акіян</string>
+    <string name="app_icon_lime">Лайм</string>
 </resources>

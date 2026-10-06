@@ -8,7 +8,9 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import com.smartcity.greenpassport.core.datastore.AppCompatLanguageRepository
 import com.smartcity.greenpassport.core.datastore.LocalAppSettingsRepository
 import com.smartcity.greenpassport.core.datastore.LocalSettingsStore
+import com.smartcity.greenpassport.core.datastore.PackageManagerAppIconRepository
 import com.smartcity.greenpassport.core.datastore.PreferencesSettingsStore
+import com.smartcity.greenpassport.core.model.settings.AppIconRepository
 import com.smartcity.greenpassport.core.model.settings.AppLanguageRepository
 import com.smartcity.greenpassport.core.model.settings.AppSettingsRepository
 import dagger.Binds
@@ -33,6 +35,9 @@ abstract class DatastoreModule {
 
     @Binds
     abstract fun bindAppLanguageRepository(impl: AppCompatLanguageRepository): AppLanguageRepository
+
+    @Binds
+    abstract fun bindAppIconRepository(impl: PackageManagerAppIconRepository): AppIconRepository
 
     companion object {
         @Provides

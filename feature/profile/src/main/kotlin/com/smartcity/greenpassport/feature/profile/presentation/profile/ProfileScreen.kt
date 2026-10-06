@@ -202,6 +202,10 @@ private fun ProfileContent(
         }
 
         item {
+            AppIconSection()
+        }
+
+        item {
             NotificationsSection(
                 enabledCategories = uiState.enabledNotificationCategories,
                 onToggle = onNotificationCategoryToggle,

@@ -63,4 +63,11 @@
     <string name="notifications_events">События</string>
     <string name="notifications_tasks">Задания и награды</string>
     <string name="notifications_messages">Сообщения</string>
+    <string name="app_icon">Иконка приложения</string>
+    <string name="app_icon_standard">Светлая</string>
+    <string name="app_icon_dark">Тёмная</string>
+    <string name="app_icon_sunset">Закат</string>
+    <string name="app_icon_night">Ночь</string>
+    <string name="app_icon_ocean">Океан</string>
+    <string name="app_icon_lime">Лайм</string>
 </resources>
