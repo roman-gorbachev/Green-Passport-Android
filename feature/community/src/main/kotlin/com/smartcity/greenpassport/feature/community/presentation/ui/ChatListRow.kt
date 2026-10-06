@@ -34,6 +34,7 @@ fun ChatListRow(
     onAction: (ChatListAction) -> Unit,
     showDivider: Boolean,
     modifier: Modifier = Modifier,
+    actions: List<ChatListAction> = ChatListAction.entries,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
@@ -61,18 +62,24 @@ fun ChatListRow(
                 isExpanded = false
                 onAction(action)
             }
-            MenuItem(
-                title = stringResource(if (settings.isPinned) R.string.unpin_chat else R.string.pin_chat),
-                icon = if (settings.isPinned) Icons.Outlined.PushPin else Icons.Filled.PushPin,
-            ) { select(ChatListAction.TOGGLE_PIN) }
-            MenuItem(
-                title = stringResource(if (settings.isMuted) R.string.unmute_chat else R.string.mute_chat),
-                icon = if (settings.isMuted) Icons.Filled.Notifications else Icons.Filled.NotificationsOff,
-            ) { select(ChatListAction.TOGGLE_MUTE) }
-            MenuItem(
-                title = stringResource(if (settings.isArchived) R.string.unarchive_chat else R.string.archive_chat),
-                icon = if (settings.isArchived) Icons.Filled.Unarchive else Icons.Filled.Archive,
-            ) { select(ChatListAction.TOGGLE_ARCHIVE) }
+            if (ChatListAction.TOGGLE_PIN in actions) {
+                MenuItem(
+                    title = stringResource(if (settings.isPinned) R.string.unpin_chat else R.string.pin_chat),
+                    icon = if (settings.isPinned) Icons.Outlined.PushPin else Icons.Filled.PushPin,
+                ) { select(ChatListAction.TOGGLE_PIN) }
+            }
+            if (ChatListAction.TOGGLE_MUTE in actions) {
+                MenuItem(
+                    title = stringResource(if (settings.isMuted) R.string.unmute_chat else R.string.mute_chat),
+                    icon = if (settings.isMuted) Icons.Filled.Notifications else Icons.Filled.NotificationsOff,
+                ) { select(ChatListAction.TOGGLE_MUTE) }
+            }
+            if (ChatListAction.TOGGLE_ARCHIVE in actions) {
+                MenuItem(
+                    title = stringResource(if (settings.isArchived) R.string.unarchive_chat else R.string.archive_chat),
+                    icon = if (settings.isArchived) Icons.Filled.Unarchive else Icons.Filled.Archive,
+                ) { select(ChatListAction.TOGGLE_ARCHIVE) }
+            }
         }
     }
 }

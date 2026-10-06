@@ -49,9 +49,6 @@ sealed interface Destination {
     data object Forum : Destination
 
     @Serializable
-    data object CommunityGroups : Destination
-
-    @Serializable
     data object ArchivedChats : Destination
 
     @Serializable

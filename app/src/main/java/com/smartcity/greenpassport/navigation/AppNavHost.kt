@@ -20,15 +20,14 @@ import com.smartcity.greenpassport.feature.calendar.presentation.ui.CalendarScre
 import com.smartcity.greenpassport.feature.calendar.presentation.ui.EventDetailSheet
 import com.smartcity.greenpassport.feature.community.presentation.ui.ArchivedChatsScreen
 import com.smartcity.greenpassport.feature.community.presentation.ui.ChatMuteButton
+import com.smartcity.greenpassport.feature.community.presentation.ui.CommunityAddButton
 import com.smartcity.greenpassport.feature.community.presentation.ui.CommunityHubScreen
 import com.smartcity.greenpassport.feature.community.presentation.ui.ForumScreen
 import com.smartcity.greenpassport.feature.community.presentation.ui.GroupDetailScreen
 import com.smartcity.greenpassport.feature.community.presentation.ui.GroupMenuButton
-import com.smartcity.greenpassport.feature.community.presentation.ui.GroupsScreen
-import com.smartcity.greenpassport.feature.community.presentation.ui.JoinByCodeButton
 import com.smartcity.greenpassport.feature.community.presentation.viewmodels.ChatMuteViewModel
+import com.smartcity.greenpassport.feature.community.presentation.viewmodels.CommunityHubViewModel
 import com.smartcity.greenpassport.feature.community.presentation.viewmodels.GroupDetailViewModel
-import com.smartcity.greenpassport.feature.community.presentation.viewmodels.GroupsViewModel
 import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipBookmarkButton
 import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipDetailScreen
 import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipsListScreen
@@ -253,27 +252,23 @@ private fun NavGraphBuilder.chatRoutes(navController: NavHostController) {
 
 private fun NavGraphBuilder.communityRoutes(navController: NavHostController) {
     composable<Destination.Community> {
+        val viewModel: CommunityHubViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         FeatureScaffold(
             title = stringResource(destinationTitleRes(Destination.Community)),
             onNavigateBack = navController::popBackStack,
+            actions = {
+                if (uiState.currentUserId != null) {
+                    CommunityAddButton(
+                        onCreateGroup = { viewModel.onCreateDialogVisibilityChanged(true) },
+                        onJoinByCode = { viewModel.onCodeDialogVisibilityChanged(true) },
+                    )
+                }
+            },
         ) { innerPadding ->
             CommunityHubScreen(
                 onChatSelected = { chatId -> navController.navigate(chatId.destination) },
                 onArchiveSelected = { navController.navigate(Destination.ArchivedChats) },
-                onGroupsSelected = { navController.navigate(Destination.CommunityGroups) },
-                contentPadding = innerPadding,
-            )
-        }
-    }
-    composable<Destination.CommunityGroups> {
-        val viewModel: GroupsViewModel = hiltViewModel()
-        FeatureScaffold(
-            title = stringResource(CommunityR.string.community_groups_title),
-            onNavigateBack = navController::popBackStack,
-            actions = { JoinByCodeButton(onClick = { viewModel.onCodeDialogVisibilityChanged(true) }) },
-        ) { innerPadding ->
-            GroupsScreen(
-                onGroupSelected = { groupId -> navController.navigate(Destination.CommunityGroup(groupId)) },
                 contentPadding = innerPadding,
                 viewModel = viewModel,
             )

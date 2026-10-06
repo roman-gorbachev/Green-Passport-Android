@@ -31,6 +31,7 @@ fun ChatRow(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     lastMessageAtEpochMillis: Long? = null,
+    subtitle: String? = null,
     isPinned: Boolean = false,
     isMuted: Boolean = false,
     isLoading: Boolean = false,
@@ -38,7 +39,7 @@ fun ChatRow(
 ) {
     ListSectionRow(
         title = title,
-        subtitle = lastMessageAtEpochMillis?.let(::relativeTime),
+        subtitle = subtitle ?: lastMessageAtEpochMillis?.let(::relativeTime),
         leading = { SymbolTile(icon = chatId.icon) },
         trailing = {
             LoadingLabel(isLoading = isLoading, color = MaterialTheme.colorScheme.primary) {

@@ -23,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
@@ -44,6 +46,8 @@ fun MessageComposer(
     cancelBannerLabel: String = "",
     onCancelBanner: () -> Unit = {},
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
     Column(
         verticalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
         modifier = modifier
@@ -80,7 +84,13 @@ fun MessageComposer(
                 modifier = Modifier.weight(1f),
             )
             FilledIconButton(
-                onClick = { if (!isSending) onSend() },
+                onClick = {
+                    if (!isSending) {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        onSend()
+                    }
+                },
                 enabled = draft.isNotBlank() || isSending,
                 modifier = Modifier.size(Dimens.PrimaryButtonHeight),
             ) {

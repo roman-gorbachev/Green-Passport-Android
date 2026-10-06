@@ -49,7 +49,13 @@
     <string name="archive_chat">Archive</string>
     <string name="unarchive_chat">Unarchive</string>
     <string name="archived_chats">Archived chats</string>
-    <string name="chats">Chats</string>
     <string name="delete">Delete</string>
     <string name="date_time">%1$s · %2$s</string>
+    <string name="search_groups_placeholder">Search groups and members</string>
+    <string name="my_groups">My groups</string>
+    <string name="other_groups">Other groups</string>
+    <string name="my_groups_empty_msg">Find a group with search or create your own</string>
+    <string name="groups_not_found">Nothing found</string>
+    <string name="member_match_format">Member: %1$s</string>
+    <string name="create_group">Create group</string>
 </resources>

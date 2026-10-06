@@ -9,18 +9,15 @@ data class ChatSummary(
     val settings: ChatSettings,
 ) {
     companion object {
-        fun list(
-            groups: List<CommunityGroup>,
-            forumLastMessageAtEpochMillis: Long?,
-            settings: Map<ChatId, ChatSettings>,
-        ): List<ChatSummary> {
-            val forum = ChatSummary(
-                chatId = ChatId.Forum,
-                groupName = null,
-                lastMessageAtEpochMillis = forumLastMessageAtEpochMillis,
-                settings = settings[ChatId.Forum] ?: ChatSettings.defaults(ChatId.Forum),
-            )
-            val groupChats = groups.map { group ->
+        fun forum(lastMessageAtEpochMillis: Long?, settings: Map<ChatId, ChatSettings>) = ChatSummary(
+            chatId = ChatId.Forum,
+            groupName = null,
+            lastMessageAtEpochMillis = lastMessageAtEpochMillis,
+            settings = settings[ChatId.Forum] ?: ChatSettings.defaults(ChatId.Forum),
+        )
+
+        fun groups(groups: List<CommunityGroup>, settings: Map<ChatId, ChatSettings>): List<ChatSummary> =
+            groups.map { group ->
                 val chatId = ChatId.Group(group.id)
                 ChatSummary(
                     chatId = chatId,
@@ -28,11 +25,9 @@ data class ChatSummary(
                     lastMessageAtEpochMillis = group.lastMessageAtEpochMillis,
                     settings = settings[chatId] ?: ChatSettings.defaults(chatId),
                 )
-            }
-            return (listOf(forum) + groupChats).sortedWith(
+            }.sortedWith(
                 compareByDescending<ChatSummary> { it.settings.isPinned }
                     .thenByDescending { it.lastMessageAtEpochMillis ?: Long.MIN_VALUE },
             )
-        }
     }
 }

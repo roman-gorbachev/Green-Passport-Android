@@ -49,6 +49,7 @@ object Dimens {
     val MessageBubbleMaxWidth = 280.dp
     val QuoteBarWidth = 3.dp
     val QuoteIconSize = 16.dp
+    val ArchiveRevealDistance = 60.dp
     val CouponQrSize = 200.dp
     val InputFieldHeight = 50.dp
     val ProgressHeroHeight = 140.dp

@@ -171,7 +171,7 @@ private fun GroupChat(
                 )
                 else -> LazyColumn(
                     state = listState,
-                    verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall, Alignment.Bottom),
                     contentPadding = PaddingValues(
                         start = Dimens.ScreenHorizontalPadding,
                         end = Dimens.ScreenHorizontalPadding,

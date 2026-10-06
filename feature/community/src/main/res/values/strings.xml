@@ -49,7 +49,13 @@
     <string name="archive_chat">В архив</string>
     <string name="unarchive_chat">Вернуть из архива</string>
     <string name="archived_chats">Архив чатов</string>
-    <string name="chats">Чаты</string>
     <string name="delete">Удалить</string>
     <string name="date_time">%1$s · %2$s</string>
+    <string name="search_groups_placeholder">Поиск групп и участников</string>
+    <string name="my_groups">Мои группы</string>
+    <string name="other_groups">Другие группы</string>
+    <string name="my_groups_empty_msg">Найдите группу через поиск или создайте свою</string>
+    <string name="groups_not_found">Ничего не найдено</string>
+    <string name="member_match_format">Участник: %1$s</string>
+    <string name="create_group">Создать группу</string>
 </resources>
