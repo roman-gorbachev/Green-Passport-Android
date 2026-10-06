@@ -50,6 +50,7 @@ import com.smartcity.greenpassport.core.designsystem.component.SymbolTile
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.CommunityGroup
 import com.smartcity.greenpassport.core.model.GroupMessage
+import com.smartcity.greenpassport.core.model.community.ChatId
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import com.smartcity.greenpassport.feature.community.R
 import com.smartcity.greenpassport.feature.community.presentation.state.GroupDetailUiState
@@ -69,6 +70,7 @@ fun GroupDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val group = uiState.group
+    if (group != null && uiState.isMember) OpenChatEffect(ChatId.Group(group.id))
 
     if (uiState.isLeaveConfirmationVisible) {
         AlertDialog(

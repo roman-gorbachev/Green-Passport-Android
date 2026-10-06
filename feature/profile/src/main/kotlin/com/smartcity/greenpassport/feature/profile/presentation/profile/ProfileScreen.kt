@@ -23,14 +23,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.BrightnessMedium
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.DropdownMenu
@@ -71,6 +73,7 @@ import com.smartcity.greenpassport.core.designsystem.theme.SectionColors
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import com.smartcity.greenpassport.core.model.settings.AppLanguage
 import com.smartcity.greenpassport.core.model.settings.AppTheme
+import com.smartcity.greenpassport.core.model.settings.NotificationCategory
 import com.smartcity.greenpassport.core.navigation.Destination
 import com.smartcity.greenpassport.feature.profile.R
 import com.smartcity.greenpassport.core.R as CoreR
@@ -85,9 +88,13 @@ fun ProfileScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var hasRequestedNotificationPermission by rememberSaveable { mutableStateOf(false) }
+    var pendingCategory by rememberSaveable { mutableStateOf<NotificationCategory?>(null) }
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
-    ) { granted -> viewModel.onNotificationsToggle(granted) }
+    ) { granted ->
+        pendingCategory?.let { category -> viewModel.onNotificationCategoryToggle(category, granted) }
+        pendingCategory = null
+    }
 
     if (uiState.hasError) {
         ErrorContent(
@@ -106,15 +113,16 @@ fun ProfileScreen(
 
     ProfileContent(
         uiState = uiState,
-        onNotificationsToggle = { enabled ->
+        onNotificationCategoryToggle = { category, enabled ->
             val needsRuntimePermission = enabled && !context.hasNotificationPermission()
             val isPermissionBlocked = hasRequestedNotificationPermission &&
                 !(context as? Activity).canShowNotificationPermissionRationale()
             when {
-                !needsRuntimePermission -> viewModel.onNotificationsToggle(enabled)
+                !needsRuntimePermission -> viewModel.onNotificationCategoryToggle(category, enabled)
                 isPermissionBlocked -> openAppNotificationSettings(context)
                 else -> {
                     hasRequestedNotificationPermission = true
+                    pendingCategory = category
                     notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
             }
@@ -162,7 +170,7 @@ private val profileMenuEntries = listOf(
 @Composable
 private fun ProfileContent(
     uiState: ProfileUiState,
-    onNotificationsToggle: (Boolean) -> Unit,
+    onNotificationCategoryToggle: (NotificationCategory, Boolean) -> Unit,
     onThemeSelected: (AppTheme) -> Unit,
     onSignOut: () -> Unit,
     onMenuEntrySelected: (Destination) -> Unit,
@@ -188,9 +196,15 @@ private fun ProfileContent(
         item {
             SettingsSection(
                 uiState = uiState,
-                onNotificationsToggle = onNotificationsToggle,
                 onThemeSelected = onThemeSelected,
                 onMenuEntrySelected = onMenuEntrySelected,
+            )
+        }
+
+        item {
+            NotificationsSection(
+                enabledCategories = uiState.enabledNotificationCategories,
+                onToggle = onNotificationCategoryToggle,
             )
         }
 
@@ -231,7 +245,6 @@ private fun ProfileContent(
 @Composable
 private fun SettingsSection(
     uiState: ProfileUiState,
-    onNotificationsToggle: (Boolean) -> Unit,
     onThemeSelected: (AppTheme) -> Unit,
     onMenuEntrySelected: (Destination) -> Unit,
     modifier: Modifier = Modifier,
@@ -263,27 +276,43 @@ private fun SettingsSection(
                 showDivider = true,
             )
         }
-        ListSectionRow(
-            title = stringResource(R.string.profile_notifications_label),
-            leading = {
-                ProfileMenuIcon(
-                    icon = Icons.Filled.NotificationsActive,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            },
-            trailing = {
-                Switch(
-                    checked = uiState.notificationsEnabled,
-                    onCheckedChange = onNotificationsToggle,
-                )
-            },
-            onClick = { onNotificationsToggle(!uiState.notificationsEnabled) },
-            showDivider = true,
-        )
         ThemeRow(selected = uiState.theme, onSelect = onThemeSelected)
         LanguageRow()
     }
 }
+
+@Composable
+private fun NotificationsSection(
+    enabledCategories: Set<NotificationCategory>,
+    onToggle: (NotificationCategory, Boolean) -> Unit,
+) {
+    ListSection(header = stringResource(R.string.notifications_settings)) {
+        NotificationCategory.entries.forEachIndexed { index, category ->
+            val isEnabled = category in enabledCategories
+            ListSectionRow(
+                title = stringResource(category.titleRes),
+                leading = { ProfileMenuIcon(icon = category.icon, color = MaterialTheme.colorScheme.primary) },
+                trailing = { Switch(checked = isEnabled, onCheckedChange = { onToggle(category, it) }) },
+                onClick = { onToggle(category, !isEnabled) },
+                showDivider = index < NotificationCategory.entries.lastIndex,
+            )
+        }
+    }
+}
+
+private val NotificationCategory.titleRes: Int
+    get() = when (this) {
+        NotificationCategory.EVENTS -> R.string.notifications_events
+        NotificationCategory.TASKS -> R.string.notifications_tasks
+        NotificationCategory.MESSAGES -> R.string.notifications_messages
+    }
+
+private val NotificationCategory.icon: ImageVector
+    get() = when (this) {
+        NotificationCategory.EVENTS -> Icons.Filled.CalendarMonth
+        NotificationCategory.TASKS -> Icons.Filled.Checklist
+        NotificationCategory.MESSAGES -> Icons.Filled.Forum
+    }
 
 @Composable
 private fun ProfileHeader(

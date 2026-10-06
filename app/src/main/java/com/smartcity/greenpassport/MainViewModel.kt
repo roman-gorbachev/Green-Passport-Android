@@ -1,8 +1,10 @@
 package com.smartcity.greenpassport
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.datastore.LocalSettingsStore
+import com.smartcity.greenpassport.core.messaging.repository.INotificationsRepository
 import com.smartcity.greenpassport.feature.auth.domain.ObserveAuthSessionUseCase
 import com.smartcity.greenpassport.feature.auth.domain.ObserveUserProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,6 +28,7 @@ class MainViewModel @Inject constructor(
     private val settingsStore: LocalSettingsStore,
     private val observeAuthSession: ObserveAuthSessionUseCase,
     private val observeUserProfile: ObserveUserProfileUseCase,
+    private val notificationsRepository: INotificationsRepository,
 ) : ViewModel() {
 
     val startupState = combine(
@@ -50,6 +54,7 @@ class MainViewModel @Inject constructor(
     private fun observeProfileStatus(): Flow<ProfileStatus> =
         observeAuthSession()
             .distinctUntilChanged { old, new -> old?.userId == new?.userId }
+            .onEach { session -> session?.let { registerDevice(it.userId) } }
             .flatMapLatest { session ->
                 when {
                     session == null -> flowOf(ProfileStatus.SIGNED_OUT)
@@ -60,7 +65,15 @@ class MainViewModel @Inject constructor(
                 }
             }
 
+    private fun registerDevice(userId: String) {
+        viewModelScope.launch {
+            runCatching { notificationsRepository.registerToken(userId) }
+                .onFailure { error -> Log.w(TAG, "Failed to register the device for chat pushes", error) }
+        }
+    }
+
     companion object {
+        private const val TAG = "MainViewModel"
         private const val KEY_ONBOARDING_SEEN = "onboarding_seen"
         private const val SUBSCRIPTION_TIMEOUT_MILLIS = 5_000L
     }

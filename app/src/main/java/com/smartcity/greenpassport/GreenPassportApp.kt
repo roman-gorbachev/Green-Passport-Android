@@ -16,6 +16,8 @@ import com.smartcity.greenpassport.onboarding.OnboardingScreen
 
 @Composable
 fun GreenPassportApp(
+    pendingChatId: String?,
+    onChatOpened: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
@@ -34,7 +36,7 @@ fun GreenPassportApp(
                 onFinished = {},
                 modifier = Modifier.safeDrawingPadding(),
             )
-            AppStartupState.Ready -> GreenPassportAppShell()
+            AppStartupState.Ready -> GreenPassportAppShell(pendingChatId = pendingChatId, onChatOpened = onChatOpened)
         }
     }
 }

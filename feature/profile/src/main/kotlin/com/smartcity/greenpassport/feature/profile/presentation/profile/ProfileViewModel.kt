@@ -5,14 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.auth.AuthSession
 import com.smartcity.greenpassport.core.model.settings.AppTheme
+import com.smartcity.greenpassport.core.model.settings.NotificationCategory
 import com.smartcity.greenpassport.feature.profile.domain.ObserveAppThemeUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveIsModeratorUseCase
-import com.smartcity.greenpassport.feature.profile.domain.ObserveNotificationsEnabledUseCase
+import com.smartcity.greenpassport.feature.profile.domain.ObserveNotificationCategoriesUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveProfileProgressUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveProfileSessionUseCase
 import com.smartcity.greenpassport.feature.profile.domain.ObserveUserProfileUseCase
 import com.smartcity.greenpassport.feature.profile.domain.SetAppThemeUseCase
-import com.smartcity.greenpassport.feature.profile.domain.SetNotificationsEnabledUseCase
+import com.smartcity.greenpassport.feature.profile.domain.SetNotificationCategoryEnabledUseCase
 import com.smartcity.greenpassport.feature.profile.domain.SignOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,9 +37,9 @@ class ProfileViewModel @Inject constructor(
     private val observeProfileProgress: ObserveProfileProgressUseCase,
     private val observeUserProfile: ObserveUserProfileUseCase,
     private val observeIsModerator: ObserveIsModeratorUseCase,
-    private val observeNotificationsEnabled: ObserveNotificationsEnabledUseCase,
+    private val observeNotificationCategories: ObserveNotificationCategoriesUseCase,
     private val observeAppTheme: ObserveAppThemeUseCase,
-    private val setNotificationsEnabled: SetNotificationsEnabledUseCase,
+    private val setNotificationCategoryEnabled: SetNotificationCategoryEnabledUseCase,
     private val setAppTheme: SetAppThemeUseCase,
     private val signOutUseCase: SignOutUseCase,
 ) : ViewModel() {
@@ -58,9 +59,10 @@ class ProfileViewModel @Inject constructor(
         retryRequests.tryEmit(Unit)
     }
 
-    fun onNotificationsToggle(enabled: Boolean) {
+    fun onNotificationCategoryToggle(category: NotificationCategory, enabled: Boolean) {
+        val userId = uiState.value.userId
         viewModelScope.launch {
-            runCatching { setNotificationsEnabled(enabled) }
+            runCatching { setNotificationCategoryEnabled(category, enabled, userId) }
                 .onFailure { error -> Log.w(TAG, "Failed to save notifications switch", error) }
         }
     }
@@ -80,7 +82,8 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun observeProfileUiState(sessions: Flow<AuthSession?>): Flow<ProfileUiState> {
-        val settings = combine(observeNotificationsEnabled(), observeAppTheme()) { enabled, theme -> enabled to theme }
+        val categories = sessions.flatMapLatest { session -> observeNotificationCategories(session?.userId) }
+        val settings = combine(categories, observeAppTheme()) { enabled, theme -> enabled to theme }
         val account = combine(sessions, retryRequests.onStart { emit(Unit) }) { session, _ -> session }
             .flatMapLatest { session ->
                 if (session == null) {
@@ -92,7 +95,7 @@ class ProfileViewModel @Inject constructor(
                 }
             }
         return combine(account, settings) { state, (enabled, theme) ->
-            state.copy(notificationsEnabled = enabled, theme = theme)
+            state.copy(enabledNotificationCategories = enabled, theme = theme)
         }
     }
 

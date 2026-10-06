@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.smartcity.greenpassport.core.R
 import com.smartcity.greenpassport.core.datasource.remote.FirestoreCollections
@@ -17,7 +16,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-private const val FIELD_FCM_TOKEN = "fcmToken"
+private const val FIELD_USER_ID = "userId"
+private const val FIELD_PLATFORM = "platform"
+private const val FIELD_UPDATED_AT = "updatedAtEpochMillis"
+private const val PLATFORM_ANDROID = "ANDROID"
 
 class NotificationsRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -33,21 +35,34 @@ class NotificationsRepository @Inject constructor(
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    override fun ensureNotificationChannel() {
-        val channel = NotificationChannel(
-            NotificationChannels.REWARDS_CHANNEL_ID,
-            context.getString(R.string.notification_channel_rewards_name),
-            NotificationManager.IMPORTANCE_DEFAULT,
+    override fun ensureNotificationChannels() {
+        val channels = listOf(
+            NotificationChannel(
+                NotificationChannels.REWARDS_CHANNEL_ID,
+                context.getString(R.string.notification_channel_rewards_name),
+                NotificationManager.IMPORTANCE_DEFAULT,
+            ),
+            NotificationChannel(
+                NotificationChannels.MESSAGES_CHANNEL_ID,
+                context.getString(R.string.notification_channel_messages),
+                NotificationManager.IMPORTANCE_HIGH,
+            ),
         )
-        val manager = context.getSystemService(NotificationManager::class.java)
-        manager?.createNotificationChannel(channel)
+        context.getSystemService(NotificationManager::class.java)?.createNotificationChannels(channels)
     }
 
-    @Suppress("DEPRECATION")
     override suspend fun registerToken(userId: String) {
         val token = messaging.token.await()
-        FirestoreCollections.users(firestore).document(userId)
-            .set(mapOf(FIELD_FCM_TOKEN to token), SetOptions.merge())
-            .await()
+        val data = mapOf(
+            FIELD_USER_ID to userId,
+            FIELD_PLATFORM to PLATFORM_ANDROID,
+            FIELD_UPDATED_AT to System.currentTimeMillis(),
+        )
+        FirestoreCollections.userDevices(firestore).document(token).set(data).await()
+    }
+
+    override suspend fun unregisterToken() {
+        val token = messaging.token.await()
+        FirestoreCollections.userDevices(firestore).document(token).delete().await()
     }
 }

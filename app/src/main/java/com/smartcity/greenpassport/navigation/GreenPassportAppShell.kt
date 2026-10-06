@@ -1,6 +1,7 @@
 package com.smartcity.greenpassport.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
@@ -9,11 +10,22 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.smartcity.greenpassport.core.designsystem.component.GlassBottomBarLayout
+import com.smartcity.greenpassport.core.model.community.ChatId
 import com.smartcity.greenpassport.core.navigation.TopLevelDestination
+import com.smartcity.greenpassport.core.navigation.destination
 
 @Composable
-fun GreenPassportAppShell(modifier: Modifier = Modifier) {
+fun GreenPassportAppShell(
+    pendingChatId: String?,
+    onChatOpened: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val navController = rememberNavController()
+    LaunchedEffect(pendingChatId) {
+        val chatId = pendingChatId ?: return@LaunchedEffect
+        navController.navigate(ChatId.fromRawValue(chatId).destination)
+        onChatOpened()
+    }
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentTab = TopLevelDestination.entries.firstOrNull { tab ->
         backStackEntry?.destination?.hasRoute(tab.destination::class) == true

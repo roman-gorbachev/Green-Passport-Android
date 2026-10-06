@@ -52,4 +52,8 @@
     <string name="achievement_unlocked_label">Атрымана</string>
     <string name="achievement_progress_format">%1$d з %2$d</string>
     <string name="achievements_unlocked_format">Адкрыта %1$d з %2$d</string>
+    <string name="notifications_settings">Апавяшчэнні</string>
+    <string name="notifications_events">Падзеі</string>
+    <string name="notifications_tasks">Заданні і ўзнагароды</string>
+    <string name="notifications_messages">Паведамленні</string>
 </resources>

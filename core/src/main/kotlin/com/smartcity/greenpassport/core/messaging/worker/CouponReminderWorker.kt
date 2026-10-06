@@ -11,6 +11,7 @@ import androidx.work.WorkerParameters
 import com.smartcity.greenpassport.core.R
 import com.smartcity.greenpassport.core.messaging.helpers.NotificationChannels
 import com.smartcity.greenpassport.core.messaging.helpers.NotificationLogEntryPoint
+import com.smartcity.greenpassport.core.model.settings.NotificationCategory
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.first
 
@@ -26,7 +27,9 @@ class CouponReminderWorker(
         val entryPoint = EntryPointAccessors.fromApplication(applicationContext, NotificationLogEntryPoint::class.java)
         entryPoint.notificationLogRepository().log(title = title, body = body)
 
-        val isEnabled = entryPoint.appSettingsRepository().observeNotificationsEnabled().first()
+        val isEnabled = entryPoint.appSettingsRepository()
+            .observeNotificationCategoryEnabled(NotificationCategory.TASKS)
+            .first()
         val isPermitted = ContextCompat.checkSelfPermission(
             applicationContext,
             Manifest.permission.POST_NOTIFICATIONS,

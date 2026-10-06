@@ -52,4 +52,6 @@
         <item quantity="many">Да бонусу +35 — %d дзён</item>
         <item quantity="other">Да бонусу +35 — %d дня</item>
     </plurals>
+    <string name="notification_channel_messages">Паведамленні ў чатах</string>
+    <string name="community_forum_title">Форум</string>
 </resources>

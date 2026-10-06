@@ -48,4 +48,6 @@
         <item quantity="one">%d day until the +35 bonus</item>
         <item quantity="other">%d days until the +35 bonus</item>
     </plurals>
+    <string name="notification_channel_messages">Chat messages</string>
+    <string name="community_forum_title">Forum</string>
 </resources>

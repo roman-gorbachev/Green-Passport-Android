@@ -42,6 +42,7 @@ import com.smartcity.greenpassport.core.designsystem.component.listSectionItems
 import com.smartcity.greenpassport.core.designsystem.layout.plus
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.model.ForumPost
+import com.smartcity.greenpassport.core.model.community.ChatId
 import com.smartcity.greenpassport.core.model.moderation.ReportReason
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import com.smartcity.greenpassport.feature.community.R
@@ -61,6 +62,7 @@ fun ForumScreen(
     viewModel: ForumViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    OpenChatEffect(ChatId.Forum)
     val listPadding = PaddingValues(top = contentPadding.calculateTopPadding())
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()

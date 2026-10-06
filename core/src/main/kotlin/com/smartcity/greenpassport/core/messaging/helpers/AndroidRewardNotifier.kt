@@ -10,6 +10,7 @@ import com.smartcity.greenpassport.core.R
 import com.smartcity.greenpassport.core.datasource.local.repository.NotificationLogRepository
 import com.smartcity.greenpassport.core.model.PointsEarnReason
 import com.smartcity.greenpassport.core.model.settings.AppSettingsRepository
+import com.smartcity.greenpassport.core.model.settings.NotificationCategory
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -28,7 +29,7 @@ class AndroidRewardNotifier @Inject constructor(
 
         notificationLogRepository.log(title = title, body = body)
 
-        if (!appSettingsRepository.observeNotificationsEnabled().first()) return
+        if (!appSettingsRepository.observeNotificationCategoryEnabled(NotificationCategory.TASKS).first()) return
         if (ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.POST_NOTIFICATIONS,

@@ -56,4 +56,8 @@
     <string name="achievement_unlocked_label">Unlocked</string>
     <string name="achievement_progress_format">%1$d of %2$d</string>
     <string name="achievements_unlocked_format">%1$d of %2$d unlocked</string>
+    <string name="notifications_settings">Notifications</string>
+    <string name="notifications_events">Events</string>
+    <string name="notifications_tasks">Tasks and rewards</string>
+    <string name="notifications_messages">Messages</string>
 </resources>
