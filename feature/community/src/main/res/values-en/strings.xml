@@ -30,4 +30,26 @@
     <string name="group_chat_empty_msg">No messages yet. Be the first to write!</string>
     <string name="join_group_to_chat_msg">Join the group to read and write in the chat</string>
     <string name="more">More</string>
+    <string name="reply">Reply</string>
+    <string name="copy">Copy</string>
+    <string name="copied">Copied</string>
+    <string name="forward">Forward</string>
+    <string name="edit">Edit</string>
+    <string name="edited">edited</string>
+    <string name="message_deleted">Message deleted</string>
+    <string name="delete_message_confirm_msg">Delete the message? Everyone will see “Message deleted”.</string>
+    <string name="editing_message">Editing</string>
+    <string name="replying_to_format">Reply to %1$s</string>
+    <string name="forwarded_from_format">Forwarded from %1$s</string>
+    <string name="forward_to">Forward to…</string>
+    <string name="pin_chat">Pin</string>
+    <string name="unpin_chat">Unpin</string>
+    <string name="mute_chat">Mute</string>
+    <string name="unmute_chat">Unmute</string>
+    <string name="archive_chat">Archive</string>
+    <string name="unarchive_chat">Unarchive</string>
+    <string name="archived_chats">Archived chats</string>
+    <string name="chats">Chats</string>
+    <string name="delete">Delete</string>
+    <string name="date_time">%1$s · %2$s</string>
 </resources>

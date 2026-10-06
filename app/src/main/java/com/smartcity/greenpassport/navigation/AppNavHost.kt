@@ -14,15 +14,19 @@ import androidx.navigation.compose.dialog
 import com.smartcity.greenpassport.R
 import com.smartcity.greenpassport.core.designsystem.component.SheetDialogProperties
 import com.smartcity.greenpassport.core.navigation.Destination
+import com.smartcity.greenpassport.core.navigation.destination
 import com.smartcity.greenpassport.feature.auth.presentation.profilesetup.ui.ProfileSetupScreen
 import com.smartcity.greenpassport.feature.calendar.presentation.ui.CalendarScreen
 import com.smartcity.greenpassport.feature.calendar.presentation.ui.EventDetailSheet
+import com.smartcity.greenpassport.feature.community.presentation.ui.ArchivedChatsScreen
+import com.smartcity.greenpassport.feature.community.presentation.ui.ChatMuteButton
 import com.smartcity.greenpassport.feature.community.presentation.ui.CommunityHubScreen
 import com.smartcity.greenpassport.feature.community.presentation.ui.ForumScreen
 import com.smartcity.greenpassport.feature.community.presentation.ui.GroupDetailScreen
 import com.smartcity.greenpassport.feature.community.presentation.ui.GroupMenuButton
 import com.smartcity.greenpassport.feature.community.presentation.ui.GroupsScreen
 import com.smartcity.greenpassport.feature.community.presentation.ui.JoinByCodeButton
+import com.smartcity.greenpassport.feature.community.presentation.viewmodels.ChatMuteViewModel
 import com.smartcity.greenpassport.feature.community.presentation.viewmodels.GroupDetailViewModel
 import com.smartcity.greenpassport.feature.community.presentation.viewmodels.GroupsViewModel
 import com.smartcity.greenpassport.feature.ecotips.presentation.ui.EcoTipBookmarkButton
@@ -65,6 +69,7 @@ fun AppNavHost(
         mainRoutes(navController)
         profileRoutes(navController)
         communityRoutes(navController)
+        chatRoutes(navController)
         contentRoutes(navController)
         gameRoutes(navController)
         couponRoutes(navController)
@@ -194,6 +199,58 @@ private fun NavGraphBuilder.profileRoutes(navController: NavHostController) {
     }
 }
 
+private fun NavGraphBuilder.chatRoutes(navController: NavHostController) {
+    composable<Destination.ArchivedChats> {
+        FeatureScaffold(
+            title = stringResource(CommunityR.string.archived_chats),
+            onNavigateBack = navController::popBackStack,
+        ) { innerPadding ->
+            ArchivedChatsScreen(
+                onChatSelected = { chatId -> navController.navigate(chatId.destination) },
+                contentPadding = innerPadding,
+            )
+        }
+    }
+    composable<Destination.Forum> {
+        val muteViewModel: ChatMuteViewModel = hiltViewModel()
+        val isMuted by muteViewModel.isMuted.collectAsStateWithLifecycle()
+        val canMute by muteViewModel.canMute.collectAsStateWithLifecycle()
+        FeatureScaffold(
+            title = stringResource(CommunityR.string.community_forum_title),
+            onNavigateBack = navController::popBackStack,
+            actions = {
+                if (canMute) ChatMuteButton(isMuted = isMuted, onToggle = muteViewModel::onToggle)
+            },
+        ) { innerPadding ->
+            ForumScreen(contentPadding = innerPadding)
+        }
+    }
+    composable<Destination.CommunityGroup> {
+        val viewModel: GroupDetailViewModel = hiltViewModel()
+        val muteViewModel: ChatMuteViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val isMuted by muteViewModel.isMuted.collectAsStateWithLifecycle()
+        val group = uiState.group
+        FeatureScaffold(
+            title = group?.name.orEmpty(),
+            onNavigateBack = navController::popBackStack,
+            actions = {
+                if (group != null && uiState.isMember) {
+                    GroupMenuButton(
+                        group = group,
+                        isMuted = isMuted,
+                        onToggleMute = muteViewModel::onToggle,
+                        onShowMembers = { viewModel.onMembersVisibilityChanged(true) },
+                        onLeave = { viewModel.onLeaveConfirmationVisibilityChanged(true) },
+                    )
+                }
+            },
+        ) { innerPadding ->
+            GroupDetailScreen(contentPadding = innerPadding, viewModel = viewModel)
+        }
+    }
+}
+
 private fun NavGraphBuilder.communityRoutes(navController: NavHostController) {
     composable<Destination.Community> {
         FeatureScaffold(
@@ -201,18 +258,11 @@ private fun NavGraphBuilder.communityRoutes(navController: NavHostController) {
             onNavigateBack = navController::popBackStack,
         ) { innerPadding ->
             CommunityHubScreen(
-                onForumSelected = { navController.navigate(Destination.Forum) },
+                onChatSelected = { chatId -> navController.navigate(chatId.destination) },
+                onArchiveSelected = { navController.navigate(Destination.ArchivedChats) },
                 onGroupsSelected = { navController.navigate(Destination.CommunityGroups) },
                 contentPadding = innerPadding,
             )
-        }
-    }
-    composable<Destination.Forum> {
-        FeatureScaffold(
-            title = stringResource(CommunityR.string.community_forum_title),
-            onNavigateBack = navController::popBackStack,
-        ) { innerPadding ->
-            ForumScreen(contentPadding = innerPadding)
         }
     }
     composable<Destination.CommunityGroups> {
@@ -227,26 +277,6 @@ private fun NavGraphBuilder.communityRoutes(navController: NavHostController) {
                 contentPadding = innerPadding,
                 viewModel = viewModel,
             )
-        }
-    }
-    composable<Destination.CommunityGroup> {
-        val viewModel: GroupDetailViewModel = hiltViewModel()
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        val group = uiState.group
-        FeatureScaffold(
-            title = group?.name.orEmpty(),
-            onNavigateBack = navController::popBackStack,
-            actions = {
-                if (group != null && uiState.isMember) {
-                    GroupMenuButton(
-                        group = group,
-                        onShowMembers = { viewModel.onMembersVisibilityChanged(true) },
-                        onLeave = { viewModel.onLeaveConfirmationVisibilityChanged(true) },
-                    )
-                }
-            },
-        ) { innerPadding ->
-            GroupDetailScreen(contentPadding = innerPadding, viewModel = viewModel)
         }
     }
     composable<Destination.Feedback> {

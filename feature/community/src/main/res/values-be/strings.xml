@@ -31,4 +31,26 @@
     <string name="group_chat_empty_msg">Паведамленняў пакуль няма. Напішыце першым!</string>
     <string name="join_group_to_chat_msg">Далучыцеся да групы, каб чытаць і пісаць у чат</string>
     <string name="more">Яшчэ</string>
+    <string name="reply">Адказаць</string>
+    <string name="copy">Капіяваць</string>
+    <string name="copied">Скапіявана</string>
+    <string name="forward">Пераслаць</string>
+    <string name="edit">Змяніць</string>
+    <string name="edited">зменена</string>
+    <string name="message_deleted">Паведамленне выдалена</string>
+    <string name="delete_message_confirm_msg">Выдаліць паведамленне? Усе ўбачаць «Паведамленне выдалена».</string>
+    <string name="editing_message">Рэдагаванне</string>
+    <string name="replying_to_format">Адказ %1$s</string>
+    <string name="forwarded_from_format">Перасланае ад %1$s</string>
+    <string name="forward_to">Пераслаць у…</string>
+    <string name="pin_chat">Замацаваць</string>
+    <string name="unpin_chat">Адмацаваць</string>
+    <string name="mute_chat">Выключыць гук</string>
+    <string name="unmute_chat">Уключыць гук</string>
+    <string name="archive_chat">У архіў</string>
+    <string name="unarchive_chat">Вярнуць з архіва</string>
+    <string name="archived_chats">Архіў чатаў</string>
+    <string name="chats">Чаты</string>
+    <string name="delete">Выдаліць</string>
+    <string name="date_time">%1$s · %2$s</string>
 </resources>

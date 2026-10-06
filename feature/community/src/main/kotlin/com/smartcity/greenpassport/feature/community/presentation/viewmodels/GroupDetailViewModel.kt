@@ -6,15 +6,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.smartcity.greenpassport.core.model.CommunityGroup
 import com.smartcity.greenpassport.core.model.GroupMessage
+import com.smartcity.greenpassport.core.model.community.ChatId
 import com.smartcity.greenpassport.core.moderation.ContentRejectedException
+import com.smartcity.greenpassport.feature.community.domain.ChangeMessageUseCase
 import com.smartcity.greenpassport.feature.community.domain.FetchGroupMembersUseCase
 import com.smartcity.greenpassport.feature.community.domain.JoinGroupUseCase
 import com.smartcity.greenpassport.feature.community.domain.LeaveGroupUseCase
+import com.smartcity.greenpassport.feature.community.domain.MessageChange
 import com.smartcity.greenpassport.feature.community.domain.ObserveCommunitySessionUseCase
 import com.smartcity.greenpassport.feature.community.domain.ObserveGroupMessagesUseCase
 import com.smartcity.greenpassport.feature.community.domain.ObserveGroupUseCase
 import com.smartcity.greenpassport.feature.community.domain.SendGroupMessageUseCase
+import com.smartcity.greenpassport.feature.community.presentation.state.ComposerMode
 import com.smartcity.greenpassport.feature.community.presentation.state.GroupDetailUiState
+import com.smartcity.greenpassport.feature.community.presentation.state.MessageAction
+import com.smartcity.greenpassport.feature.community.presentation.state.MessageTarget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -43,9 +49,11 @@ class GroupDetailViewModel @Inject constructor(
     private val joinGroup: JoinGroupUseCase,
     private val leaveGroup: LeaveGroupUseCase,
     private val fetchMembers: FetchGroupMembersUseCase,
+    private val changeMessage: ChangeMessageUseCase,
 ) : ViewModel() {
 
     private val groupId: String = checkNotNull(savedStateHandle["groupId"])
+    private val chatId = ChatId.Group(groupId)
 
     private val local = MutableStateFlow(GroupDetailUiState())
 
@@ -69,15 +77,60 @@ class GroupDetailViewModel @Inject constructor(
         val userId = state.currentUserId ?: return
         val text = state.draft.trim()
         if (!state.isMember || text.isEmpty() || state.isSending) return
+        val mode = state.composerMode
         viewModelScope.launch {
             local.update { it.copy(isSending = true, isSendFailed = false) }
-            runCatching { sendMessage(groupId, userId, text) }
-                .onSuccess { local.update { it.copy(isSending = false, draft = "") } }
+            runCatching {
+                when (mode) {
+                    ComposerMode.New -> sendMessage(groupId, userId, text)
+                    is ComposerMode.Reply -> sendMessage(groupId, userId, text, replyTo = mode.quote)
+                    is ComposerMode.Edit -> changeMessage(chatId, mode.messageId, MessageChange.Edit(text))
+                }
+            }
+                .onSuccess { local.update { it.copy(isSending = false, draft = "", composerMode = ComposerMode.New) } }
                 .onFailure { error ->
                     Log.w(TAG, "Failed to send message", error)
                     val isRejected = error is ContentRejectedException
                     local.update { it.copy(isSending = false, isTextRejected = isRejected, isSendFailed = !isRejected) }
                 }
+        }
+    }
+
+    fun onMessageAction(action: MessageAction, target: MessageTarget) {
+        when (action) {
+            MessageAction.Reply -> local.update { it.copy(composerMode = ComposerMode.Reply(target.quote)) }
+            MessageAction.Edit -> local.update {
+                it.copy(composerMode = ComposerMode.Edit(target.id), draft = target.text, isTextRejected = false)
+            }
+            MessageAction.Delete -> local.update { it.copy(pendingDeletion = target) }
+            MessageAction.Copy, MessageAction.Forward, is MessageAction.Report -> Unit
+        }
+    }
+
+    fun onCancelComposerMode() {
+        local.update { state ->
+            val draft = if (state.composerMode is ComposerMode.Edit) "" else state.draft
+            state.copy(composerMode = ComposerMode.New, draft = draft)
+        }
+    }
+
+    fun onDeletionDismissed() {
+        local.update { it.copy(pendingDeletion = null) }
+    }
+
+    fun onDeletionConfirmed() {
+        val target = local.value.pendingDeletion ?: return
+        local.update { state ->
+            val isEditingTarget = (state.composerMode as? ComposerMode.Edit)?.messageId == target.id
+            state.copy(
+                pendingDeletion = null,
+                composerMode = if (isEditingTarget) ComposerMode.New else state.composerMode,
+                draft = if (isEditingTarget) "" else state.draft,
+            )
+        }
+        viewModelScope.launch {
+            runCatching { changeMessage(chatId, target.id, MessageChange.Delete) }
+                .onFailure { error -> Log.w(TAG, "Failed to delete message", error) }
         }
     }
 

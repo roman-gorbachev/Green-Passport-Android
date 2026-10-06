@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.DropdownMenu
@@ -27,6 +29,8 @@ import com.smartcity.greenpassport.feature.community.R
 @Composable
 fun GroupMenuButton(
     group: CommunityGroup,
+    isMuted: Boolean,
+    onToggleMute: () -> Unit,
     onShowMembers: () -> Unit,
     onLeave: () -> Unit,
     modifier: Modifier = Modifier,
@@ -44,6 +48,19 @@ fun GroupMenuButton(
             )
         }
         DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(if (isMuted) R.string.unmute_chat else R.string.mute_chat)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = if (isMuted) Icons.Filled.Notifications else Icons.Filled.NotificationsOff,
+                        contentDescription = null,
+                    )
+                },
+                onClick = {
+                    isExpanded = false
+                    onToggleMute()
+                },
+            )
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.group_members)) },
                 leadingIcon = { Icon(imageVector = Icons.Filled.People, contentDescription = null) },

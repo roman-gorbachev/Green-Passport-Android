@@ -22,6 +22,8 @@ data class GroupDetailUiState(
     val isSendFailed: Boolean = false,
     val isJoining: Boolean = false,
     val isLeaving: Boolean = false,
+    val composerMode: ComposerMode = ComposerMode.New,
+    val pendingDeletion: MessageTarget? = null,
 ) {
     val isMember: Boolean
         get() {

@@ -11,4 +11,6 @@ data class ForumUiState(
     val isSendFailed: Boolean = false,
     val currentUserId: String? = null,
     val reportedPostIds: Set<String> = emptySet(),
+    val composerMode: ComposerMode = ComposerMode.New,
+    val pendingDeletion: MessageTarget? = null,
 )

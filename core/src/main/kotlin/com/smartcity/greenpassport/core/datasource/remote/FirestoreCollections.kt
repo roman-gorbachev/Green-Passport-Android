@@ -17,6 +17,8 @@ private const val EVENT_REGISTRATIONS_COLLECTION = "eventRegistrations"
 private const val POSTS_COLLECTION = "posts"
 private const val GROUPS_COLLECTION = "groups"
 private const val CHATS_COLLECTION = "chats"
+private const val CHAT_SETTINGS_COLLECTION = "chatSettings"
+private const val USER_DEVICES_COLLECTION = "userDevices"
 private const val MESSAGES_COLLECTION = "messages"
 private const val ECO_TIPS_COLLECTION = "ecoTips"
 private const val ECO_TIP_READS_COLLECTION = "ecoTipReads"
@@ -67,6 +69,12 @@ object FirestoreCollections {
 
     fun chatMessages(firestore: FirebaseFirestore, chatId: String): CollectionReference =
         appRoot(firestore).collection(CHATS_COLLECTION).document(chatId).collection(MESSAGES_COLLECTION)
+
+    fun chatSettings(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(CHAT_SETTINGS_COLLECTION)
+
+    fun userDevices(firestore: FirebaseFirestore): CollectionReference =
+        appRoot(firestore).collection(USER_DEVICES_COLLECTION)
 
     fun ecoTips(firestore: FirebaseFirestore): CollectionReference =
         appRoot(firestore).collection(ECO_TIPS_COLLECTION)

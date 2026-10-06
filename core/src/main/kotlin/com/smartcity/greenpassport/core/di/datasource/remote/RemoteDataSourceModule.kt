@@ -1,6 +1,7 @@
 package com.smartcity.greenpassport.core.di.datasource.remote
 
 import com.smartcity.greenpassport.core.datasource.remote.repository.AchievementsRepositoryImpl
+import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreChatSettingsRepository
 import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreCommunityRepository
 import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreEcoTipsRepository
 import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreEventsRepository
@@ -8,6 +9,8 @@ import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreFa
 import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreFeedbackRepository
 import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreHistoryRepository
 import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreMapPointsRepository
+import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreMessageEditingRepository
+import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreMessageNotificationsRepository
 import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreShopRepository
 import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreTasksRepository
 import com.smartcity.greenpassport.core.datasource.remote.repository.FirestoreUserProfileRepository
@@ -21,6 +24,9 @@ import com.smartcity.greenpassport.core.model.HistoryRepository
 import com.smartcity.greenpassport.core.model.MapPointsRepository
 import com.smartcity.greenpassport.core.model.ShopRepository
 import com.smartcity.greenpassport.core.model.TasksRepository
+import com.smartcity.greenpassport.core.model.community.ChatSettingsRepository
+import com.smartcity.greenpassport.core.model.community.MessageEditingRepository
+import com.smartcity.greenpassport.core.model.community.MessageNotificationsRepository
 import com.smartcity.greenpassport.core.model.profile.UserProfileRepository
 import dagger.Binds
 import dagger.Module
@@ -35,6 +41,17 @@ interface RemoteDataSourceModule {
 
     @Binds
     fun bindCommunityRepository(impl: FirestoreCommunityRepository): CommunityRepository
+
+    @Binds
+    fun bindMessageEditingRepository(impl: FirestoreMessageEditingRepository): MessageEditingRepository
+
+    @Binds
+    fun bindChatSettingsRepository(impl: FirestoreChatSettingsRepository): ChatSettingsRepository
+
+    @Binds
+    fun bindMessageNotificationsRepository(
+        impl: FirestoreMessageNotificationsRepository
+    ): MessageNotificationsRepository
 
     @Binds
     fun bindEcoTipsRepository(impl: FirestoreEcoTipsRepository): EcoTipsRepository

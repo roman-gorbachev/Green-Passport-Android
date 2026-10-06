@@ -1,6 +1,8 @@
 package com.smartcity.greenpassport.feature.community.domain
 
 import com.smartcity.greenpassport.core.model.CommunityRepository
+import com.smartcity.greenpassport.core.model.community.ForwardOrigin
+import com.smartcity.greenpassport.core.model.community.MessageQuote
 import com.smartcity.greenpassport.core.model.profile.UserProfileRepository
 import com.smartcity.greenpassport.core.moderation.ContentRejectedException
 import com.smartcity.greenpassport.core.moderation.TextModerator
@@ -13,7 +15,12 @@ class PostToForumUseCase @Inject constructor(
     private val userProfileRepository: UserProfileRepository,
     private val textModerator: TextModerator,
 ) {
-    suspend operator fun invoke(authorId: String, text: String) {
+    suspend operator fun invoke(
+        authorId: String,
+        text: String,
+        replyTo: MessageQuote? = null,
+        forwardedFrom: ForwardOrigin? = null,
+    ) {
         if (!textModerator.isAllowed(text)) throw ContentRejectedException()
         val profile = userProfileRepository.observeProfile(authorId).catch { emit(null) }.first()
         communityRepository.postToForum(
@@ -21,6 +28,8 @@ class PostToForumUseCase @Inject constructor(
             authorName = profile?.let { "${it.firstName} ${it.lastName}".trim() }?.ifBlank { null },
             authorAvatar = profile?.avatar,
             text = text,
+            replyTo = replyTo,
+            forwardedFrom = forwardedFrom,
         )
     }
 }

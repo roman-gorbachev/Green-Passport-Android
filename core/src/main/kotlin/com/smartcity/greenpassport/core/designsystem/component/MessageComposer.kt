@@ -1,5 +1,6 @@
 package com.smartcity.greenpassport.core.designsystem.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,9 +9,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -19,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
 import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
@@ -35,6 +40,9 @@ fun MessageComposer(
     onSend: () -> Unit,
     modifier: Modifier = Modifier,
     errorMessage: String? = null,
+    banner: ComposerBanner? = null,
+    cancelBannerLabel: String = "",
+    onCancelBanner: () -> Unit = {},
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
@@ -42,6 +50,9 @@ fun MessageComposer(
             .fillMaxWidth()
             .padding(horizontal = Dimens.ScreenHorizontalPadding, vertical = Dimens.SpacingSmall),
     ) {
+        if (banner != null) {
+            ComposerBannerRow(banner = banner, cancelLabel = cancelBannerLabel, onCancel = onCancelBanner)
+        }
         if (errorMessage != null) {
             Text(
                 text = errorMessage,
@@ -81,6 +92,43 @@ fun MessageComposer(
     }
 }
 
+@Composable
+private fun ComposerBannerRow(banner: ComposerBanner, cancelLabel: String, onCancel: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingCompact),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(Dimens.CornerRadiusLarge))
+            .padding(start = Dimens.CardPadding),
+    ) {
+        Icon(imageVector = banner.icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = banner.title,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            if (banner.text != null) {
+                Text(
+                    text = banner.text,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+        IconButton(onClick = onCancel) {
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = cancelLabel,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun MessageComposerPreview() {
@@ -93,6 +141,11 @@ private fun MessageComposerPreview() {
             isSending = false,
             onSend = {},
             errorMessage = "Не удалось отправить",
+            banner = ComposerBanner(
+                icon = Icons.AutoMirrored.Filled.Reply,
+                title = "Ответ Ане",
+                text = "Кто идёт на субботник?"
+            ),
         )
     }
 }

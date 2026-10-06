@@ -13,6 +13,8 @@ import com.smartcity.greenpassport.core.model.CommunityRepository
 import com.smartcity.greenpassport.core.model.ForumPost
 import com.smartcity.greenpassport.core.model.GroupMember
 import com.smartcity.greenpassport.core.model.GroupMessage
+import com.smartcity.greenpassport.core.model.community.ForwardOrigin
+import com.smartcity.greenpassport.core.model.community.MessageQuote
 import com.smartcity.greenpassport.core.model.profile.AvatarStyle
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +43,14 @@ private const val FIELD_SENDER_AVATAR = "senderAvatar"
 private const val FIELD_FIRST_NAME = "firstName"
 private const val FIELD_LAST_NAME = "lastName"
 private const val FIELD_AVATAR = "avatar"
+private const val FIELD_REPLY_TO = "replyTo"
+private const val FIELD_FORWARDED_FROM = "forwardedFrom"
+private const val FIELD_QUOTE_MESSAGE_ID = "messageId"
+private const val FIELD_QUOTE_SENDER_NAME = "senderName"
+private const val FIELD_QUOTE_TEXT = "text"
+private const val FIELD_EDITED_AT = "editedAtEpochMillis"
+private const val FIELD_DELETED = "deleted"
+private const val FIELD_LAST_MESSAGE_AT = "lastMessageAtEpochMillis"
 private const val MESSAGES_LIMIT = 200L
 private const val MEMBERS_QUERY_CHUNK_SIZE = 30
 
@@ -56,11 +66,21 @@ class FirestoreCommunityRepository @Inject constructor(
         awaitClose { registration.remove() }
     }
 
+    override fun observeLatestForumPostAt(): Flow<Long?> = callbackFlow {
+        val query = FirestoreCollections.posts(firestore).orderBy(FIELD_CREATED_AT, Query.Direction.DESCENDING).limit(1)
+        val registration = query.addSnapshotListener { snapshot, _ ->
+            trySend(snapshot?.documents?.firstOrNull()?.getLong(FIELD_CREATED_AT))
+        }
+        awaitClose { registration.remove() }
+    }
+
     override suspend fun postToForum(
         authorId: String,
         authorName: String?,
         authorAvatar: AvatarStyle?,
         text: String,
+        replyTo: MessageQuote?,
+        forwardedFrom: ForwardOrigin?,
     ) {
         val data = mapOf(
             FIELD_AUTHOR_ID to authorId,
@@ -68,12 +88,20 @@ class FirestoreCommunityRepository @Inject constructor(
             FIELD_AUTHOR_AVATAR to authorAvatar?.name,
             FIELD_TEXT to text,
             FIELD_CREATED_AT to System.currentTimeMillis(),
-        )
+        ) + messageExtras(replyTo, forwardedFrom)
         FirestoreCollections.posts(firestore).add(data).await()
     }
 
     override fun observeGroups(): Flow<List<CommunityGroup>> = callbackFlow {
         val registration = FirestoreCollections.groups(firestore).addSnapshotListener { snapshot, _ ->
+            trySend(snapshot?.documents.orEmpty().mapNotNull { it.toCommunityGroup() })
+        }
+        awaitClose { registration.remove() }
+    }
+
+    override fun observeMyGroups(userId: String): Flow<List<CommunityGroup>> = callbackFlow {
+        val query = FirestoreCollections.groups(firestore).whereArrayContains(FIELD_MEMBER_IDS, userId)
+        val registration = query.addSnapshotListener { snapshot, _ ->
             trySend(snapshot?.documents.orEmpty().mapNotNull { it.toCommunityGroup() })
         }
         awaitClose { registration.remove() }
@@ -131,6 +159,8 @@ class FirestoreCommunityRepository @Inject constructor(
         senderName: String?,
         senderAvatar: AvatarStyle?,
         text: String,
+        replyTo: MessageQuote?,
+        forwardedFrom: ForwardOrigin?,
     ) {
         val data = mapOf(
             FIELD_SENDER_ID to senderId,
@@ -138,8 +168,24 @@ class FirestoreCommunityRepository @Inject constructor(
             FIELD_SENDER_AVATAR to senderAvatar?.name,
             FIELD_TEXT to text,
             FIELD_CREATED_AT to System.currentTimeMillis(),
-        )
+        ) + messageExtras(replyTo, forwardedFrom)
         FirestoreCollections.chatMessages(firestore, groupId).add(data).await()
+    }
+
+    private fun messageExtras(replyTo: MessageQuote?, forwardedFrom: ForwardOrigin?): Map<String, Any> = buildMap {
+        if (replyTo != null) {
+            put(
+                FIELD_REPLY_TO,
+                mapOf(
+                    FIELD_QUOTE_MESSAGE_ID to replyTo.messageId,
+                    FIELD_QUOTE_SENDER_NAME to replyTo.senderName,
+                    FIELD_QUOTE_TEXT to replyTo.text,
+                ),
+            )
+        }
+        if (forwardedFrom != null) {
+            put(FIELD_FORWARDED_FROM, mapOf(FIELD_QUOTE_SENDER_NAME to forwardedFrom.senderName))
+        }
     }
 
     override suspend fun fetchMembers(ids: List<String>): List<GroupMember> {
@@ -170,6 +216,10 @@ internal fun DocumentSnapshot.toForumPost(): ForumPost? {
         createdAtEpochMillis = createdAt,
         isHidden = getBoolean(FIELD_HIDDEN) == true,
         reportCount = getLong(FIELD_REPORT_COUNT)?.toInt() ?: 0,
+        replyTo = toMessageQuote(),
+        forwardedFrom = toForwardOrigin(),
+        isEdited = getLong(FIELD_EDITED_AT) != null,
+        isDeleted = getBoolean(FIELD_DELETED) == true,
     )
 }
 
@@ -182,6 +232,7 @@ private fun DocumentSnapshot.toCommunityGroup(): CommunityGroup? {
         memberIds = memberIds,
         ownerId = getString(FIELD_OWNER_ID),
         inviteCode = getString(FIELD_INVITE_CODE),
+        lastMessageAtEpochMillis = getLong(FIELD_LAST_MESSAGE_AT),
     )
 }
 
@@ -196,7 +247,26 @@ private fun DocumentSnapshot.toGroupMessage(): GroupMessage? {
         senderAvatar = AvatarStyle.entries.firstOrNull { it.name == getString(FIELD_SENDER_AVATAR) },
         text = text,
         sentAtEpochMillis = sentAt,
+        replyTo = toMessageQuote(),
+        forwardedFrom = toForwardOrigin(),
+        isEdited = getLong(FIELD_EDITED_AT) != null,
+        isDeleted = getBoolean(FIELD_DELETED) == true,
     )
+}
+
+private fun DocumentSnapshot.toMessageQuote(): MessageQuote? {
+    val quote = get(FIELD_REPLY_TO) as? Map<*, *> ?: return null
+    val messageId = quote[FIELD_QUOTE_MESSAGE_ID] as? String ?: return null
+    return MessageQuote(
+        messageId = messageId,
+        senderName = quote[FIELD_QUOTE_SENDER_NAME] as? String,
+        text = quote[FIELD_QUOTE_TEXT] as? String ?: "",
+    )
+}
+
+private fun DocumentSnapshot.toForwardOrigin(): ForwardOrigin? {
+    val origin = get(FIELD_FORWARDED_FROM) as? Map<*, *> ?: return null
+    return ForwardOrigin(senderName = origin[FIELD_QUOTE_SENDER_NAME] as? String)
 }
 
 private fun DocumentSnapshot.toGroupMember(): GroupMember {
