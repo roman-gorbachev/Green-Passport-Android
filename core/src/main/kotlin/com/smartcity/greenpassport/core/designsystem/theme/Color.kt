@@ -19,18 +19,18 @@ private val MintSurfaceHighLight = Color(0xFFC9E6D3)
 private val ErrorLight = Color(0xFFFF3B30)
 private val OnErrorLight = Color(0xFFFFFFFF)
 
-private val ScreenBackgroundDark = Color(0xFF000000)
-private val CardBackgroundDark = Color(0xFF1C1C1E)
-private val FieldBackgroundDark = Color(0xFF2C2C2E)
-private val ForestDark = Color(0xFF2E8C5E)
+private val ScreenBackgroundDark = Color(0xFF08120D)
+private val CardBackgroundDark = Color(0xFF13211A)
+private val FieldBackgroundDark = Color(0xFF1C2E24)
+private val ForestDark = Color(0xFF34A86E)
 private val OnForestDark = Color(0xFFFFFFFF)
 private val LimeDark = Color(0xFFB5E04C)
 private val OnLimeDark = Color(0xFF17331F)
 private val LabelDark = Color(0xFFFFFFFF)
-private val SecondaryTextDark = Color(0xFF98989F)
-private val SeparatorDark = Color(0xFF38383A)
-private val MintSurfaceDark = Color(0xFF1E2A24)
-private val MintSurfaceHighDark = Color(0xFF32443A)
+private val SecondaryTextDark = Color(0xFF8FA598)
+private val SeparatorDark = Color(0xFF22362B)
+private val MintSurfaceDark = Color(0xFF16271E)
+private val MintSurfaceHighDark = Color(0xFF1E3D2C)
 private val ErrorDark = Color(0xFFFF453A)
 private val OnErrorDark = Color(0xFFFFFFFF)
 
@@ -118,4 +118,14 @@ val DarkSectionColors = SectionColors(
     tips = Color(0xFFF08F33),
     calendar = Color(0xFF3F93EE),
     feedback = Color(0xFFEE5C7B),
+)
+
+val LightBrandColors = BrandColors(
+    forestDeep = Color(0xFF1F6B47),
+    heroGlow = Color.Transparent,
+)
+
+val DarkBrandColors = BrandColors(
+    forestDeep = Color(0xFF17553A),
+    heroGlow = Color(0x5934A86E),
 )

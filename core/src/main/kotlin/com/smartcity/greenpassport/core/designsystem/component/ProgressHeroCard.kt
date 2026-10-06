@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -52,12 +53,19 @@ fun ProgressHeroCard(
 ) {
     val onPrimary = MaterialTheme.colorScheme.onPrimary
 
+    val brandColors = GreenPassportTheme.brandColors
     GpSurfaceCard(
         onClick = onClick,
-        color = MaterialTheme.colorScheme.primary,
+        color = brandColors.forestDeep,
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = Dimens.ProgressHeroHeight),
+            .heightIn(min = Dimens.ProgressHeroHeight)
+            .shadow(
+                elevation = Dimens.HeroGlowElevation,
+                shape = RoundedCornerShape(Dimens.CornerRadiusLarge),
+                ambientColor = brandColors.heroGlow,
+                spotColor = brandColors.heroGlow,
+            ),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

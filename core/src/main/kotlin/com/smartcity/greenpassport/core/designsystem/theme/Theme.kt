@@ -14,6 +14,7 @@ import androidx.core.view.WindowCompat
 
 private val LocalRewardTierColors = staticCompositionLocalOf { LightRewardTierColors }
 private val LocalSectionColors = staticCompositionLocalOf { LightSectionColors }
+private val LocalBrandColors = staticCompositionLocalOf { LightBrandColors }
 
 object GreenPassportTheme {
     val rewardTierColors: RewardTierColors
@@ -23,6 +24,10 @@ object GreenPassportTheme {
     val sectionColors: SectionColors
         @Composable
         get() = LocalSectionColors.current
+
+    val brandColors: BrandColors
+        @Composable
+        get() = LocalBrandColors.current
 }
 
 @Composable
@@ -33,6 +38,7 @@ fun GreenPassportTheme(
     val colorScheme = if (darkTheme) GreenPassportDarkColorScheme else GreenPassportLightColorScheme
     val rewardTierColors = if (darkTheme) DarkRewardTierColors else LightRewardTierColors
     val sectionColors = if (darkTheme) DarkSectionColors else LightSectionColors
+    val brandColors = if (darkTheme) DarkBrandColors else LightBrandColors
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -49,6 +55,7 @@ fun GreenPassportTheme(
     CompositionLocalProvider(
         LocalRewardTierColors provides rewardTierColors,
         LocalSectionColors provides sectionColors,
+        LocalBrandColors provides brandColors,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

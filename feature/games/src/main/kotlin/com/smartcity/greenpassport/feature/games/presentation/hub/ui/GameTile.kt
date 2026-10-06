@@ -41,6 +41,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import com.smartcity.greenpassport.core.designsystem.component.NetworkImage
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
+import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.model.games.Game
 import com.smartcity.greenpassport.feature.games.presentation.hub.state.gameGradient
 import com.smartcity.greenpassport.feature.games.presentation.hub.state.gameIcon
@@ -111,7 +112,8 @@ fun GameTile(
 
 @Composable
 private fun GameArtwork(game: Game) {
-    val colors = gameGradient(game) ?: listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primary)
+    val fallback = GreenPassportTheme.brandColors.forestDeep
+    val colors = gameGradient(game) ?: listOf(fallback, fallback)
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
         modifier = Modifier

@@ -53,6 +53,7 @@ object Dimens {
     val ArchiveHideDistance = 24.dp
     val MenuShadowElevation = 8.dp
     val MenuMinWidth = 200.dp
+    val HeroGlowElevation = 20.dp
     val CouponQrSize = 200.dp
     val InputFieldHeight = 50.dp
     val ProgressHeroHeight = 140.dp

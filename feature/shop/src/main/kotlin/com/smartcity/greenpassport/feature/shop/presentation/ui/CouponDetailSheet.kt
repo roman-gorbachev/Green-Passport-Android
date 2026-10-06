@@ -34,6 +34,7 @@ import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSheetScaffold
 import com.smartcity.greenpassport.core.designsystem.text.localized
 import com.smartcity.greenpassport.core.designsystem.theme.Dimens
+import com.smartcity.greenpassport.core.designsystem.theme.GreenPassportTheme
 import com.smartcity.greenpassport.core.model.CouponStatus
 import com.smartcity.greenpassport.feature.shop.R
 import com.smartcity.greenpassport.feature.shop.presentation.state.CouponDetailUiState
@@ -171,8 +172,8 @@ private fun CouponCodeBlock(
 ) {
     val cardGradient = Brush.linearGradient(
         listOf(
-            MaterialTheme.colorScheme.primary,
-            MaterialTheme.colorScheme.primary.copy(alpha = CARD_GRADIENT_END_ALPHA),
+            GreenPassportTheme.brandColors.forestDeep,
+            GreenPassportTheme.brandColors.forestDeep.copy(alpha = CARD_GRADIENT_END_ALPHA),
         ),
     )
     val onCardColor = MaterialTheme.colorScheme.onPrimary
