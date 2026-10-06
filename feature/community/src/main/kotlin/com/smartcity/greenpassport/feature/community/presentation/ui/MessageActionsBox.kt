@@ -9,12 +9,7 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Flag
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +20,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import com.smartcity.greenpassport.core.designsystem.component.GpDropdownMenu
+import com.smartcity.greenpassport.core.designsystem.component.GpDropdownMenuItem
 import com.smartcity.greenpassport.core.model.moderation.ReportReason
 import com.smartcity.greenpassport.feature.community.R
 import com.smartcity.greenpassport.feature.community.presentation.state.MessageAction
@@ -50,7 +47,7 @@ fun MessageActionsBox(
         ),
     ) {
         content()
-        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+        GpDropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
             val select = { action: MessageAction ->
                 isExpanded = false
                 onAction(action, target)
@@ -86,10 +83,5 @@ private fun ActionItem(
     isDestructive: Boolean = false,
     onClick: () -> Unit,
 ) {
-    val color = if (isDestructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
-    DropdownMenuItem(
-        text = { Text(text = title, color = color) },
-        leadingIcon = { Icon(imageVector = icon, contentDescription = null, tint = color) },
-        onClick = onClick,
-    )
+    GpDropdownMenuItem(text = title, icon = icon, onClick = onClick, isDestructive = isDestructive)
 }

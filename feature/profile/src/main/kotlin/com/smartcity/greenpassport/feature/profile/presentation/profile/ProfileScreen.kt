@@ -35,8 +35,6 @@ import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -58,6 +56,8 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.ErrorContent
+import com.smartcity.greenpassport.core.designsystem.component.GpDropdownMenu
+import com.smartcity.greenpassport.core.designsystem.component.GpDropdownMenuItem
 import com.smartcity.greenpassport.core.designsystem.component.ListSection
 import com.smartcity.greenpassport.core.designsystem.component.ListSectionRow
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
@@ -379,14 +379,16 @@ private fun ThemeRow(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                DropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }) {
+                GpDropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }) {
                     AppTheme.entries.forEach { theme ->
-                        DropdownMenuItem(
-                            text = { Text(stringResource(themeLabelRes(theme))) },
+                        GpDropdownMenuItem(
+                            text = stringResource(themeLabelRes(theme)),
+                            icon = themeIcon(theme),
                             onClick = {
                                 isMenuOpen = false
                                 onSelect(theme)
                             },
+                            isSelected = theme == selected,
                         )
                     }
                 }
@@ -429,14 +431,16 @@ private fun LanguageRow(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                DropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }) {
+                GpDropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }) {
                     AppLanguage.entries.forEach { language ->
-                        DropdownMenuItem(
-                            text = { Text(stringResource(appLanguageLabelRes(language))) },
+                        GpDropdownMenuItem(
+                            text = stringResource(appLanguageLabelRes(language)),
+                            icon = null,
                             onClick = {
                                 isMenuOpen = false
                                 viewModel.onLanguageSelected(language)
                             },
+                            isSelected = language == selected,
                         )
                     }
                 }

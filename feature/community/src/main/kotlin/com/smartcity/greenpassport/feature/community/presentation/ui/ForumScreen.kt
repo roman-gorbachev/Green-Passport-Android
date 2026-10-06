@@ -17,13 +17,12 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Flag
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +34,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
+import com.smartcity.greenpassport.core.designsystem.component.GpDropdownMenu
+import com.smartcity.greenpassport.core.designsystem.component.GpDropdownMenuItem
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
 import com.smartcity.greenpassport.core.designsystem.component.MessageComposer
 import com.smartcity.greenpassport.core.designsystem.component.ProfileAvatar
@@ -75,6 +76,7 @@ fun ForumScreen(
             else -> viewModel.onMessageAction(action, target)
         }
     }
+    FollowNewestPostEffect(listState = listState, newestPostId = uiState.posts.firstOrNull()?.id)
     val onQuoteClick = { messageId: String ->
         val index = uiState.posts.indexOfFirst { it.id == messageId }
         if (index >= 0) scope.launch { listState.animateScrollToItem(index) }
@@ -224,10 +226,11 @@ private fun ReportMenu(onReport: (ReportReason) -> Unit) {
                 tint = MaterialTheme.colorScheme.outline,
             )
         }
-        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+        GpDropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
             ReportReason.entries.forEach { reason ->
-                DropdownMenuItem(
-                    text = { Text(stringResource(reportReasonLabelRes(reason))) },
+                GpDropdownMenuItem(
+                    text = stringResource(reportReasonLabelRes(reason)),
+                    icon = null,
                     onClick = {
                         isExpanded = false
                         onReport(reason)
@@ -237,3 +240,14 @@ private fun ReportMenu(onReport: (ReportReason) -> Unit) {
         }
     }
 }
+
+@Composable
+private fun FollowNewestPostEffect(listState: LazyListState, newestPostId: String?) {
+    LaunchedEffect(newestPostId) {
+        if (newestPostId != null && listState.firstVisibleItemIndex <= NEWEST_POST_FOLLOW_INDEX) {
+            listState.animateScrollToItem(0)
+        }
+    }
+}
+
+private const val NEWEST_POST_FOLLOW_INDEX = 1

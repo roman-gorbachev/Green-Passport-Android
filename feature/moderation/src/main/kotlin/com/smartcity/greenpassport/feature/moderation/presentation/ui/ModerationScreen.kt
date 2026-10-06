@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -32,6 +30,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smartcity.greenpassport.core.designsystem.component.EmptyContent
+import com.smartcity.greenpassport.core.designsystem.component.GpDropdownMenu
+import com.smartcity.greenpassport.core.designsystem.component.GpDropdownMenuItem
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.GpSurfaceCard
 import com.smartcity.greenpassport.core.designsystem.component.LoadingContent
@@ -199,10 +199,11 @@ private fun RejectMenu(
         TextButton(onClick = { isExpanded = true }, enabled = enabled) {
             Text(text = stringResource(R.string.reject), color = MaterialTheme.colorScheme.error)
         }
-        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+        GpDropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
             reasons.forEach { reason ->
-                DropdownMenuItem(
-                    text = { Text(reason) },
+                GpDropdownMenuItem(
+                    text = reason,
+                    icon = null,
                     onClick = {
                         isExpanded = false
                         onReject(reason)

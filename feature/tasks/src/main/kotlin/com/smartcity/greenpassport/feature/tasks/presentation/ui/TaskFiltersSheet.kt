@@ -12,8 +12,6 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.LocationCity
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import com.smartcity.greenpassport.core.designsystem.component.GpDropdownMenu
+import com.smartcity.greenpassport.core.designsystem.component.GpDropdownMenuItem
 import com.smartcity.greenpassport.core.designsystem.component.GpPrimaryButton
 import com.smartcity.greenpassport.core.designsystem.component.ListSection
 import com.smartcity.greenpassport.core.designsystem.component.ListSectionRow
@@ -210,15 +210,16 @@ private fun CityRow(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
-                DropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }) {
+                GpDropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }) {
                     options.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(cityLabel(option, profileCity)) },
-                            trailingIcon = { CheckMark(isVisible = option == selected) },
+                        GpDropdownMenuItem(
+                            text = cityLabel(option, profileCity),
+                            icon = null,
                             onClick = {
                                 isMenuOpen = false
                                 onSelect(option)
                             },
+                            isSelected = option == selected,
                         )
                     }
                 }

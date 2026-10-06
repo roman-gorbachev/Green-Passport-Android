@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -75,7 +74,6 @@ fun CommunityHubScreen(
     val listState = rememberLazyListState()
     var isArchiveRevealed by rememberSaveable { mutableStateOf(false) }
     val archiveConnection = rememberArchiveRevealConnection(
-        listState = listState,
         onReveal = { isArchiveRevealed = true },
         onHide = { isArchiveRevealed = false },
     )
@@ -262,22 +260,27 @@ private fun forumActions(currentUserId: String?): List<ChatListAction> =
 
 @Composable
 private fun rememberArchiveRevealConnection(
-    listState: LazyListState,
     onReveal: () -> Unit,
     onHide: () -> Unit,
 ): NestedScrollConnection {
-    val revealDistance = with(LocalDensity.current) { Dimens.ArchiveRevealDistance.toPx() }
-    return remember(listState, revealDistance) {
+    val density = LocalDensity.current
+    val revealDistance = with(density) { Dimens.ArchiveRevealDistance.toPx() }
+    val hideDistance = with(density) { Dimens.ArchiveHideDistance.toPx() }
+    return remember(revealDistance, hideDistance) {
         object : NestedScrollConnection {
             private var pulled = 0f
+            private var pushed = 0f
 
             override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
-                if (available.y > 0f) {
+                val delta = consumed.y + available.y
+                if (delta > 0f && available.y > 0f) {
+                    pushed = 0f
                     pulled += available.y
                     if (pulled > revealDistance) onReveal()
-                } else if (consumed.y < 0f) {
+                } else if (delta < 0f) {
                     pulled = 0f
-                    if (listState.firstVisibleItemIndex > 0) onHide()
+                    pushed -= delta
+                    if (pushed > hideDistance) onHide()
                 }
                 return Offset.Zero
             }

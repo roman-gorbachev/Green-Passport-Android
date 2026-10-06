@@ -9,12 +9,9 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +20,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.smartcity.greenpassport.core.designsystem.component.GpDropdownMenu
+import com.smartcity.greenpassport.core.designsystem.component.GpDropdownMenuItem
 import com.smartcity.greenpassport.core.model.CommunityGroup
 import com.smartcity.greenpassport.feature.community.R
 
@@ -47,32 +46,27 @@ fun GroupMenuButton(
                 tint = MaterialTheme.colorScheme.primary,
             )
         }
-        DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
-            DropdownMenuItem(
-                text = { Text(stringResource(if (isMuted) R.string.unmute_chat else R.string.mute_chat)) },
-                leadingIcon = {
-                    Icon(
-                        imageVector = if (isMuted) Icons.Filled.Notifications else Icons.Filled.NotificationsOff,
-                        contentDescription = null,
-                    )
-                },
+        GpDropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+            GpDropdownMenuItem(
+                text = stringResource(if (isMuted) R.string.unmute_chat else R.string.mute_chat),
+                icon = if (isMuted) Icons.Filled.Notifications else Icons.Filled.NotificationsOff,
                 onClick = {
                     isExpanded = false
                     onToggleMute()
                 },
             )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.group_members)) },
-                leadingIcon = { Icon(imageVector = Icons.Filled.People, contentDescription = null) },
+            GpDropdownMenuItem(
+                text = stringResource(R.string.group_members),
+                icon = Icons.Filled.People,
                 onClick = {
                     isExpanded = false
                     onShowMembers()
                 },
             )
             if (inviteText != null) {
-                DropdownMenuItem(
-                    text = { Text(inviteTitle) },
-                    leadingIcon = { Icon(imageVector = Icons.Filled.PersonAdd, contentDescription = null) },
+                GpDropdownMenuItem(
+                    text = inviteTitle,
+                    icon = Icons.Filled.PersonAdd,
                     onClick = {
                         isExpanded = false
                         val intent = Intent(Intent.ACTION_SEND).apply {
@@ -83,19 +77,14 @@ fun GroupMenuButton(
                     },
                 )
             }
-            DropdownMenuItem(
-                text = { Text(text = stringResource(R.string.leave_group), color = MaterialTheme.colorScheme.error) },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error,
-                    )
-                },
+            GpDropdownMenuItem(
+                text = stringResource(R.string.leave_group),
+                icon = Icons.AutoMirrored.Filled.Logout,
                 onClick = {
                     isExpanded = false
                     onLeave()
                 },
+                isDestructive = true,
             )
         }
     }
