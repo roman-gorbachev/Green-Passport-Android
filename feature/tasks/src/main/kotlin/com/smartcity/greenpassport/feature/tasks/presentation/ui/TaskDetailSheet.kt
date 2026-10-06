@@ -4,8 +4,11 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -145,6 +148,7 @@ private fun PhotoSourceDialog(
     )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TaskDetailContent(
     task: Task,
@@ -182,8 +186,10 @@ private fun TaskDetailContent(
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
+                        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingExtraSmall),
+                        itemVerticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(top = Dimens.SpacingExtraSmall),
                     ) {
                         PointsChip(points = task.rewardPoints)
@@ -191,7 +197,8 @@ private fun TaskDetailContent(
                             text = stringResource(verificationLabelRes(task.verification)),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.padding(start = Dimens.SpacingSmall),
+                            maxLines = 1,
+                            softWrap = false,
                         )
                     }
                 }

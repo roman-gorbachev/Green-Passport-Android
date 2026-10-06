@@ -16,4 +16,6 @@
     <string name="calendar_no_events_on_day">У гэты дзень мерапрыемстваў няма</string>
     <string name="calendar_previous_month">Папярэдні месяц</string>
     <string name="calendar_next_month">Наступны месяц</string>
+    <string name="not_registered">Не запісаныя</string>
+    <string name="registered">Запісаныя</string>
 </resources>

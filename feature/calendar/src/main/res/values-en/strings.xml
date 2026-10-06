@@ -15,4 +15,6 @@
     <string name="calendar_no_events_on_day">No events on this day</string>
     <string name="calendar_previous_month">Previous month</string>
     <string name="calendar_next_month">Next month</string>
+    <string name="not_registered">Not registered</string>
+    <string name="registered">Registered</string>
 </resources>

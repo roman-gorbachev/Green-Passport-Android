@@ -33,6 +33,7 @@ object Dimens {
     val LoadingIndicatorSize = 16.dp
     val CalendarDaySize = 36.dp
     val CalendarBadgeMinSize = 16.dp
+    val CalendarLegendDotSize = 8.dp
     val ArticleCoverHeight = 220.dp
     val ArticleThumbnailSize = 64.dp
     val RewardThumbnailSize = 56.dp

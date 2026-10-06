@@ -1,6 +1,7 @@
 package com.smartcity.greenpassport.feature.calendar.presentation.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -76,17 +77,22 @@ fun CalendarScreen(
         ) {
             item(key = MONTH_KEY) {
                 GpSurfaceCard(modifier = Modifier.fillMaxWidth()) {
-                    MonthCalendar(
-                        month = uiState.visibleMonth,
-                        selectedDay = uiState.selectedDay,
-                        dayCounts = uiState.dayCounts,
-                        onMonthChange = viewModel::onMonthChange,
-                        onDaySelected = { day ->
-                            viewModel.onDaySelected(day)
-                            coroutineScope.launch { listState.animateScrollToItem(DAY_TITLE_ITEM_INDEX) }
-                        },
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSmall),
                         modifier = Modifier.padding(Dimens.CardPadding),
-                    )
+                    ) {
+                        MonthCalendar(
+                            month = uiState.visibleMonth,
+                            selectedDay = uiState.selectedDay,
+                            dayCounts = uiState.dayCounts,
+                            onMonthChange = viewModel::onMonthChange,
+                            onDaySelected = { day ->
+                                viewModel.onDaySelected(day)
+                                coroutineScope.launch { listState.animateScrollToItem(DAY_TITLE_ITEM_INDEX) }
+                            },
+                        )
+                        CalendarLegend()
+                    }
                 }
             }
             item(key = DAY_TITLE_KEY) {
