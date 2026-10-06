@@ -28,3 +28,16 @@ export function selectRecipients(filter: RecipientFilter): string[] {
     id !== filter.senderId && !filter.disabledUserIds.has(id) && !filter.mutedUserIds.has(id),
   );
 }
+
+export type RevisionKind = 'EDIT' | 'DELETE';
+
+export interface PostVersion {
+  text: string;
+  deleted: boolean;
+}
+
+export function revisionKind(before: PostVersion, after: PostVersion): RevisionKind | null {
+  if (!before.text || before.deleted) return null;
+  if (after.deleted) return 'DELETE';
+  return after.text !== before.text ? 'EDIT' : null;
+}

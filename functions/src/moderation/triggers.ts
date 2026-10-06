@@ -92,7 +92,7 @@ export const moderateContent = onCall({ region: REGION }, async (request): Promi
 
   const postRef = db.doc(paths.post(postId));
   if (action === 'delete') {
-    await postRef.delete();
+    await db.recursiveDelete(postRef);
   } else {
     await postRef.update({
       hidden: action === 'hide',

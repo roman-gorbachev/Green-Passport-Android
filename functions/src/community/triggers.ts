@@ -3,8 +3,10 @@ import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/fire
 import { APP_ROOT, FIRESTORE_TRIGGER_REGION } from '../config';
 import { db, paths } from '../db';
 import { isTextAllowed } from '../moderation/wordFilter';
-import { FORUM_CHAT_ID, type ChatMessageData } from './chatPayload';
+import { FORUM_CHAT_ID, revisionKind, type ChatMessageData, type PostVersion } from './chatPayload';
 import { forumRecipients, groupRecipients, sendChatPush } from './chatPush';
+
+const POST_REVISIONS_COLLECTION = 'revisions';
 
 function messageData(snapshot: DocumentSnapshot, nameField: string): ChatMessageData {
   const name = snapshot.get(nameField);
@@ -27,12 +29,28 @@ async function scrubReplies(collection: CollectionReference, messageId: string):
   await batch.commit();
 }
 
+function postVersion(snapshot: DocumentSnapshot): PostVersion {
+  return { text: String(snapshot.get('text') ?? ''), deleted: snapshot.get('deleted') === true };
+}
+
+async function saveRevision(before: DocumentSnapshot, after: DocumentSnapshot): Promise<void> {
+  const kind = revisionKind(postVersion(before), postVersion(after));
+  if (!kind) return;
+  await before.ref.collection(POST_REVISIONS_COLLECTION).add({
+    text: String(before.get('text') ?? ''),
+    kind,
+    changedAtEpochMillis: kind === 'EDIT' ? Number(after.get('editedAtEpochMillis') ?? Date.now()) : Date.now(),
+    authorId: String(before.get('authorId') ?? ''),
+  });
+}
+
 export const onForumPostUpdated = onDocumentUpdated(
   { region: FIRESTORE_TRIGGER_REGION, document: `${APP_ROOT}/posts/{postId}` },
   async (event) => {
     const before = event.data?.before;
     const after = event.data?.after;
     if (!before || !after) return;
+    await saveRevision(before, after);
     if (becameDeleted(before, after)) {
       await scrubReplies(db.collection(paths.posts()), event.params.postId);
       return;

@@ -343,3 +343,18 @@ test('chat settings and devices are private to their owner', async () => {
   await assertFails(setDoc(doc(firestoreOf(ALICE), `${ROOT}/userDevices/token3`), { ...device, platform: 'WEB' }));
   await assertSucceeds(deleteDoc(aliceDevice));
 });
+
+test('forum post history is read only by moderators and written by nobody', async () => {
+  await env.withSecurityRulesDisabled(async (context) => {
+    await setDoc(doc(context.firestore(), `${ROOT}/posts/post1/revisions/r1`), {
+      text: 'Было', kind: 'EDIT', changedAtEpochMillis: 2, authorId: BOB,
+    });
+  });
+  const revisions = (uid) => collection(firestoreOf(uid), `${ROOT}/posts/post1/revisions`);
+  await assertFails(getDocs(revisions(BOB)));
+  await assertFails(getDocs(revisions(ALICE)));
+  await assertFails(getDoc(doc(revisions(BOB), 'r1')));
+  await assertSucceeds(getDocs(revisions(ADMIN)));
+  await assertFails(setDoc(doc(revisions(BOB), 'r2'), { text: 'Подделка', kind: 'EDIT', changedAtEpochMillis: 3 }));
+  await assertFails(setDoc(doc(revisions(ADMIN), 'r3'), { text: 'Подделка', kind: 'EDIT', changedAtEpochMillis: 3 }));
+});

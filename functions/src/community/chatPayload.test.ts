@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { PREVIEW_MAX_LENGTH, messageBody, selectRecipients } from './chatPayload';
+import { PREVIEW_MAX_LENGTH, messageBody, revisionKind, selectRecipients } from './chatPayload';
 
 test('the body is the sender name and the text, or the text alone', () => {
   assert.equal(messageBody({ senderName: 'Алиса', text: ' Привет ', isForwarded: false }), 'Алиса: Привет');
@@ -22,4 +22,12 @@ test('recipients exclude the sender, muted chats and disabled notifications', ()
     mutedUserIds: new Set(['dave']),
   });
   assert.deepEqual(recipients, ['bob']);
+});
+
+test('an edit or a deletion of a post is a revision, other updates are not', () => {
+  const original = { text: 'Привет', deleted: false };
+  assert.equal(revisionKind(original, { text: 'Привет всем', deleted: false }), 'EDIT');
+  assert.equal(revisionKind(original, { text: '', deleted: true }), 'DELETE');
+  assert.equal(revisionKind(original, { text: 'Привет', deleted: false }), null);
+  assert.equal(revisionKind({ text: '', deleted: true }, { text: '', deleted: true }), null);
 });
